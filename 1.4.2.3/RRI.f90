@@ -67,7 +67,7 @@ integer maxhydro
 call RRI_Read
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! STEP 1: FILE READING 
+!!! STEP 1: FILE READING
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! max timestep
@@ -106,7 +106,7 @@ write(*,*) "num_of_landuse : ", num_of_landuse
 where( land .le. 0 .or. land .gt. num_of_landuse ) land = num_of_landuse
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! STEP 2: CALC PREPARATION 
+!!! STEP 2: CALC PREPARATION
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! dx, dy calc
@@ -179,7 +179,7 @@ if( rivfile_switch .ge. 1 ) then
  call read_gis_real(depthfile, depth)
  call read_gis_real(heightfile, height)
  where( height(:,:) .lt. 0.d0 ) height(:,:) = 0.d0
-endif 
+endif
 where(riv.eq.1) len_riv = length
 
 ! river cross section is set by section files
@@ -571,7 +571,7 @@ call sub_riv_ij2idx( hr, hr_idx )
 !              qr_ave_idx, qg_ave_idx, qp_t_idx)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! STEP 3: CALCULATION 
+!!! STEP 3: CALCULATION
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 rain_sum = 0.d0
@@ -602,7 +602,7 @@ do t = 1, maxt
  if( dam_switch .eq. 1 ) dam_vol_temp(:) = 0.d0
 
  ! hr -> hr_idx
- ! Memo: riv_ij2idx must be here. 
+ ! Memo: riv_ij2idx must be here.
  ! hr_idx cannot be replaced within the following do loop.
  call sub_riv_ij2idx( hr, hr_idx )
 
@@ -632,7 +632,7 @@ do t = 1, maxt
 1 continue
   qr_ave_temp_idx(:) = 0.d0
 
-  ! Adaptive Runge-Kutta 
+  ! Adaptive Runge-Kutta
   ! (1)
   call funcr( vr_idx, fr, qr_idx )
   vr_temp = vr_idx + b21 * ddt * fr
@@ -719,7 +719,7 @@ do t = 1, maxt
  qs_ave_idx = 0.d0
 
  ! hs -> hs_idx
- ! Memo: slo_ij2idx must be here. 
+ ! Memo: slo_ij2idx must be here.
  ! hs_idx cannot be replaced within the following do loop.
  call sub_slo_ij2idx( hs, hs_idx )
  call sub_slo_ij2idx( gampt_ff, gampt_ff_idx ) ! modified by T.Sayama on June 10, 2017
@@ -757,7 +757,7 @@ do t = 1, maxt
 3 continue
   qs_ave_temp_idx(:,:) = 0.d0
 
-  ! Adaptive Runge-Kutta 
+  ! Adaptive Runge-Kutta
   ! (1)
   call funcs( hs_idx, qp_t_idx, fs, qs_idx )
   hs_temp = hs_idx + b21 * ddt * fs
@@ -840,7 +840,7 @@ do t = 1, maxt
  qg_ave_idx = 0.d0
 
  ! hg -> hg_idx
- ! Memo: slo_ij2idx must be here. 
+ ! Memo: slo_ij2idx must be here.
  ! hg_idx cannot be replaced within the following do loop.
  call sub_slo_ij2idx( hg, hg_idx )
  !call sub_slo_ij2idx( gampt_ff, gampt_ff_idx ) ! modified by T.Sayama on June 10, 2017
@@ -858,7 +858,7 @@ do t = 1, maxt
 5 continue
   qg_ave_temp_idx(:,:) = 0.d0
 
-  ! Adaptive Runge-Kutta 
+  ! Adaptive Runge-Kutta
   ! (1)
   call funcg( hg_idx, fg, qg_idx )
   hg_temp = hg_idx + b21 * ddt * fg
