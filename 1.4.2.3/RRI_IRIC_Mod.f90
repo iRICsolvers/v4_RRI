@@ -39,13 +39,13 @@ contains
     implicit none
 
     character(len=*),intent(in):: name
-    integer, dimension(:,:), allocatable, intent(out):: v
+    integer, intent(out):: v(ny, nx)
 
     integer, dimension(:,:), allocatable:: tmpv
     integer:: i, j, ierr
 
     allocate(tmpv(nx, ny))
-    call cg_iric_read_grid_integer_cell_f(cgns_f, name, tmpv, ierr)
+    call cg_iric_read_grid_integer_cell_f(name, tmpv, ierr)
 
     do i = 1, nx
       do j = 1, ny
@@ -59,13 +59,13 @@ contains
     implicit none
 
     character(len=*),intent(in):: name
-    double precision, dimension(:,:), allocatable, intent(out):: v
+    double precision, intent(out):: v(ny, nx)
 
     double precision, dimension(:,:), allocatable:: tmpv
     integer:: i, j, ierr
 
     allocate(tmpv(nx, ny))
-    call cg_iric_read_grid_real_cell_f(cgns_f, name, tmpv, ierr)
+    call cg_iric_read_grid_real_cell_f(name, tmpv, ierr)
 
     do i = 1, nx
       do j = 1, ny
@@ -92,7 +92,7 @@ contains
       end do
     end do
 
-    call cg_iric_write_sol_cell_real_f(cgns_f, name, tmpv, ierr)
+    call cg_iric_write_sol_cell_real_f(name, tmpv, ierr)
   end subroutine
 
   subroutine iric_read_grid()
