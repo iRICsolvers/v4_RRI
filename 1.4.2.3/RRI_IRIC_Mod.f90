@@ -102,12 +102,15 @@ contains
     double precision, dimension(:,:), allocatable:: grid_x, grid_y
 
     call cg_iric_gotogridcoord2d_f(isize, jsize, ierr)
+    print *, "isize, jsize", isize, jsize
     if (ierr /= 0) stop "CGNS grid read error"
     allocate(grid_x(isize, jsize), grid_y(isize, jsize))
+    print *, "grid_x, grid_y allocated"
     call cg_iric_getgridcoord2d_f(grid_x, grid_y, ierr)
+    print *, "cg_iric_getgridcoord2d_f called"
 
     ! iRIC から読み込んだ格子はメートル単位の座標系
-    utm = 1
+    ! utm = 1
     xllcorner = grid_x(1, 1)
     yllcorner = grid_y(1, 1)
     cellsize = grid_x(2, 1) - grid_x(1, 1)
@@ -119,13 +122,18 @@ contains
     allocate(dir(ny, nx))
     allocate(land(ny, nx))
 
+    print *, "iric_read_cell_attr_real Elevation"
     call iric_read_cell_attr_real("Elevation", zs)
+    print *, "iric_read_cell_attr_int Acc"
     call iric_read_cell_attr_int("Acc", acc)
+    print *, "iric_read_cell_attr_int Dir"
     call iric_read_cell_attr_int("Dir", dir)
     land = 1
     if (land_switch.eq.1) then
+      print *, "iric_read_cell_attr_int Land"
       call iric_read_cell_attr_int("Land", land)
     endif
+    print *, "iric_read_cell_attr_real all ok"
 
     ! ONLY FOR DEBUGGING
     print *, "ISIZE, JSIZE = ", isize, jsize
