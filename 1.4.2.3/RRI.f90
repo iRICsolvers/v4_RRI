@@ -9,6 +9,7 @@ use globals
 use runge_mod
 use dam_mod, only: dam_switch, dam_vol_temp
 use tecout_mod
+use iric
 implicit none
 
 ! variable definition
@@ -73,33 +74,37 @@ call RRI_Read
 ! max timestep
 maxt = lasth * 3600 / dt
 
-! dem file
-open( 10, file = demfile, status = "old" )
-read(10,*) ctemp, nx
-read(10,*) ctemp, ny
-read(10,*) ctemp, xllcorner
-read(10,*) ctemp, yllcorner
-read(10,*) ctemp, cellsize
-read(10,*) ctemp, nodata
-close(10)
+! load data from CGNS file
+call iric_cgns_open
+call iric_read_input_condition
 
-allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
-call read_gis_real(demfile, zs)
+! dem data is now read from CGNS file
+! open( 10, file = demfile, status = "old" )
+! read(10,*) ctemp, nx
+! read(10,*) ctemp, ny
+! read(10,*) ctemp, xllcorner
+! read(10,*) ctemp, yllcorner
+! read(10,*) ctemp, cellsize
+! read(10,*) ctemp, nodata
+! close(10)
+
+! allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
+! call read_gis_real(demfile, zs)
 
 ! flow accumulation file
-allocate (riv(ny, nx), acc(ny, nx))
-call read_gis_int(accfile, acc)
+! allocate (riv(ny, nx), acc(ny, nx))
+! call read_gis_int(accfile, acc)
 
 ! flow direction file
-allocate (dir(ny, nx))
-call read_gis_int(dirfile, dir)
+! allocate (dir(ny, nx))
+! call read_gis_int(dirfile, dir)
 
 ! landuse file
-allocate( land(ny, nx) )
-land = 1
-if( land_switch.eq.1 ) then
- call read_gis_int(landfile, land)
-endif
+! allocate( land(ny, nx) )
+! land = 1
+! if( land_switch.eq.1 ) then
+!   call read_gis_int(landfile, land)
+! endif
 
 ! land : 1 ... num_of_landuse
 write(*,*) "num_of_landuse : ", num_of_landuse
@@ -1111,6 +1116,8 @@ i = ny, 1, -1)
  endif
 
 enddo
+
+call iric_cgns_close
 
 !pause
 
