@@ -1086,6 +1086,8 @@ i = ny, 1, -1)
   if(outswitch_gv .ne. 0) close(107)
   if(outswitch_gampt_ff .ne. 0) close(108)
 
+  call iric_cgns_output_result
+
   if( tec_switch .eq. 1 ) then
    if (tt .eq. 1) then
     call Tecout_alloc(nx, ny, 4)

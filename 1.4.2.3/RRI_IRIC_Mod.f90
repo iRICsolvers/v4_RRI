@@ -73,6 +73,48 @@ contains
     end do
   end subroutine
 
+  subroutine iric_write_result_int(name, v)
+    use globals
+    implicit none
+
+    character(len=*),intent(in):: name
+    integer, dimension(:,:), allocatable, intent(in):: v
+
+    integer, dimension(:,:), allocatable:: tmpv
+    integer:: i, j, ierr
+
+    allocate(tmpv(nx, ny))
+
+    do i = 1, nx
+      do j = 1, ny
+        tmpv(i, j) = v(j, i)
+      end do
+    end do
+
+    call cg_iric_write_sol_cell_integer_f(cgns_f, name, tmpv, ierr)
+  end subroutine
+
+  subroutine iric_write_result_real(name, v)
+    use globals
+    implicit none
+
+    character(len=*),intent(in):: name
+    double precision, dimension(:,:), allocatable, intent(in):: v
+
+    double precision, dimension(:,:), allocatable:: tmpv
+    integer:: i, j, ierr
+
+    allocate(tmpv(nx, ny))
+
+    do i = 1, nx
+      do j = 1, ny
+        tmpv(i, j) = v(j, i)
+      end do
+    end do
+
+    call cg_iric_write_sol_cell_integer_f(cgns_f, name, tmpv, ierr)
+  end subroutine
+
   subroutine iric_read_grid()
     use globals
 
@@ -112,4 +154,118 @@ contains
 
     deallocate(grid_x, grid_y)
   end subroutine
+
+  subroutine iric_write_qu(qs_ave)
+    use globals
+    implicit none
+
+    double precision, dimension(:,:,:), allocatable, intent(in):: qs_ave
+    double precision, dimension(:,:), allocatable:: v
+    integer:: i, j
+
+    allocate(v(ny, nx))
+    do i = 1, ny
+      do j = 1, nx
+        v(i, j) = ((qs_ave(1, i, j) + (qs_ave(3, i, j) - qs_ave(4, i, j)) / 2.d0) * area)
+      end do
+    end do
+    call iric_write_result_real('qu', v)
+    deallocate(v)
+  end subroutine
+
+  subroutine iric_write_qv(qs_ave)
+    use globals
+    implicit none
+
+    double precision, dimension(:,:,:), allocatable, intent(in):: qs_ave
+    double precision, dimension(:,:), allocatable:: v
+    integer:: i, j
+
+    allocate(v(ny, nx))
+    do i = 1, ny
+      do j = 1, nx
+        v(i, j) = ((qs_ave(2, i, j) + (qs_ave(3, i, j) + qs_ave(4, i, j)) / 2.d0) * area)
+      end do
+    end do
+    call iric_write_result_real('qv', v)
+    deallocate(v)
+  end subroutine
+
+  subroutine iric_write_gu(qg_ave)
+    use globals
+    implicit none
+
+    double precision, dimension(:,:,:), allocatable, intent(in):: qg_ave
+    double precision, dimension(:,:), allocatable:: v
+    integer:: i, j
+
+    allocate(v(ny, nx))
+    do i = 1, ny
+      do j = 1, nx
+        v(i, j) = ((qg_ave(1, i, j) + (qg_ave(3, i, j) - qg_ave(4, i, j)) / 2.d0) * area)
+      end do
+    end do
+    call iric_write_result_real('gu', v)
+    deallocate(v)
+  end subroutine
+
+  subroutine iric_write_gv(qg_ave)
+    use globals
+    implicit none
+
+    double precision, dimension(:,:,:), allocatable, intent(in):: qg_ave
+    double precision, dimension(:,:), allocatable:: v
+    integer:: i, j
+
+    allocate(v(ny, nx))
+    do i = 1, ny
+      do j = 1, nx
+        v(i, j) = ((qg_ave(2, i, j) + (qg_ave(3, i, j) + qg_ave(4, i, j)) / 2.d0) * area)
+      end do
+    end do
+    call iric_write_result_real('gu', v)
+    deallocate(v)
+  end subroutine
+
+  subroutine iric_cgns_output_result( &
+    hs,hr,hg,ar_ave,qs_ave,qg_ave)
+    use globals
+
+    double precision, dimension(:,:), allocatable, intent(in):: &
+      hs, hr, hg, ar_ave
+    double precision, dimension(:,:,:), allocatable, intent(in):: &
+      qs_ave, qg_ave
+    integer:: ierr
+
+    call cg_iric_write_sol_time_f(cgns_f, time, ierr)
+
+    if (outswitch_hs /= 0) then
+      call iric_write_result_real('hs', hs)
+    end if
+    if (outswitch_hr /= 0) then
+      call iric_write_result_real('hr', hr)
+    end if
+    if (outswitch_hg /= 0) then
+      call iric_write_result_real('hg', hg)
+    end if
+    if (outswitch_qr /= 0) then
+      call iric_write_result_real('qr', ar_ave)
+    end if
+    if (outswitch_qu /= 0) then
+      call iric_write_qu(qs_ave)
+    end if
+    if (outswitch_qv /= 0) then
+      call iric_write_qv(qs_ave)
+    end if
+    if (outswitch_gu /= 0) then
+      call iric_write_gu(qg_ave)
+    end if
+    if (outswitch_gv /= 0) then
+      call iric_write_gv(qg_ave)
+    end if
+    if (outswitch_gampt_ff /= 0) then
+      call iric_write_result_real('gampt_ff', gampt_ff)
+    end if
+  end subroutine
+
 end module
