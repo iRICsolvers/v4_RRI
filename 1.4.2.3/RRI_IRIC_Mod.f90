@@ -6,6 +6,7 @@ module iric
 
   public iric_cgns_open, iric_cgns_close
   public iric_read_input_condition
+  public iric_cgns_output_result
 
 contains
   subroutine iric_cgns_open()
@@ -73,27 +74,6 @@ contains
     end do
   end subroutine
 
-  subroutine iric_write_result_int(name, v)
-    use globals
-    implicit none
-
-    character(len=*),intent(in):: name
-    integer, dimension(:,:), allocatable, intent(in):: v
-
-    integer, dimension(:,:), allocatable:: tmpv
-    integer:: i, j, ierr
-
-    allocate(tmpv(nx, ny))
-
-    do i = 1, nx
-      do j = 1, ny
-        tmpv(i, j) = v(j, i)
-      end do
-    end do
-
-    call cg_iric_write_sol_cell_integer_f(cgns_f, name, tmpv, ierr)
-  end subroutine
-
   subroutine iric_write_result_real(name, v)
     use globals
     implicit none
@@ -112,7 +92,7 @@ contains
       end do
     end do
 
-    call cg_iric_write_sol_cell_integer_f(cgns_f, name, tmpv, ierr)
+    call cg_iric_write_sol_cell_real_f(cgns_f, name, tmpv, ierr)
   end subroutine
 
   subroutine iric_read_grid()
@@ -228,11 +208,11 @@ contains
   end subroutine
 
   subroutine iric_cgns_output_result( &
-    hs,hr,hg,ar_ave,qs_ave,qg_ave)
+    hs,hr,hg,qr_ave,qs_ave,qg_ave)
     use globals
 
     double precision, dimension(:,:), allocatable, intent(in):: &
-      hs, hr, hg, ar_ave
+      hs, hr, hg, qr_ave
     double precision, dimension(:,:,:), allocatable, intent(in):: &
       qs_ave, qg_ave
     integer:: ierr
@@ -249,7 +229,7 @@ contains
       call iric_write_result_real('hg', hg)
     end if
     if (outswitch_qr /= 0) then
-      call iric_write_result_real('qr', ar_ave)
+      call iric_write_result_real('qr', qr_ave)
     end if
     if (outswitch_qu /= 0) then
       call iric_write_qu(qs_ave)

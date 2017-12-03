@@ -1086,7 +1086,7 @@ i = ny, 1, -1)
   if(outswitch_gv .ne. 0) close(107)
   if(outswitch_gampt_ff .ne. 0) close(108)
 
-  call iric_cgns_output_result
+  call iric_cgns_output_result(hs,hr,hg,qr_ave,qs_ave,qg_ave)
 
   if( tec_switch .eq. 1 ) then
    if (tt .eq. 1) then
