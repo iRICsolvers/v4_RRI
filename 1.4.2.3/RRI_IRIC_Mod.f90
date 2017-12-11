@@ -11,7 +11,7 @@ module iric
 contains
   subroutine iric_cgns_open()
     implicit none
-    include 'cgnslib_f.h'
+    include '..\include\cgnslib_f.h'
 
     integer:: ierr
 
