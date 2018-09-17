@@ -11,15 +11,29 @@ module iric
 contains
   subroutine iric_cgns_open()
     implicit none
-    include 'cgnslib_f.h'
+    include '..\include\cgnslib_f.h'
+    include '..\include\iriclib_f.h'
 
-    integer:: ierr
+    integer:: ierr, icount
 
-    cgns_name = "Case1.cgn"
+    
+    
+    !引数取得
+    icount = nargs()
+    if (icount ==  2) then
+        call getarg(1, cgns_name, ierr)
+    else
+        write(*,"(a)") "You should specify an argument."
+        stop
+    endif
+
     call cg_open_f(cgns_name, CG_MODE_MODIFY, cgns_f, ierr)
     if (ierr /= 0) stop "cg_open_f failed"
     call cg_iric_init_f(cgns_f, ierr)
     if (ierr /= 0) stop "cg_iric_init_f failed"
+    
+    ! guiにcgnsファイルを読込みであることを知らせるファイルを生成
+    call iric_initoption_f(IRIC_OPTION_CANCEL, ierr)
 
   end subroutine
 
@@ -254,6 +268,10 @@ contains
     if (outswitch_gampt_ff /= 0) then
       call iric_write_result_real('gampt_ff', gampt_ff)
     end if
+    
+    !flush
+    call cg_iric_flush_f(cgns_name, cgns_f, ierr)
+    
   end subroutine
 
 end module
