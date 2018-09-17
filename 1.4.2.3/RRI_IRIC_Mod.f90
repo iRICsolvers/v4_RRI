@@ -239,7 +239,7 @@ contains
       qs_ave, qg_ave
     integer:: ierr
 
-    call cg_iric_write_sol_time_f(cgns_f, time, ierr)
+    call cg_iric_write_sol_time_f(time, ierr)
 
     if (outswitch_hs /= 0) then
       call iric_write_result_real('hs', hs)

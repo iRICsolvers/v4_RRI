@@ -686,7 +686,7 @@ do t = 1, maxt
    ! try smaller ddt
    ddt = max( safety * ddt * (errmax ** pshrnk), 0.5d0 * ddt )
    ddt_chk_riv = ddt
-   write(*,*) "shrink (riv): ", ddt, errmax, maxloc( vr_err )
+   !write(*,*) "shrink (riv): ", ddt, errmax, maxloc( vr_err )
    if(ddt.eq.0) stop 'stepsize underflow'
    if(dam_switch .eq. 1 ) dam_vol_temp(:) = 0.d0
    go to 1
@@ -810,7 +810,7 @@ do t = 1, maxt
    ! try smaller ddt
    ddt = max( safety * ddt * (errmax ** pshrnk), 0.5d0 * ddt )
    ddt_chk_slo = ddt
-   write(*,*) "shrink (slo): ", ddt, errmax, maxloc( hs_err )
+   !write(*,*) "shrink (slo): ", ddt, errmax, maxloc( hs_err )
    if(ddt.eq.0) stop 'stepsize underflow'
    go to 3
   else
@@ -905,7 +905,7 @@ do t = 1, maxt
    ! try smaller ddt
    ddt = max( safety * ddt * (errmax ** pshrnk), 0.5d0 * ddt )
    ddt_chk_slo = ddt
-   write(*,*) "shrink (gw): ", ddt, errmax, maxloc( hg_err )
+   !write(*,*) "shrink (gw): ", ddt, errmax, maxloc( hg_err )
    if(ddt.eq.0) stop 'stepsize underflow'
    go to 5
   else
@@ -972,9 +972,9 @@ do t = 1, maxt
  call sub_slo_ij2idx( hs, hs_idx )
  call sub_slo_ij2idx( hg, hg_idx )
 
- write(*,*) "max hr: ", maxval(hr), "loc : ", maxloc(hr)
- write(*,*) "max hs: ", maxval(hs), "loc : ", maxloc(hs)
- if(gw_switch .eq. 1) write(*,*) "max hg: ", maxval(hg), "loc : ", maxloc(hg)
+ !write(*,*) "max hr: ", maxval(hr), "loc : ", maxloc(hr)
+ !write(*,*) "max hs: ", maxval(hs), "loc : ", maxloc(hs)
+ !if(gw_switch .eq. 1) write(*,*) "max hg: ", maxval(hg), "loc : ", maxloc(hg)
 
  !******* OUTPUT *****************************************
 
@@ -1111,8 +1111,8 @@ i = ny, 1, -1)
  ! check water balance
  if(mod(t, 1).eq.0) then
   call storage_calc(hs, hr, hg, ss, sr, si, sg)
-  write(*, '(6e15.3)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
-(rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit)
+  !write(*, '(6e15.3)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
+!(rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit)
   write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
 (rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit), ss, sr, si, sg
  endif
