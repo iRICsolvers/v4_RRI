@@ -62,6 +62,11 @@ parameter( hydro_file = "hydro.txt" )
 integer, allocatable :: hydro_i(:), hydro_j(:)
 integer maxhydro
 
+
+integer, dimension(:,:), allocatable :: acc1, dir1
+real(8), dimension(:,:), allocatable :: zs1
+integer :: ierr
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! STEP 0: FILE NAME AND PARAMETER SETTING
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -76,35 +81,95 @@ maxt = lasth * 3600 / dt
 
 ! load data from CGNS file
 call iric_cgns_open
-call iric_read_input_condition
+!call iric_read_input_condition
 
 ! dem data is now read from CGNS file
-! open( 10, file = demfile, status = "old" )
-! read(10,*) ctemp, nx
-! read(10,*) ctemp, ny
-! read(10,*) ctemp, xllcorner
-! read(10,*) ctemp, yllcorner
-! read(10,*) ctemp, cellsize
-! read(10,*) ctemp, nodata
-! close(10)
+ open( 10, file = demfile, status = "old" )
+ read(10,*) ctemp, nx
+ read(10,*) ctemp, ny
+ read(10,*) ctemp, xllcorner
+ read(10,*) ctemp, yllcorner
+ read(10,*) ctemp, cellsize
+ read(10,*) ctemp, nodata
+ close(10)
 
-! allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
-! call read_gis_real(demfile, zs)
+ allocate(gxx(nx+1,ny+1), gyy(nx+1,ny+1))
+ gxx(1,1) = xllcorner
+ gyy(1,1) = yllcorner
+ do j=2, ny+1
+    gxx(1,j) = gxx(1,1)
+    gyy(1,j) = gyy(1,j-1) + cellsize
+ end do
+
+ do i=2,nx+1
+    gxx(i,1) = gxx(i-1,1) + cellsize 
+    gyy(i,1) = gyy(1,1)
+ end do
+ 
+ do i=2,nx+1
+     do j=2,ny+1
+        gxx(i,j) = gxx(i-1,j) + cellsize 
+        gyy(i,j) = gyy(i,j-1) + cellsize
+     end do
+ end do
+ 
+ allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
+ allocate (zs1(nx, ny), acc1(nx, ny), dir1(nx, ny))
+ call read_gis_real(demfile, zs)
+ 
+ call cg_iric_writegridcoord2d_f(nx+1, ny+1, gxx, gyy, ierr)
+ 
+ !debug----------
+ !call cg_iric_write_sol_time_f(time, ierr)
+ !
+ !call cg_iric_write_sol_gridcoord2d_f(gxx, gyy, ierr)
+ !do i = 1, nx
+ !    do j= 1, ny
+ !        zs1(i,j) = zs(ny-j+1,i)
+ !    end do
+ !end do
+ !
+ !
+ !call cg_iric_write_sol_cell_real_f("zs", zs, ierr)
+ !call cg_iric_write_sol_cell_real_f("zs1", zs1, ierr)
+ !debug----------
 
 ! flow accumulation file
-! allocate (riv(ny, nx), acc(ny, nx))
-! call read_gis_int(accfile, acc)
+ allocate (riv(ny, nx), acc(ny, nx))
+ call read_gis_int(accfile, acc)
+ 
+ !debug----------
+ !do i = 1, nx
+ !    do j= 1, ny
+ !        acc1(i,j) = acc(ny-j+1,i)
+ !    end do
+ !end do
+ !call cg_iric_write_sol_cell_integer_f("acc", acc, ierr)
+ !call cg_iric_write_sol_cell_integer_f("axx1", acc1, ierr)
+ !debug----------
 
 ! flow direction file
-! allocate (dir(ny, nx))
-! call read_gis_int(dirfile, dir)
-
+ allocate (dir(ny, nx))
+ call read_gis_int(dirfile, dir)
+ 
+ !debug----------
+ !do i = 1, nx
+ !    do j= 1, ny
+ !        dir1(i,j) = dir(ny-j+1,i)
+ !    end do
+ !end do
+ !call cg_iric_write_sol_cell_integer_f("dir", dir, ierr)
+ !call cg_iric_write_sol_cell_integer_f("dxx1", dir1, ierr)
+ !call iric_cgns_close()
+ !debug----------
+ !stop
+ 
 ! landuse file
-! allocate( land(ny, nx) )
-! land = 1
-! if( land_switch.eq.1 ) then
-!   call read_gis_int(landfile, land)
-! endif
+ allocate( land(ny, nx) )
+ land = 1
+ if( land_switch.eq.1 ) then
+   call read_gis_int(landfile, land)
+ endif
 
 ! land : 1 ... num_of_landuse
 write(*,*) "num_of_landuse : ", num_of_landuse
@@ -270,6 +335,7 @@ where(riv.eq.1) hr = 0.d0
 where(domain.eq.1) hs = 0.d0
 where(domain.eq.2) hs = 0.d0
 
+!for restart
 ! for slope cells
 ! if init_slo_switch = 1 => read from file
 
@@ -588,6 +654,9 @@ out_dt = dble(maxt) / dble(outnum)
 out_dt = max(1.d0, out_dt)
 out_next = nint(out_dt)
 tt = 0
+
+!èâä˙ílèoóÕ
+call iric_cgns_output_result(qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
 
 do t = 1, maxt
 
@@ -1086,7 +1155,7 @@ i = ny, 1, -1)
   if(outswitch_gv .ne. 0) close(107)
   if(outswitch_gampt_ff .ne. 0) close(108)
 
-  call iric_cgns_output_result(hs,hr,hg,qr_ave,qs_ave,qg_ave)
+  call iric_cgns_output_result(qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
 
   if( tec_switch .eq. 1 ) then
    if (tt .eq. 1) then

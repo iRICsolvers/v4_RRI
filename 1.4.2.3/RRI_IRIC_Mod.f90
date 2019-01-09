@@ -30,7 +30,7 @@ contains
     call cg_open_f(cgns_name, CG_MODE_MODIFY, cgns_f, ierr)
     if (ierr /= 0) stop "cg_open_f failed"
     call cg_iric_init_f(cgns_f, ierr)
-    if (ierr /= 0) stop "cg_iric_init_f failed"
+    !if (ierr /= 0) stop "cg_iric_init_f failed"
     
     ! guiにcgnsファイルを読込みであることを知らせるファイルを生成
     call iric_initoption_f(IRIC_OPTION_CANCEL, ierr)
@@ -102,11 +102,36 @@ contains
 
     do i = 1, nx
       do j = 1, ny
-        tmpv(i, j) = v(j, i)
+        tmpv(i, j) = v(ny-j+1, i)
+        !tmpv(i, j) = v(j, i)
+        !tmpv(i, j) = v(i, j)
       end do
     end do
 
     call cg_iric_write_sol_cell_real_f(name, tmpv, ierr)
+  end subroutine
+  
+  subroutine iric_write_result_integer(name, v)
+    use globals
+    implicit none
+
+    character(len=*),intent(in):: name
+    integer, dimension(:,:), allocatable, intent(in):: v
+
+    integer, dimension(:,:), allocatable:: tmpv
+    integer:: i, j, ierr
+
+    allocate(tmpv(nx, ny))
+
+    do i = 1, nx
+      do j = 1, ny
+        tmpv(i, j) = v(ny-j+1, i)
+        !tmpv(i, j) = v(j, i)
+        !tmpv(i, j) = v(i, j)
+      end do
+    end do
+
+    call cg_iric_write_sol_cell_integer_f(name, tmpv, ierr)
   end subroutine
 
   subroutine iric_read_grid()
@@ -230,18 +255,37 @@ contains
   end subroutine
 
   subroutine iric_cgns_output_result( &
-    hs,hr,hg,qr_ave,qs_ave,qg_ave)
+    qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
     use globals
 
     double precision, dimension(:,:), allocatable, intent(in):: &
-      hs, hr, hg, qr_ave
+      qp_t,hs, hr, hg, qr_ave
     double precision, dimension(:,:,:), allocatable, intent(in):: &
       qs_ave, qg_ave
+
+    double precision, dimension(:,:), allocatable :: rain_rate
+    integer :: i, j
     integer:: ierr
 
     call cg_iric_write_sol_time_f(time, ierr)
 
+    !call cg_iric_write_sol_gridcoord2d_f(gxx, gyy, ierr)
+    
     if (outswitch_hs /= 0) then
+        allocate(rain_rate(1:ny, 1:nx))
+        do i=1,ny
+             do j=1,nx
+                 rain_rate(i,j) = qp_t(i,j) * 3600.d0 * 1000.d0
+             end do
+         end do
+                
+      
+      call iric_write_result_real('zs', zs)
+      call iric_write_result_integer('acc', acc)
+      call iric_write_result_integer('dir', dir)
+      call iric_write_result_integer('land', land)
+      
+      call iric_write_result_real('qp_t', rain_rate)
       call iric_write_result_real('hs', hs)
     end if
     if (outswitch_hr /= 0) then

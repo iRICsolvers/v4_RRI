@@ -1,5 +1,8 @@
 module globals
 
+character*256 rri_dir
+character*256 rrifile
+    
 character*256 rainfile
 character*256 demfile
 character*256 accfile
@@ -121,6 +124,7 @@ integer i4
 parameter( i4 = 4 )
 
 integer, allocatable, save :: domain(:,:), dir(:,:)
+real(8), allocatable, save :: gxx(:,:), gyy(:,:)
 real(8), allocatable, save :: zs(:,:), zb(:,:), zb_riv(:,:)
 integer, allocatable, save :: riv(:,:), acc(:,:), land(:,:)
 real(8), allocatable, save :: width(:,:), depth(:,:), height(:,:), area_ratio(:,:), len_riv(:,:) ! v1.4 add (len_riv(:,:)) 

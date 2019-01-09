@@ -12,35 +12,142 @@
 
 <CalculationCondition>
 
-	<Tab name="FileControl" caption="ファイル管理⇒iRIC内処理が望ましい">
-		<!-- RRI_Input  L1 バージョン情報-->
+  <Tab name="Main" caption="条件">
+    <Item name="rrifile" caption="RRI Input File" >
+      <Definition valueType="filename" default="Select File" />
+    </Item>
+  </Tab>
+  
+  
+	<!--<Tab name="FileControl" caption="地形条件">
+		--><!-- RRI_Input  L1 バージョン情報--><!--
 		<Item name="RRI_version" caption="RRI Version【L1】" >
-				<!-- RRI_version →RRIソースでは、format_version-->
+				--><!-- RRI_version →RRIソースでは、format_version--><!--
 			<Definition valueType="string" default="RRI Input Format Ver1.4.2" />
 		</Item>
 		
-		<!-- RRI_Input  L2 = blank -->
+		--><!-- RRI_Input  L2 = blank --><!--
 		
-		<!-- RRI_Input  L4	DEMファイルのパス（地形データ） -->
-		<Item name="demfile" caption="DEMファイル【L4】⇒Elevationより作成" >
+		--><!-- RRI_Input  L4	DEMファイルのパス（地形データ） --><!--
+		<Item name="demfile" caption="DEMファイル" >
 			<Definition valueType="filename" default="Select File" />
 		</Item>
 		
-		<!-- RRI_Input  L6	dirファイルのパス（流下方向データ） -->
-		<Item name="dirfile" caption="DIRファイル【L6】⇒DEMより作成" >
+		--><!-- RRI_Input  L6	dirファイルのパス（流下方向データ） --><!--
+		<Item name="dirfile" caption="DIRファイル" >
 			<Definition valueType="filename" default="Select File" />
 		</Item>
 		
-		<!-- RRI_Input  L5	accファイルのパス（累積流量データ） -->
-		<Item name="accfile" caption="ACCファイル【L5】⇒DIRより作成" >
+		--><!-- RRI_Input  L5	accファイルのパス（累積流量データ） --><!--
+		<Item name="accfile" caption="ACCファイル" >
 			<Definition valueType="filename" default="Select File" />
 		</Item>
 
-		<!-- RRI_Input  L7	（Null） -->
+   
+		--><!-- RRI_Input  L7	（Null） --><!--
 	</Tab>
+  
+  <Tab name="rain" caption="降雨条件">
+    --><!-- RRI_Input  L3 Rainファイルのパス（雨量データ） --><!--
+    <Item name="rainfile" caption="ファイル指定" >
+      <Definition valueType="filename" default="Select File" />
+    </Item>
+
+    --><!-- RRI_Input  L14	雨量データの南西座標値（経度）lon --><!--
+    <Item name="xllcorner_rain" caption="雨量データの南西座標値（経度）lon" >
+      <Definition valueType="real" default="110.200000" />
+    </Item>
+
+    --><!-- RRI_Input  L15	雨量データの南西座標値（緯度）lat --><!--
+    <Item name="yllcorner_rain" caption="雨量データの南西座標値（緯度）lat" >
+      <Definition valueType="real" default="-8.300000" />
+    </Item>
+
+    --><!-- RRI_Input  L16	雨量データの空間解像度（経度␣緯度の順） --><!--
+    <Item name="cellsize_rain_x"  caption="雨量データの空間解像度 経度">
+      <Definition valueType="real" default="0.0083333333" />
+    </Item>
+    <Item name="cellsize_rain_y" caption="雨量データの空間解像度 緯度">
+      <Definition valueType="real" default="0.0083333333" />
+    </Item>
+  </Tab>
+
+  <Tab name="evaporation" caption="蒸発散">
+    <Item name="evp_switch" caption="蒸発散の考慮フラグ">
+      <Definition valueType="integer" default="0">
+        <Enumeration value="0" caption="設定しない" />
+        <Enumeration value="1" caption="設定する" />
+        <Enumeration value="2" caption="設定する（GAから無）" />
+      </Definition>
+    </Item>
+
+    <Item name="evpfile" caption="ファイル指定" >
+      <Definition valueType="filename" default="Select File" >
+      <Dependency>
+        <Condition type="or">
+          <Condition type="isEqual" target="evp_switch" value="1" />
+          <Condition type="isEqual" target="evp_switch" value="2" />
+        </Condition>
+        <Action type="enable" />
+      </Dependency>
+     </Definition>
+    </Item>
+
+    --><!-- RRI_Input  L14	雨量データの南西座標値（経度）lon --><!--
+    <Item name="xllcorner_evp" caption="蒸発散データの南西座標値（経度）lon" >
+      <Definition valueType="real" default="110.200000" >
+        <Dependency>
+          <Condition type="or">
+            <Condition type="isEqual" target="evp_switch" value="1" />
+            <Condition type="isEqual" target="evp_switch" value="2" />
+          </Condition>
+          <Action type="enable" />
+        </Dependency>
+      </Definition>
+    </Item>
+
+    --><!-- RRI_Input  L15	雨量データの南西座標値（緯度）lat --><!--
+    <Item name="yllcorner_evp" caption="蒸発散データの南西座標値（緯度）lat" >
+      <Definition valueType="real" default="-8.300000" >
+        <Dependency>
+        <Condition type="or">
+          <Condition type="isEqual" target="evp_switch" value="1" />
+          <Condition type="isEqual" target="evp_switch" value="2" />
+        </Condition>
+        <Action type="enable" />
+      </Dependency>
+     </Definition>
+    </Item>
+
+    --><!-- RRI_Input  L16	雨量データの空間解像度（経度␣緯度の順） --><!--
+    <Item name="cellsize_evp_x"  caption="蒸発散データの空間解像度 経度">
+      <Definition valueType="real" default="0.0083333333" >
+        <Dependency>
+          <Condition type="or">
+            <Condition type="isEqual" target="evp_switch" value="1" />
+            <Condition type="isEqual" target="evp_switch" value="2" />
+          </Condition>
+          <Action type="enable" />
+        </Dependency>
+      </Definition>
+    </Item>
+    <Item name="cellsize_evp_y" caption="蒸発散データの空間解像度 緯度">
+      <Definition valueType="real" default="0.0083333333">
+        <Dependency>
+          <Condition type="or">
+            <Condition type="isEqual" target="evp_switch" value="1" />
+            <Condition type="isEqual" target="evp_switch" value="2" />
+          </Condition>
+          <Action type="enable" />
+        </Dependency>
+      </Definition>
+    </Item>
+
+  </Tab>
+  
 
 	<Tab name="Basic_Condition" caption="基本条件">
-		<!-- RRI_Input  L8	地形や雨量データの座標指定方法 -->
+		--><!-- RRI_Input  L8	地形や雨量データの座標指定方法 --><!--
 		<Item name="utm" caption="座標系                        【L8】" >
 			<Definition valueType="integer" default="0">
 				<Enumeration caption="緯度経度" value="0" />
@@ -48,7 +155,7 @@
 			</Definition>
 		</Item>
 
-		<!-- RRI_Input  L9	二次元モデルの移動方向 -->
+		--><!-- RRI_Input  L9	二次元モデルの移動方向 --><!--
 		<Item name="eight_dir" caption="移動方向                     【L9】" >
 			<Definition valueType="integer" default="1">
 				<Enumeration value="0" caption="4方向" />
@@ -56,28 +163,30 @@
 			</Definition>
 		</Item>
 
-		<!-- RRI_Input  L10	シミュレーション期間 -->
+		--><!-- RRI_Input  L10	シミュレーション期間 --><!--
 		<Item name="lasth" caption="シミュレーション期間(hr)     【L10】" >
 			<Definition valueType="integer" default="24" max="20000" />
 		</Item>
 		
-		<!-- RRI_Input  L11	氾濫原のシミュレーション時間ステップ -->
+		--><!-- RRI_Input  L11	氾濫原のシミュレーション時間ステップ --><!--
 		<Item name="dt" caption="氾濫原計算時間ステップ(s)【L11】" >
 			<Definition valueType="integer" default="600" max="20000" />
 		</Item>
 		
-		<!-- RRI_Input  L12	河道内のシミュレーション時間ステップ -->
+		--><!-- RRI_Input  L12	河道内のシミュレーション時間ステップ --><!--
 		<Item name="dt_riv" caption="河道計算時間ステップ(s)   【L12】" >
 			<Definition valueType="integer" default="60" max="20000" />
 		</Item>
 		
-		<!-- RRI_Input  L13	出力ファイル数 -->
+		--><!-- RRI_Input  L13	出力ファイル数 --><!--
 		<Item name="outnum" caption="出力ファイル数（=シミュレーション期間/出力時間）【L13】" >
 			<Definition valueType="integer" default="24" max="100000" />
 		</Item>
-	</Tab>
+	</Tab>-->
 
-	<Tab name="Rain_Evap" caption="降雨・蒸発散⇒iRIC内設定が望ましい" >
+  
+  
+	<!--<Tab name="Rain_Evap" caption="降雨・蒸発散⇒iRIC内設定が望ましい" >
 		<GridLayout>
 			<Label row="0" col="1" caption="       降雨【L3,14～16】" />
 			<Label row="0" col="2" caption="       蒸発散【L74～78】" />
@@ -91,32 +200,16 @@
 
 			<Label row="1" col="1" caption="設定する（必須）" />
 
-			<!-- RRI_Input  L3 Rainファイルのパス（雨量データ） -->
+			--><!-- RRI_Input  L3 Rainファイルのパス（雨量データ） --><!--
 			<Item row="2" col="1" name="rainfile" >
 				<Definition valueType="filename" default="Select File" />
-			</Item>
+			</Item>--><!--
 
-			<!-- RRI_Input  L14	雨量データの南西座標値（経度）lon -->
-			<Item row="3" col="1" name="xllcorner_rain" >
-				<Definition valueType="real" default="135.0" />
-			</Item>
-		
-			<!-- RRI_Input  L15	雨量データの南西座標値（緯度）lat -->
-			<Item row="4" col="1" name="yllcorner_rain" >
-				<Definition valueType="real" default="34.65" />
-			</Item>
-	
-			<!-- RRI_Input  L16	雨量データの空間解像度（経度␣緯度の順） -->
-			<Item row="5" col="1" name="cellsize_rain_x" >
-				<Definition valueType="real" default="0.0102062072" />
-			</Item>
-			<Item row="6" col="1" name="cellsize_rain_y" >
-				<Definition valueType="real" default="0.0102062072" />
-			</Item>
+			
 
-			<!-- RRI_Input  L17	（Null） -->
+			--><!-- RRI_Input  L17	（Null） --><!--
 
-			<!-- RRI_Input  L74	蒸発散の与え方（設定しない(0) or 設定する(1) or GAなし(2)） -->
+			--><!-- RRI_Input  L74	蒸発散の与え方（設定しない(0) or 設定する(1) or GAなし(2)） --><!--
 			<Item row="1" col="2" name="evp_switch" >
 				<Definition valueType="integer" default="0">
 					<Enumeration value="0" caption="設定しない" />
@@ -125,7 +218,7 @@
 				</Definition>
 			</Item>
 		
-			<!-- RRI_Input  L75	蒸発散設定ファイルのパス -->
+			--><!-- RRI_Input  L75	蒸発散設定ファイルのパス --><!--
 			<Item row="2" col="2" name="evpfile" >
 				<Definition valueType="filename" default="Select File" >
 					<Dependency>
@@ -138,7 +231,7 @@
 				</Definition>
 			</Item>
 		
-			<!-- RRI_Input  L76	蒸発散データの南西座標値（経度） -->
+			--><!-- RRI_Input  L76	蒸発散データの南西座標値（経度） --><!--
 			<Item row="3" col="2" name="xllcorner_evp" >
 				<Definition valueType="real" default="135.0" >
 					<Dependency>
@@ -151,7 +244,7 @@
 				</Definition>
 			</Item>
 		
-			<!-- RRI_Input  L77	蒸発散データの南西座標値（緯度） -->
+			--><!-- RRI_Input  L77	蒸発散データの南西座標値（緯度） --><!--
 			<Item row="4" col="2" name="yllcorner_evp" >
 				<Definition valueType="real" default="34.65" >
 					<Dependency>
@@ -164,7 +257,7 @@
 				</Definition>
 			</Item>
 		
-			<!-- RRI_Input  L78	蒸発散データの空間解像度（経度␣緯度の順） -->
+			--><!-- RRI_Input  L78	蒸発散データの空間解像度（経度␣緯度の順） --><!--
 			<Item row="5" col="2" name="cellsize_evp_x" >
 				<Definition valueType="real" default="0.0102062072" >
 					<Dependency>
@@ -188,19 +281,19 @@
 				</Definition>
 			</Item>
 		
-			<!-- RRI_Input  L79	（Null） -->
+			--><!-- RRI_Input  L79	（Null） --><!--
 		</GridLayout>
-	</Tab>
+	</Tab>-->
 
-	<Tab name="River_Condition" caption="河道条件">
+	<!--<Tab name="River_Condition" caption="河道条件">
 		<GroupBox>
-			<!-- RRI_Input  L18	河道の粗度係数（マニング） -->
+			--><!-- RRI_Input  L18	河道の粗度係数（マニング） --><!--
 			<Item name="ns_river" caption="河道粗度（m^(-1/3)s）【L18】" >
 				<Definition valueType="real" default="0.030" />
 			</Item>
 		</GroupBox>
 
-		<!-- RRI_Input  L80	河道延長の与え方（設定しない(0) or 設定する(1)） -->
+		--><!-- RRI_Input  L80	河道延長の与え方（設定しない(0) or 設定する(1)） --><!--
 		<GroupBox>
 			<Item name="sec_length_switch" caption="河道延長の任意設定【L80】">
 				<Definition valueType="integer" default="0">
@@ -212,7 +305,7 @@
 
 		<GroupBox caption="河道断面">
 			<GroupBox caption="矩形断面設定">
-				<!-- RRI_Input  L46	河道形状の与え方(自動(0) or File指定(1)） -->
+				--><!-- RRI_Input  L46	河道形状の与え方(自動(0) or File指定(1)） --><!--
 				<Item name="rivfile_switch" caption="  河道断面の与え方【L46】" >
 					<Definition valueType="integer" default="0">
 						<Enumeration value="0" caption="河道形状係数より" />
@@ -221,7 +314,7 @@
 				</Item>
 	
 				<GroupBox caption="河道形状係数設定" >
-					<!-- RRI_Input  L38	河道判定の閾値（地点上流メッシュ数） -->
+					--><!-- RRI_Input  L38	河道判定の閾値（地点上流メッシュ数） --><!--
 					<GroupBox>
 						<Item name="riv_thresh" caption="河道判定の閾値（地点上流メッシュ数）【L38】">
 							<Definition valueType="integer" default="20" >
@@ -241,7 +334,7 @@
 						<Label row="1" col="0" caption="河道幅  【L39-40】" />
 						<Label row="2" col="0" caption="河道深さ【L41-42】" />
 				
-						<!-- RRI_Input  L39	河道幅算定のための形状変数C -->
+						--><!-- RRI_Input  L39	河道幅算定のための形状変数C --><!--
 						<Item row="1" col="1" name="width_param_c" caption="河道幅形状変数Cw（width=Cw×A＾Sw）【L39】" >
 							<Definition valueType="real" default="5.5" >
 								<Dependency>
@@ -251,7 +344,7 @@
 							</Definition>
 						</Item>
 
-						<!-- RRI_Input  L40	河道幅算定のための形状変数S -->
+						--><!-- RRI_Input  L40	河道幅算定のための形状変数S --><!--
 						<Item row="1" col="2" name="width_param_s" caption="河道幅形状変数Sw（width=Cw×A＾Sw）【L40】" >
 							<Definition valueType="real" default="0.61" >
 								<Dependency>
@@ -261,7 +354,7 @@
 							</Definition>
 						</Item>
 
-						<!-- RRI_Input  L41	河道深さ算定のための形状変数C -->	
+						--><!-- RRI_Input  L41	河道深さ算定のための形状変数C --><!--	
 						<Item row="2" col="1" name="depth_param_c" caption="河道深さ形状変数Cd（depth=Cd×A＾Sd）【L41】" >
 							<Definition valueType="real" default="0.94" >
 								<Dependency>
@@ -271,7 +364,7 @@
 							</Definition>
 						</Item>
 
-						<!-- RRI_Input  L42	河道深さ算定のための形状変数S -->
+						--><!-- RRI_Input  L42	河道深さ算定のための形状変数S --><!--
 						<Item row="2" col="2" name="depth_param_s" caption="河道深さ形状変数Sd（depth=Cd×A＾Sd）【L42】" >
 							<Definition valueType="real" default="0.34" >
 								<Dependency>
@@ -284,7 +377,7 @@
 					</GroupBox>
 
 					<GroupBox caption="堤防" >
-						<!-- RRI_Input  L43	堤防の高さ（地盤高からの高さ） -->
+						--><!-- RRI_Input  L43	堤防の高さ（地盤高からの高さ） --><!--
 						<Item name="height_param" caption="堤防高【L43】" >
 							<Definition valueType="real" default="0.00" >
 								<Dependency>
@@ -294,7 +387,7 @@
 							</Definition>
 						</Item>
 
-						<!-- RRI_Input  L44	堤防位置の閾値（地点上流メッシュ数） -->
+						--><!-- RRI_Input  L44	堤防位置の閾値（地点上流メッシュ数） --><!--
 						<Item name="height_limit_param" caption="堤防位置の閾値（地点上流メッシュ数）【L44】" >
 							<Definition valueType="real" default="1000" >
 								<Dependency>
@@ -306,11 +399,11 @@
 					</GroupBox>
 				</GroupBox>
 
-					<!-- RRI_Input  L45	（Null） -->
+					--><!-- RRI_Input  L45	（Null） --><!--
 
 			</GroupBox>
 			<GroupBox caption="任意断面設定⇒iRIC内設定が望ましい">
-				<!-- RRI_Input  L83	河道断面の与え方（設定しない(0) or 設定する(1)） -->
+				--><!-- RRI_Input  L83	河道断面の与え方（設定しない(0) or 設定する(1)） --><!--
 				<Item name="sec_switch" caption="任意断面の与え方          【L83】">
 					<Definition valueType="integer" default="0">
 						<Enumeration value="0" caption="設定しない" />
@@ -318,7 +411,7 @@
 					</Definition>
 				</Item>
 
-				<!-- RRI_Input  L84	河道断面の設定位置ファイルのパス -->
+				--><!-- RRI_Input  L84	河道断面の設定位置ファイルのパス --><!--
 				<Item name="sec_map_file" caption="河道断面設定位置ファイル【L84】" >
 					<Definition valueType="filename" default="Select File" >
 						<Dependency>
@@ -328,7 +421,7 @@
 					</Definition>
 				</Item>
 		
-				<!-- RRI_Input  L85	断面毎の断面特性ファイルのパス -->
+				--><!-- RRI_Input  L85	断面毎の断面特性ファイルのパス --><!--
 				<Item name="sec_file" caption="断面特性ファイル            【L85】" >
 					<Definition valueType="string" default=".\Riv\sec_" >
 						<Dependency>
@@ -338,14 +431,14 @@
 					</Definition>
 				</Item>
 				
-				<!-- RRI_Input  L86	（Null） -->
+				--><!-- RRI_Input  L86	（Null） --><!--
 
 			</GroupBox>
 		</GroupBox>
 		
-	</Tab>
+	</Tab>-->
 
-	<Tab name="Initial_Condition" caption="初期水深(ﾎｯﾄｽﾀｰﾄ用)⇒iRIC内処理が望ましい">
+	<!--<Tab name="Initial_Condition" caption="初期水深(ﾎｯﾄｽﾀｰﾄ用)⇒iRIC内処理が望ましい">
 		<GridLayout>
 			<Label row="0" col="1" caption="                           【L51】" />
 			<Label row="0" col="2" caption="ファイル" />
@@ -355,28 +448,28 @@
 			<Label row="3" col="0" caption="基岩        【L54】" />
 			<Label row="4" col="0" caption="GreenAmpt【L55】" />
 
-			<!-- RRI_Input  L51	斜面の初期水深の与え方 -->
+			--><!-- RRI_Input  L51	斜面の初期水深の与え方 --><!--
 			<Item row="1" col="1" name="init_slo_switch" >
 				<Definition valueType="integer" default="0">
 					<Enumeration value="0" caption="設定しない" />
 					<Enumeration value="1" caption="設定する" />
 				</Definition>
 			</Item>
-			<!-- RRI_Input  L51 河道の初期水深の与え方 -->
+			--><!-- RRI_Input  L51 河道の初期水深の与え方 --><!--
 			<Item row="2" col="1" name="init_riv_switch" >
 				<Definition valueType="integer" default="0">
 					<Enumeration value="0" caption="設定しない" />
 					<Enumeration value="1" caption="設定する" />
 				</Definition>
 			</Item>
-			<!-- RRI_Input  L51 基岩の初期水深の与え方 -->
+			--><!-- RRI_Input  L51 基岩の初期水深の与え方 --><!--
 			<Item row="3" col="1" name="init_gw_switch" >
 				<Definition valueType="integer" default="0">
 					<Enumeration value="0" caption="設定しない" />
 					<Enumeration value="1" caption="設定する" />
 				</Definition>
 			</Item>
-			<!-- RRI_Input  L51 GreenAmptの初期水深の与え方 -->
+			--><!-- RRI_Input  L51 GreenAmptの初期水深の与え方 --><!--
 			<Item row="4" col="1" name="init_gampt_ff_switch" >
 				<Definition valueType="integer" default="0">
 					<Enumeration value="0" caption="設定しない" />
@@ -384,7 +477,7 @@
 				</Definition>
 			</Item>
 
-			<!-- RRI_Input  L52	斜面における初期水深設定ファイルのパス　※単位：[m] -->
+			--><!-- RRI_Input  L52	斜面における初期水深設定ファイルのパス　※単位：[m] --><!--
 			<Item row="1" col="2" name="initfile_slo" >
 				<Definition valueType="filename" default="Select File" >
 					<Dependency>
@@ -394,7 +487,7 @@
 				</Definition>
 			</Item>
 
-			<!-- RRI_Input  L53	河道における初期水深設定ファイルのパス　※単位：[m] -->
+			--><!-- RRI_Input  L53	河道における初期水深設定ファイルのパス　※単位：[m] --><!--
 			<Item row="2" col="2" name="initfile_riv" >
 				<Definition valueType="filename" default="Select File" >
 					<Dependency>
@@ -404,7 +497,7 @@
 				</Definition>
 			</Item>
 
-			<!-- RRI_Input  L54	基岩における初期水深設定ファイルのパス　※単位：[m] -->
+			--><!-- RRI_Input  L54	基岩における初期水深設定ファイルのパス　※単位：[m] --><!--
 			<Item row="3" col="2" name="initfile_gw" >
 				<Definition valueType="filename" default="Select File" >
 					<Dependency>
@@ -414,7 +507,7 @@
 				</Definition>
 			</Item>
 
-			<!-- RRI_Input  L55	Green-Amptにおける初期水深設定ファイルのパス　※単位：[m] -->
+			--><!-- RRI_Input  L55	Green-Amptにおける初期水深設定ファイルのパス　※単位：[m] --><!--
 			<Item row="4" col="2" name="initfile_gampt_ff" >
 				<Definition valueType="filename" default="Select File" >
 					<Dependency>
@@ -424,7 +517,7 @@
 				</Definition>
 			</Item>
 		
-			<!-- RRI_Input  L56	（Null） -->
+			--><!-- RRI_Input  L56	（Null） --><!--
 		</GridLayout>
 	</Tab>
 
@@ -446,7 +539,7 @@
 			<Label row="10" col="0" caption="storageファイル【L97】" />
 			<Label row="11" col="0" caption="ハイドロファイル【L99-100】⇒不要：iRIC機能で可能" />
 
-			<!-- RRI_Input  L87	出力ファイル設定（出力(1) or 出力しない(0)） -->
+			--><!-- RRI_Input  L87	出力ファイル設定（出力(1) or 出力しない(0)） --><!--
 			<Item row="1"  col="1" name="outswitch_hs" caption="斜面水深">
 				<Definition valueType="integer" default="1">
 					<Enumeration value="1" caption="出力する" />
@@ -508,7 +601,7 @@
 				</Definition>
 			</Item>
 
-			<!-- RRI_Input  L99	ハイドロデータ(流量)の出力設定（出力(1) or 出力しない(0)） -->
+			--><!-- RRI_Input  L99	ハイドロデータ(流量)の出力設定（出力(1) or 出力しない(0)） --><!--
 			<Item row="11" col="1" name="hydro_switch" caption="ハイドロファイル">
 				<Definition valueType="integer" default="1">
 					<Enumeration value="1" caption="出力する" />
@@ -516,7 +609,7 @@
 				</Definition>
 			</Item>
 	
-			<!-- RRI_Input  L88	斜面水深の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L88	斜面水深の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="1"  col="2" name="outfile_hs_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -535,7 +628,7 @@
 			</Item>
 			<Label row="1"  col="4" caption=".out" />
 		
-			<!-- RRI_Input  L89	河道水深の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L89	河道水深の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="2"  col="2" name="outfile_hr_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -554,7 +647,7 @@
 			</Item>
 			<Label row="2"  col="4" caption=".out" />
 		
-			<!-- RRI_Input  L90	基岩水深の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L90	基岩水深の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="3"  col="2" name="outfile_hg_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -573,7 +666,7 @@
 			</Item>
 			<Label row="3"  col="4" caption=".out" />
 		
-			<!-- RRI_Input  L91	河道流量の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L91	河道流量の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="4"  col="2" name="outfile_qr_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -592,7 +685,7 @@
 			</Item>
 			<Label row="4"  col="4" caption=".out" />
 		
-			<!-- RRI_Input  L92	斜面流量(u成分)の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L92	斜面流量(u成分)の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="5"  col="2" name="outfile_qu_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -611,7 +704,7 @@
 			</Item>
 			<Label row="5"  col="4" caption=".out" />
 		
-			<!-- RRI_Input  L93	斜面流量(v成分)の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L93	斜面流量(v成分)の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="6"  col="2" name="outfile_qv_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -630,7 +723,7 @@
 			</Item>
 			<Label row="6"  col="4" caption=".out" />
 		
-			<!-- RRI_Input  L94	基岩流量(u成分)の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L94	基岩流量(u成分)の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="7"  col="2" name="outfile_gu_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -649,7 +742,7 @@
 			</Item>
 			<Label row="7"  col="4" caption=".out" />
 			
-			<!-- RRI_Input  L95	基岩流量(v成分)の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L95	基岩流量(v成分)の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="8"  col="2" name="outfile_gv_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -668,7 +761,7 @@
 			</Item>
 			<Label row="8"  col="4" caption=".out" />
 		
-			<!-- RRI_Input  L96	Green-AmptのF(累積水分量)の出力先とファイル名のパス　※拡張子：out -->
+			--><!-- RRI_Input  L96	Green-AmptのF(累積水分量)の出力先とファイル名のパス　※拡張子：out --><!--
 			<Item row="9"  col="2" name="outfile_gampt_ff_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -687,7 +780,7 @@
 			</Item>
 			<Label row="9"  col="4" caption=".out" />
 			
-			<!-- RRI_Input  L97	計算結果ファイルの出力先とファイル名のパス -->
+			--><!-- RRI_Input  L97	計算結果ファイルの出力先とファイル名のパス --><!--
 			<Item row="10" col="2" name="outfile_storage_folder" >
 				<Definition valueType="foldername" default="Select Folder" >
 					<Dependency>
@@ -706,9 +799,9 @@
 			</Item>
 			<Label row="10" col="4" caption="(拡張子まで)" />
 
-			<!-- RRI_Input  L98	（Null） -->
+			--><!-- RRI_Input  L98	（Null） --><!--
 		
-			<!-- RRI_Input  L100	出力地点ファイルのパス＋ファイル名 -->
+			--><!-- RRI_Input  L100	出力地点ファイルのパス＋ファイル名 --><!--
 			<Label row="11" col="2" caption="出力位置ファイル" />
 			<Item row="11" col="3" name="location_file" >
 				<Definition valueType="filename" default="./location.txt" >
@@ -721,243 +814,16 @@
 			<Label row="11" col="4" caption="(ファイル選択)" />
 
 
-			<!-- iRICの基本機能で対応 -->
+			--><!-- iRICの基本機能で対応 --><!--
 		</GridLayout>
-   </Tab>
+   </Tab>-->
 
 </CalculationCondition>
 
 <GridRelatedCondition>
-		<Item name="Elevation" caption="Elevation (m)">
-			<Definition position="cell" valueType="real" default="max" />
-    	</Item>
-		<Item name="Acc" caption="Acc">
-			<Definition position="cell" valueType="integer" default="0" mapping="iric_acc.exe" />
-		</Item>
-		<Item name="Dir" caption="Dir">
-			<Definition position="cell" valueType="integer" default="0" mapping="iric_dir.exe" />
-		</Item>
-		<Item name="Land" caption="Land">
-			<Definition position="cell" valueType="integer" default="0" />
-		</Item>
-
-	
-	<Item name="land" caption="土地利用【L20-36,65-66】">
-	<!-- RRI_Input  L65	土地利用の与え方　※少なくとも1つ必要(0) -->
-		<!-- 一律土地利用なら：land_switch=0 今回は使用しない -->
-		<!-- 複数土地利用なら：land_switch=1 今回使用、１つの土地利用でもファイルで設定 -->
-	<!-- RRI_Input  L66	土地利用ファイルのパス（土地利用データ） -->
-		<Definition position="cell" valueType="complex" >
-			<!-- RRI_Input  L20	Diffusion(1) or Kinematic(0) -->
-			<Item name="dif" caption="Diffusion or Kinematic           【L20】" >
-				<Definition valueType="integer" default="1">
-					<Enumeration value="1" caption="Diffusion" />
-					<Enumeration value="0" caption="Kinamatic" />
-				</Definition>
-			</Item>
-			
-			<!-- RRI_Input  L21	斜面の粗度係数（マニング） -->
-			<Item name="ns_slope" caption="等価粗度（m^(-1/3)s）            【L21】" >
-				<Definition valueType="real" default="0.70" />
-			</Item>
-				
-			<!-- RRI_Input  L22	土壌層厚 -->
-			<Item name="soildepth" caption="土壌層厚（m）                       【L22】" >
-				<Definition valueType="real" default="1.00" />
-			</Item>
-
-			<!-- RRI_Input  L23	飽和層の空隙率 -->
-			<Item name="ganmaa" caption="有効空隙率                         【L23】" >
-				<Definition valueType="real" default="0.30" />
-			</Item>
-		
-			<!-- RRI_Input  L24	（Null） -->
-	
-			<!-- RRI_Input  L25	Green-Amptの鉛直透水係数 -->
-			<Item name="ksv" caption="G-A 鉛直透水係数（m/s）       【L25】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-
-			<!-- RRI_Input  L26	Green-Amptの変数Sf -->
-			<Item name="faif" caption="Green-Ampt Sf（m）               【L26】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-		
-			<!-- RRI_Input  L27	（Null） -->
-		
-			<!-- RRI_Input  L28	飽和水平透水係数 -->
-			<Item name="ka" caption="飽和水平透水係数（m/s）        【L28】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-		
-			<!-- RRI_Input  L29	不飽和層の空隙率 -->
-			<Item name="gammam" caption="不飽和層空隙率                   【L29】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-		
-			<!-- RRI_Input  L30	不飽和透水係数と飽和透水係数の関係※km=ka/β -->
-			<Item name="beta" caption="透水係数比（飽和/不飽和）     【L30】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-			
-			<!-- RRI_Input  L31	（Null） -->
-			
-			<!-- RRI_Input  L32	基岩の鉛直透水係数 -->
-			<Item name="ksg" caption="基岩の鉛直透水係数（m/s）     【L32】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-
-			<!-- RRI_Input  L33	基岩の有効空隙率 -->
-			<Item name="ganmag" caption="基岩の有効空隙率                【L33】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-			
-			<!-- RRI_Input  L34	基岩の飽和透水係数 -->
-			<Item name="kg0" caption="基岩の飽和透水係数（m/s）     【L34】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-
-			<!-- RRI_Input  L35	基岩の低減率 -->
-			<Item name="fpg" caption="基岩の飽和透水係数低減係数 【L35】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-
-			<!-- RRI_Input  L36	基岩の漏水量 -->
-			<Item name="rgl" caption="基岩の下部漏水量（m/s）        【L36】" >
-				<Definition valueType="real" default="0.00" />
-			</Item>
-
-	        <!-- RRI_Input  L37	（Null） -->
-		</Definition>
-	</Item>
-
-	<!-- RRI_Input  L67	（Null） -->
-
-	<!-- RRI_Input  L47	河道幅ファイルのパス（RivWidth） -->
-	<Item name="width" caption="河道幅（形状係数を与える場合は不要）  【L47】">
-		<Definition position="cell" valueType="real" default="50.0" />
-	</Item>
-
-	<!-- RRI_Input  L48	河道深さファイルのパス（RivDepth） -->
-	<Item name="depth" caption="河道深さ（形状係数を与える場合は不要）【L48】">
-		<Definition position="cell" valueType="real" default="5.0" />
-	</Item>
-
-	<!-- RRI_Input  L49	堤防高ファイルのパス（RivHeight） -->
-	<Item name="height" caption="堤防高（形状係数を与える場合は不要）  【L49】">
-		<Definition position="cell" valueType="real" default="2.0" />
-	</Item>
-
-	<!-- RRI_Input  L50	（Null） -->
-
-	<!-- RRI_Input  L81	河道延長の設定ファイルのパス -->
-	<Item name="sec_length" caption="河道延長（任意）【L81】">
-		<Definition position="cell" valueType="real" />
-	</Item>
-		
-	<!-- RRI_Input  L82	（Null） -->
-
-	
+  <Item name="Elevation" caption="Elevation (m)">
+    <Definition position="cell" valueType="real" default="max" />
+  </Item>
 </GridRelatedCondition>
-
- 
-<!-- RRI_Input  L57	斜面と河道の水深境界条件の与え方（設定しない(0) or 設定する(1) or 二次元で設定する(2)） -->
-	<!-- 設定しなければ：bound_slo_wlev_switch=0 -->
-	<!-- 設定した場合：bound_slo_wlev_switch=1 -->
-	<!-- 二次元設定は、とりあえずなし：bound_slo_wlev_switch=1 -->
-
-<!-- RRI_Input  L58	斜面の水深境界条件設定ファイルのパス -->
-<BoundaryCondition name="bound_slo_wlev" caption="Slope Water Level" position="cell">
-	<Item name="boundfile_slo_wlev" caption="斜面水深の時間変化">
-		<Definition conditionType="functional">
-			<Parameter name="bound_slo_wlev_time" valueType="real" caption="時間" />
-			<Value  name="bound_slo_wlev_hydro" valueType="real" caption="水深(m)" />
-		</Definition>
-	</Item>
-</BoundaryCondition>		
-		
-<!-- RRI_Input  L59	河道の水深境界条件設定ファイルのパス -->
-<BoundaryCondition name="bound_riv_wlev" caption="River Water Level" position="cell">
-	<Item name="boundfile_riv_wlev" caption="河道水深の時間変化">
-		<Definition conditionType="functional">
-			<Parameter name="bound_riv_wlev_time" valueType="real" caption="時間" />
-			<Value  name="bound_riv_wlev_hydro" valueType="real" caption="水深(m)" />
-			</Definition>
-	</Item>
-</BoundaryCondition>		
-
-<!-- RRI_Input  L60	（Null） -->
-
-<!-- RRI_Input  L61	斜面と河道の流量境界条件の与え方（設定しない(0) or 設定する(1) or 二次元で設定する(2)） -->
-	<!-- 設定しなければ：bound_slo_wlev_switch=0 -->
-	<!-- 設定した場合：bound_slo_wlev_switch=1 -->
-	<!-- 二次元設定は、とりあえずなし：bound_slo_wlev_switch=1 -->
-
-<!-- RRI_Input  L62	斜面の流量境界条件設定ファイルのパス -->
-<BoundaryCondition name="bound_slo_disc" caption="Slope Discharge" position="cell">
-	<Item name="boundfile_slo_disc" caption="斜面流量の時間変化">
-		<Definition conditionType="functional">
-			<Parameter name="bound_slo_disc_time" valueType="real" caption="時間" />
-			<Value  name="bound_slo_disc_hydro" valueType="real" caption="流量(m3/s)" />
-		</Definition>
-	</Item>
-</BoundaryCondition>		
-		
-<!-- RRI_Input  L63	河道の流量境界条件設定ファイルのパス -->
-<BoundaryCondition name="bound_riv_disc" caption="River Discharge" position="cell">
-	<Item name="boundfile_riv_disc" caption="河道流量の時間変化">
-		<Definition conditionType="functional">
-			<Parameter name="bound_riv_disc_time" valueType="real" caption="時間" />
-			<Value  name="bound_riv_disc_hydro" valueType="real" caption="流量(m3/s)" />
-		</Definition>
-	</Item>
-</BoundaryCondition>		
-
-<!-- RRI_Input  L64	（Null） -->
-
-<BoundaryCondition name="Dam" caption="Dam" position="cell">
-	<!-- RRI_Input  L68	ダムの与え方 -->
-		<!-- 無なら：dam_switch=0 -->
-		<!-- 有なら：dam_switch=1 -->
-
-	<!-- RRI_Input  L69	ダム設定ファイルのパスで設定する内容 -->
-		<Item name="dam_volmax" caption="ダム貯留量(m3)">
-			<Definition valueType="real" />
-		</Item>
-		<Item name="dam_floodq" caption="一定放流量(m/s)">
-			<Definition valueType="real" />
-		</Item>
-
-	<!-- RRI_Input  L70	（Null） -->
-
-</BoundaryCondition>		
-
-<BoundaryCondition name="Div" caption="Division" position="cell">
-	<!-- RRI_Input  L71	分流の与え方 -->
-		<!-- 無なら：div_switch=0 -->
-		<!-- 有なら：div_switch=1 -->
-
-	<!-- RRI_Input  L72	分流設定ファイルのパスで設定する内容 -->
-		<Item name="org_dest" caption="分流元or分流先">
-			<Definition valueType="integer" default="0">
-				<Enumeration value="0" caption="分流元" />
-				<Enumeration value="1" caption="分流先" />
-			</Definition>
-		</Item>
-		<Item name="div_num" caption="分流番号(分流元と分流先で番号を合わせる)">
-			<Definition valueType="integer" default="1" />
-		</Item>
-		<Item name="div_rate" caption="分流比率">
-			<Definition valueType="real" default="0.1" >
-				<Dependency>
-					<Condition type="isEqual" target="org_dest" value="0" />
-					<Action type="enable" />
-				</Dependency>
-			</Definition>
-		</Item>
-
-	<!-- RRI_Input  L73	（Null） -->
-
-</BoundaryCondition>		
 
 </SolverDefinition>

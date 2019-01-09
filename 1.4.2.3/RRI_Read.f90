@@ -14,7 +14,7 @@ integer :: ier, cgns_f, icount
 character(len=64):: cgns_name
 
 !CGNSファイルを開く
-cgns_name = "Case1.cgn"
+!cgns_name = "input.cgn"
 
 !引数取得
 icount = nargs()
@@ -30,7 +30,16 @@ if (ier /= 0) stop "cg_open_f failed"
 call cg_iric_init_f(cgns_f, ier)
 !if (ier /= 0) stop "cg_iric_init_f failed"
 
-open(1, file = "RRI_Input.txt", status = 'old')
+
+call cg_iric_read_string_f("rrifile", rrifile, ier)
+
+write(*,*) index(rrifile,"\", back=.true.) 
+rri_dir = rrifile(1:index(rrifile,"\", back=.true.) )
+
+write(*,"(a,a)") "rri_dir = ", rri_dir
+
+!open(1, file = "..\RRI_Input.txt", status = 'old')
+open(1, file = trim(rrifile), status = 'old')
 
 read(1,'(a)') format_version
 write(*,'("format_version : ", a)') trim(adjustl(format_version))
@@ -44,6 +53,11 @@ read(1,'(a)') rainfile
 read(1,'(a)') demfile
 read(1,'(a)') accfile
 read(1,'(a)') dirfile
+
+rainfile = trim(rri_dir)//rainfile(3:len(rainfile))
+demfile = trim(rri_dir)//demfile(3:len(demfile))
+accfile = trim(rri_dir)//accfile(3:len(accfile))
+dirfile = trim(rri_dir)//dirfile(3:len(dirfile))
 
 write(*,'("rainfile : ", a)') trim(adjustl(rainfile))
 write(*,'("demfile : ", a)') trim(adjustl(demfile))
@@ -60,14 +74,6 @@ read(1,*) dt
 read(1,*) dt_riv
 read(1,*) outnum
 
-
-call cg_iric_read_integer_f("utm", utm, ier)
-call cg_iric_read_integer_f("eight_dir", eight_dir, ier)
-call cg_iric_read_integer_f("lasth", lasth, ier)
-call cg_iric_read_integer_f("dt", dt, ier)
-call cg_iric_read_integer_f("dt_riv", dt_riv, ier)
-call cg_iric_read_integer_f("outnum", outnum, ier)
-
 !----------　ここから（未済） ----------
 !降雨データの左上コーナ座標値とセルサイズ
 !雨の読込みをiRICで行うと不要になるはず　　→　要確認
@@ -75,10 +81,6 @@ read(1,*) xllcorner_rain
 read(1,*) yllcorner_rain
 read(1,*) cellsize_rain_x, cellsize_rain_y
 
-call cg_iric_read_real_f("xllcorner_rain", xllcorner_rain, ier)
-call cg_iric_read_real_f("yllcorner_rain", yllcorner_rain, ier)
-call cg_iric_read_real_f("cellsize_rain_x", cellsize_rain_x, ier)
-call cg_iric_read_real_f("cellsize_rain_y", cellsize_rain_y, ier)
 !----------　ここまで（未済） ----------
 
 write(*,'("utm : ", i5)') utm
@@ -95,13 +97,10 @@ read(1,*)
 write(*,*)
 
 read(1,*) ns_river
-call cg_iric_read_real_f("ns_river", ns_river, ier)
-
 
 !----------　ここから（未済） ----------
 !cell属性のcomplex型で処理する
 read(1,*) num_of_landuse
-call cg_iric_read_integer_f("num_of_landuse", num_of_landuse, ier)
 
 allocate( dif(num_of_landuse) )
 allocate( ns_slope(num_of_landuse), soildepth(num_of_landuse) )
@@ -179,25 +178,20 @@ read(1,*) depth_param_s
 read(1,*) height_param
 read(1,*) height_limit_param
 
-call cg_iric_read_integer_f("riv_thresh", riv_thresh, ier)
-call cg_iric_read_real_f("width_param_c", width_param_c, ier)
-call cg_iric_read_real_f("width_param_s", width_param_s, ier)
-call cg_iric_read_real_f("depth_param_c", depth_param_c, ier)
-call cg_iric_read_real_f("depth_param_s", depth_param_s, ier)
-call cg_iric_read_real_f("height_param", height_param, ier)
-call cg_iric_read_real_f("height_limit_param", height_limit_param, ier)
-
-
 read(1,*)
 write(*,*)
 
 read(1,*) rivfile_switch
-call cg_iric_read_integer_f("rivfile_switch", rivfile_switch, ier)
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') widthfile
 read(1,'(a)') depthfile
 read(1,'(a)') heightfile
+
+widthfile = trim(rri_dir)//widthfile(3:len(widthfile))
+depthfile = trim(rri_dir)//depthfile(3:len(depthfile))
+heightfile = trim(rri_dir)//heightfile(3:len(heightfile))
+
 !------- ここまで（ファイルで与える？要件等） ------
 
 
@@ -219,16 +213,18 @@ read(1,*)
 write(*,*)
 
 read(1,*) init_slo_switch, init_riv_switch, init_gw_switch, init_gampt_ff_switch
-call cg_iric_read_integer_f("init_slo_switch", init_slo_switch, ier)
-call cg_iric_read_integer_f("init_riv_switch", init_riv_switch, ier)
-call cg_iric_read_integer_f("init_gw_switch", init_gw_switch, ier)
-call cg_iric_read_integer_f("init_gampt_ff_switch", init_gampt_ff_switch, ier)
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,"(a)") initfile_slo
 read(1,'(a)') initfile_riv
 read(1,'(a)') initfile_gw
 read(1,'(a)') initfile_gampt_ff
+
+initfile_slo = trim(rri_dir)//initfile_slo(3:len(initfile_slo))
+initfile_riv = trim(rri_dir)//initfile_riv(3:len(initfile_riv))
+initfile_gw = trim(rri_dir)//initfile_gw(3:len(initfile_gw))
+initfile_gampt_ff = trim(rri_dir)//initfile_gampt_ff(3:len(initfile_gampt_ff))
+
 !------- ここまで（ファイルで与える？要件等） ------
 
 if(init_slo_switch.ne.0) write(*,'("initfile_slo : ", a)') trim(adjustl(initfile_slo))
@@ -240,12 +236,14 @@ read(1,*)
 write(*,*)
 
 read(1,*) bound_slo_wlev_switch, bound_riv_wlev_switch
-call cg_iric_read_integer_f("bound_slo_wlev_switch", bound_slo_wlev_switch, ier)
-call cg_iric_read_integer_f("bound_riv_wlev_switch", bound_riv_wlev_switch, ier)
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') boundfile_slo_wlev
 read(1,'(a)') boundfile_riv_wlev
+
+boundfile_slo_wlev = trim(rri_dir)//boundfile_slo_wlev(3:len(boundfile_slo_wlev))
+boundfile_riv_wlev = trim(rri_dir)//boundfile_riv_wlev(3:len(boundfile_riv_wlev))
+
 !------- ここまで（ファイルで与える？要件等） ------
 
 if(bound_slo_wlev_switch.ne.0) write(*,'("boundfile_slo_wlev : ", a)') trim(adjustl(boundfile_slo_wlev))
@@ -255,12 +253,14 @@ read(1,*)
 write(*,*)
 
 read(1,*) bound_slo_disc_switch, bound_riv_disc_switch
-call cg_iric_read_integer_f("bound_slo_disc_switch", bound_slo_disc_switch, ier)
-call cg_iric_read_integer_f("bound_riv_disc_switch", bound_riv_disc_switch, ier)
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') boundfile_slo_disc
 read(1,'(a)') boundfile_riv_disc
+
+boundfile_slo_disc = trim(rri_dir)//boundfile_slo_disc(3:len(boundfile_slo_disc))
+boundfile_riv_disc = trim(rri_dir)//boundfile_riv_disc(3:len(boundfile_riv_disc))
+
 !------- ここまで（ファイルで与える？要件等） ------
 
 if(bound_slo_disc_switch.ne.0) write(*,'("boundfile_slo_disc : ", a)') trim(adjustl(boundfile_slo_disc))
@@ -270,10 +270,12 @@ read(1,*)
 write(*,*)
 
 read(1,*) land_switch
-call cg_iric_read_integer_f("land_switch", land_switch, ier)
+
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') landfile
+
+landfile = trim(rri_dir)//landfile(3:len(landfile))
 !------- ここまで（ファイルで与える？要件等） ------
 if(land_switch.eq.1) write(*,'("landfile : ", a)') trim(adjustl(landfile))
 
@@ -281,10 +283,12 @@ read(1,*)
 write(*,*)
 
 read(1,*) dam_switch
-call cg_iric_read_integer_f("dam_switch", dam_switch, ier)
+!call cg_iric_read_integer_f("dam_switch", dam_switch, ier)
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') damfile
+
+damfile = trim(rri_dir)//damfile(3:len(damfile))
 !------- ここまで（ファイルで与える？要件等） ------
 if(dam_switch.eq.1) write(*,'("damfile : ", a)') trim(adjustl(damfile))
 
@@ -292,10 +296,11 @@ read(1,*)
 write(*,*)
 
 read(1,*) div_switch
-call cg_iric_read_integer_f("div_switch", div_switch, ier)
+!call cg_iric_read_integer_f("div_switch", div_switch, ier)
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') divfile
+divfile = trim(rri_dir)//divfile(3:len(divfile))
 !------- ここまで（ファイルで与える？要件等） ------
 if(div_switch.eq.1) write(*,'("divfile : ", a)') trim(adjustl(divfile))
 
@@ -308,12 +313,7 @@ read(1,*) xllcorner_evp
 read(1,*) yllcorner_evp
 read(1,*) cellsize_evp_x, cellsize_evp_y
 
-call cg_iric_read_integer_f("evp_switch", evp_switch, ier)
-call cg_iric_read_string_f("evpfile", evpfile, ier)
-call cg_iric_read_real_f("xllcorner_evp", xllcorner_evp, ier)
-call cg_iric_read_real_f("yllcorner_evp", yllcorner_evp, ier)
-call cg_iric_read_real_f("cellsize_evp_x", cellsize_evp_x, ier)
-call cg_iric_read_real_f("cellsize_evp_y", cellsize_evp_y, ier)
+evpfile = trim(rri_dir)//evpfile(3:len(evpfile))
 
 
 if( evp_switch .ne. 0 ) then
@@ -327,10 +327,12 @@ read(1,*)
 write(*,*)
 
 read(1,*) sec_length_switch
-call cg_iric_read_integer_f("sec_length_switch", sec_length_switch, ier)
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') sec_length_file
+
+sec_length_file = trim(rri_dir)//sec_length_file(3:len(sec_length_file))
+
 !------- ここまで（ファイルで与える？要件等） ------
 
 if(sec_length_switch.eq.1) write(*,'("sec_length : ", a)') trim(adjustl(sec_length_file))
@@ -339,11 +341,14 @@ read(1,*)
 write(*,*)
 
 read(1,*) sec_switch
-call cg_iric_read_integer_f("sec_switch", sec_switch, ier)
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') sec_map_file
 read(1,'(a)') sec_file
+
+sec_map_file = trim(rri_dir)//sec_map_file(3:len(sec_map_file))
+sec_file = trim(rri_dir)//sec_file(3:len(sec_file))
+
 !------- ここまで（ファイルで与える？要件等） ------
 
 if(sec_switch.eq.1) write(*,'("sec_map_file : ", a)') trim(adjustl(sec_map_file))
@@ -372,56 +377,18 @@ read(1,'(a)') outfile_gv
 read(1,'(a)') outfile_gampt_ff
 read(1,'(a)') outfile_storage
 
-call cg_iric_read_integer_f("outswitch_hs", outswitch_hs, ier)
-call cg_iric_read_integer_f("outswitch_hr", outswitch_hr, ier)
-call cg_iric_read_integer_f("outswitch_hg", outswitch_hg, ier)
-call cg_iric_read_integer_f("outswitch_qr", outswitch_qr, ier)
-call cg_iric_read_integer_f("outswitch_qu", outswitch_qu, ier)
-call cg_iric_read_integer_f("outswitch_qv", outswitch_qv, ier)
-call cg_iric_read_integer_f("outswitch_gu", outswitch_gu, ier)
-call cg_iric_read_integer_f("outswitch_gv", outswitch_gv, ier)
-call cg_iric_read_integer_f("outswitch_gampt_ff", outswitch_gampt_ff, ier)
-call cg_iric_read_integer_f("outswitch_storage", outswitch_storage, ier)
 
-outfile_hs =""
-call cg_iric_read_string_f("outfile_hs_folder", outfile_hs, ier)
-outfile_hs = trim(adjustl(outfile_hs))//"/hs_"
 
-outfile_hr =""
-call cg_iric_read_string_f("outfile_hr_folder", outfile_hr, ier)
-outfile_hr = trim(adjustl(outfile_hr))//"/hr_"
-
-outfile_hg = ""
-call cg_iric_read_string_f("outfile_hg_folder", outfile_hg, ier)
-outfile_hg = trim(adjustl(outfile_hg))//"/hg_"
-
-outfile_qr=""
-call cg_iric_read_string_f("outfile_qr_folder", outfile_qr, ier)
-outfile_qr = trim(adjustl(outfile_qr))//"/qr_"
-
-outfile_qu=""
-call cg_iric_read_string_f("outfile_qu_folder", outfile_qu, ier)
-outfile_qu = trim(adjustl(outfile_qu))//"/qu_"
-
-outfile_qv=""
-call cg_iric_read_string_f("outfile_qv_folder", outfile_qv, ier)
-outfile_qv = trim(adjustl(outfile_qv))//"/qv_"
-
-outfile_gu=""
-call cg_iric_read_string_f("outfile_gu_folder", outfile_gu, ier)
-outfile_gu = trim(adjustl(outfile_gu))//"/gu_"
-
-outfile_gv=""
-call cg_iric_read_string_f("outfile_gv_folder", outfile_gv, ier)
-outfile_gv = trim(adjustl(outfile_gv))//"/gv_"
-
-outfile_gampt_ff=""
-call cg_iric_read_string_f("outfile_gampt_ff_folder", outfile_gampt_ff, ier)
-outfile_gampt_ff = trim(adjustl(outfile_gampt_ff))//"/gampt_ff_"
-
-outfile_storage=""
-call cg_iric_read_string_f("outfile_storage_folder", outfile_storage, ier)
-outfile_storage = trim(adjustl(outfile_storage))//"/storage.dat"
+outfile_hs = trim(rri_dir)//outfile_hs(3:len(outfile_hs))
+outfile_hr = trim(rri_dir)//outfile_hr(3:len(outfile_hr))
+outfile_hg = trim(rri_dir)//outfile_hg(3:len(outfile_hg))
+outfile_qr = trim(rri_dir)//outfile_qr(3:len(outfile_qr))
+outfile_qu = trim(rri_dir)//outfile_qu(3:len(outfile_qu))
+outfile_qv = trim(rri_dir)//outfile_qv(3:len(outfile_qv))
+outfile_gu = trim(rri_dir)//outfile_gu(3:len(outfile_gu))
+outfile_gv = trim(rri_dir)//outfile_gv(3:len(outfile_gv))
+outfile_gampt_ff = trim(rri_dir)//outfile_gampt_ff(3:len(outfile_gampt_ff))
+outfile_storage = trim(rri_dir)//outfile_storage(3:len(outfile_storage))
 
 
 if(outswitch_hs .ne. 0) write(*,'("outfile_hs : ", a)') trim(adjustl(outfile_hs))
@@ -440,6 +407,8 @@ write(*,*)
 
 read(1,*) hydro_switch
 read(1,'(a)') location_file
+location_file = trim(rri_dir)//location_file(3:len(location_file))
+
 if(hydro_switch .eq. 1) write(*,'("location_file : ", a)') trim(adjustl(location_file))
 
 write(*,*)
