@@ -25,7 +25,7 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Debug|x64">
-				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/nostandard-realloc-lhs" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" AdditionalIncludeDirectories="..\linclude" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/nostandard-realloc-lhs" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" AdditionalIncludeDirectories="D:\RiverLink Dropbox\2018\18-018_pwri_rri-dias\02_work\dias\rri\include" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole" AdditionalDependencies="..\lib\cgnsdll_x64_ifort.lib ..\lib\iriclib_x64_ifort.lib"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
@@ -35,7 +35,7 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Release|x64">
-				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/nostandard-realloc-lhs" SuppressStartupBanner="true" AdditionalIncludeDirectories="..\linclude" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/nostandard-realloc-lhs" SuppressStartupBanner="true" AdditionalIncludeDirectories="D:\RiverLink Dropbox\2018\18-018_pwri_rri-dias\02_work\dias\rri\include" RuntimeLibrary="rtMultiThreadedDLL"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole" AdditionalDependencies="..\lib\cgnsdll_x64_ifort.lib ..\lib\iriclib_x64_ifort.lib"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>

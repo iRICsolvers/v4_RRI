@@ -569,7 +569,9 @@ do
   read(11, *, iostat = ios) (rdummy, j = 1, nx_rain)
  enddo
  if( ios.lt.0 ) exit
+ if( ios /= 0 ) exit
  tt = tt + 1
+
 enddo
 tt_max_rain = tt - 1
 

@@ -5,7 +5,7 @@ use dam_mod
 use tecout_mod
 
 implicit none
-include '..\include\cgnslib_f.h'
+include 'cgnslib_f.h'
 
 integer i
 character*256 format_version
@@ -17,9 +17,12 @@ character(len=64):: cgns_name
 !cgns_name = "input.cgn"
 
 !à¯êîéÊìæ
-icount = nargs()
-if (icount ==  2) then
-    call getarg(1, cgns_name, ier)
+!icount = nargs()
+icount = iargc()
+!if (icount ==  2) then
+if (icount ==  1) then
+    !call getarg(1, cgns_name, ier)
+    call getarg(1, cgns_name)
 else
     write(*,"(a)") "You should specify an argument."
     stop
@@ -33,8 +36,13 @@ call cg_iric_init_f(cgns_f, ier)
 
 call cg_iric_read_string_f("rrifile", rrifile, ier)
 
-write(*,*) index(rrifile,"\", back=.true.) 
-rri_dir = rrifile(1:index(rrifile,"\", back=.true.) )
+!write(*,*) index(rrifile,"\", back=.true.) 
+!rri_dir = rrifile(1:index(rrifile,"\", back=.true.) )
+
+write(*,*) index(rrifile,"/", back=.true.) 
+rri_dir = rrifile(1:index(rrifile,"/", back=.true.) )
+
+
 
 write(*,"(a,a)") "rri_dir = ", rri_dir
 

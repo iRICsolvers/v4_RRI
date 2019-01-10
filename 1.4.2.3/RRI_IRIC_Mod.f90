@@ -11,17 +11,20 @@ module iric
 contains
   subroutine iric_cgns_open()
     implicit none
-    include '..\include\cgnslib_f.h'
-    include '..\include\iriclib_f.h'
+    include 'cgnslib_f.h'
+    include 'iriclib_f.h'
 
     integer:: ierr, icount
 
     
     
     !引数取得
-    icount = nargs()
-    if (icount ==  2) then
-        call getarg(1, cgns_name, ierr)
+    !icount = nargs()
+    icount = iargc()
+    !if (icount ==  2) then
+    if (icount == 1) then
+        !call getarg(1, cgns_name, ierr)
+        call getarg(1, cgns_name)
     else
         write(*,"(a)") "You should specify an argument."
         stop
