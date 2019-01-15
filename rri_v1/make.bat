@@ -12,7 +12,7 @@ ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_DT_Check.f90
 ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_Evp.f90 
 ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_GW.f90
 ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_Infilt.f90 
-ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_Read.f90 
+ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_Read.f90 -I ../include
 ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_Riv.f90 
 ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_RivSlo.f90 
 ifort /MD /c  /Qopenmp /O3   /nostandard-realloc-lhs ../1.4.2.3/RRI_section.f90 

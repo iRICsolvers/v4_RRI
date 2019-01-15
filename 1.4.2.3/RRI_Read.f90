@@ -62,10 +62,10 @@ read(1,'(a)') demfile
 read(1,'(a)') accfile
 read(1,'(a)') dirfile
 
-rainfile = trim(rri_dir)//rainfile(3:len(rainfile))
-demfile = trim(rri_dir)//demfile(3:len(demfile))
-accfile = trim(rri_dir)//accfile(3:len(accfile))
-dirfile = trim(rri_dir)//dirfile(3:len(dirfile))
+!rainfile = trim(rri_dir)//rainfile(3:len(rainfile))
+!demfile = trim(rri_dir)//demfile(3:len(demfile))
+!accfile = trim(rri_dir)//accfile(3:len(accfile))
+!dirfile = trim(rri_dir)//dirfile(3:len(dirfile))
 
 write(*,'("rainfile : ", a)') trim(adjustl(rainfile))
 write(*,'("demfile : ", a)') trim(adjustl(demfile))
@@ -196,9 +196,9 @@ read(1,'(a)') widthfile
 read(1,'(a)') depthfile
 read(1,'(a)') heightfile
 
-widthfile = trim(rri_dir)//widthfile(3:len(widthfile))
-depthfile = trim(rri_dir)//depthfile(3:len(depthfile))
-heightfile = trim(rri_dir)//heightfile(3:len(heightfile))
+!widthfile = trim(rri_dir)//widthfile(3:len(widthfile))
+!depthfile = trim(rri_dir)//depthfile(3:len(depthfile))
+!heightfile = trim(rri_dir)//heightfile(3:len(heightfile))
 
 !------- ここまで（ファイルで与える？要件等） ------
 
@@ -228,10 +228,10 @@ read(1,'(a)') initfile_riv
 read(1,'(a)') initfile_gw
 read(1,'(a)') initfile_gampt_ff
 
-initfile_slo = trim(rri_dir)//initfile_slo(3:len(initfile_slo))
-initfile_riv = trim(rri_dir)//initfile_riv(3:len(initfile_riv))
-initfile_gw = trim(rri_dir)//initfile_gw(3:len(initfile_gw))
-initfile_gampt_ff = trim(rri_dir)//initfile_gampt_ff(3:len(initfile_gampt_ff))
+!initfile_slo = trim(rri_dir)//initfile_slo(3:len(initfile_slo))
+!initfile_riv = trim(rri_dir)//initfile_riv(3:len(initfile_riv))
+!initfile_gw = trim(rri_dir)//initfile_gw(3:len(initfile_gw))
+!initfile_gampt_ff = trim(rri_dir)//initfile_gampt_ff(3:len(initfile_gampt_ff))
 
 !------- ここまで（ファイルで与える？要件等） ------
 
@@ -249,8 +249,8 @@ read(1,*) bound_slo_wlev_switch, bound_riv_wlev_switch
 read(1,'(a)') boundfile_slo_wlev
 read(1,'(a)') boundfile_riv_wlev
 
-boundfile_slo_wlev = trim(rri_dir)//boundfile_slo_wlev(3:len(boundfile_slo_wlev))
-boundfile_riv_wlev = trim(rri_dir)//boundfile_riv_wlev(3:len(boundfile_riv_wlev))
+!boundfile_slo_wlev = trim(rri_dir)//boundfile_slo_wlev(3:len(boundfile_slo_wlev))
+!boundfile_riv_wlev = trim(rri_dir)//boundfile_riv_wlev(3:len(boundfile_riv_wlev))
 
 !------- ここまで（ファイルで与える？要件等） ------
 
@@ -266,8 +266,8 @@ read(1,*) bound_slo_disc_switch, bound_riv_disc_switch
 read(1,'(a)') boundfile_slo_disc
 read(1,'(a)') boundfile_riv_disc
 
-boundfile_slo_disc = trim(rri_dir)//boundfile_slo_disc(3:len(boundfile_slo_disc))
-boundfile_riv_disc = trim(rri_dir)//boundfile_riv_disc(3:len(boundfile_riv_disc))
+!boundfile_slo_disc = trim(rri_dir)//boundfile_slo_disc(3:len(boundfile_slo_disc))
+!boundfile_riv_disc = trim(rri_dir)//boundfile_riv_disc(3:len(boundfile_riv_disc))
 
 !------- ここまで（ファイルで与える？要件等） ------
 
@@ -283,7 +283,7 @@ read(1,*) land_switch
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') landfile
 
-landfile = trim(rri_dir)//landfile(3:len(landfile))
+!landfile = trim(rri_dir)//landfile(3:len(landfile))
 !------- ここまで（ファイルで与える？要件等） ------
 if(land_switch.eq.1) write(*,'("landfile : ", a)') trim(adjustl(landfile))
 
@@ -296,7 +296,7 @@ read(1,*) dam_switch
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') damfile
 
-damfile = trim(rri_dir)//damfile(3:len(damfile))
+!damfile = trim(rri_dir)//damfile(3:len(damfile))
 !------- ここまで（ファイルで与える？要件等） ------
 if(dam_switch.eq.1) write(*,'("damfile : ", a)') trim(adjustl(damfile))
 
@@ -308,7 +308,7 @@ read(1,*) div_switch
 
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') divfile
-divfile = trim(rri_dir)//divfile(3:len(divfile))
+!divfile = trim(rri_dir)//divfile(3:len(divfile))
 !------- ここまで（ファイルで与える？要件等） ------
 if(div_switch.eq.1) write(*,'("divfile : ", a)') trim(adjustl(divfile))
 
@@ -321,7 +321,7 @@ read(1,*) xllcorner_evp
 read(1,*) yllcorner_evp
 read(1,*) cellsize_evp_x, cellsize_evp_y
 
-evpfile = trim(rri_dir)//evpfile(3:len(evpfile))
+!evpfile = trim(rri_dir)//evpfile(3:len(evpfile))
 
 
 if( evp_switch .ne. 0 ) then
@@ -339,7 +339,7 @@ read(1,*) sec_length_switch
 !------- ここから（ファイルで与える？要件等） ------
 read(1,'(a)') sec_length_file
 
-sec_length_file = trim(rri_dir)//sec_length_file(3:len(sec_length_file))
+!sec_length_file = trim(rri_dir)//sec_length_file(3:len(sec_length_file))
 
 !------- ここまで（ファイルで与える？要件等） ------
 
@@ -354,8 +354,8 @@ read(1,*) sec_switch
 read(1,'(a)') sec_map_file
 read(1,'(a)') sec_file
 
-sec_map_file = trim(rri_dir)//sec_map_file(3:len(sec_map_file))
-sec_file = trim(rri_dir)//sec_file(3:len(sec_file))
+!sec_map_file = trim(rri_dir)//sec_map_file(3:len(sec_map_file))
+!sec_file = trim(rri_dir)//sec_file(3:len(sec_file))
 
 !------- ここまで（ファイルで与える？要件等） ------
 
@@ -387,16 +387,16 @@ read(1,'(a)') outfile_storage
 
 
 
-outfile_hs = trim(rri_dir)//outfile_hs(3:len(outfile_hs))
-outfile_hr = trim(rri_dir)//outfile_hr(3:len(outfile_hr))
-outfile_hg = trim(rri_dir)//outfile_hg(3:len(outfile_hg))
-outfile_qr = trim(rri_dir)//outfile_qr(3:len(outfile_qr))
-outfile_qu = trim(rri_dir)//outfile_qu(3:len(outfile_qu))
-outfile_qv = trim(rri_dir)//outfile_qv(3:len(outfile_qv))
-outfile_gu = trim(rri_dir)//outfile_gu(3:len(outfile_gu))
-outfile_gv = trim(rri_dir)//outfile_gv(3:len(outfile_gv))
-outfile_gampt_ff = trim(rri_dir)//outfile_gampt_ff(3:len(outfile_gampt_ff))
-outfile_storage = trim(rri_dir)//outfile_storage(3:len(outfile_storage))
+!outfile_hs = trim(rri_dir)//outfile_hs(3:len(outfile_hs))
+!outfile_hr = trim(rri_dir)//outfile_hr(3:len(outfile_hr))
+!outfile_hg = trim(rri_dir)//outfile_hg(3:len(outfile_hg))
+!outfile_qr = trim(rri_dir)//outfile_qr(3:len(outfile_qr))
+!outfile_qu = trim(rri_dir)//outfile_qu(3:len(outfile_qu))
+!outfile_qv = trim(rri_dir)//outfile_qv(3:len(outfile_qv))
+!outfile_gu = trim(rri_dir)//outfile_gu(3:len(outfile_gu))
+!outfile_gv = trim(rri_dir)//outfile_gv(3:len(outfile_gv))
+!outfile_gampt_ff = trim(rri_dir)//outfile_gampt_ff(3:len(outfile_gampt_ff))
+!outfile_storage = trim(rri_dir)//outfile_storage(3:len(outfile_storage))
 
 
 if(outswitch_hs .ne. 0) write(*,'("outfile_hs : ", a)') trim(adjustl(outfile_hs))
@@ -415,7 +415,7 @@ write(*,*)
 
 read(1,*) hydro_switch
 read(1,'(a)') location_file
-location_file = trim(rri_dir)//location_file(3:len(location_file))
+!location_file = trim(rri_dir)//location_file(3:len(location_file))
 
 if(hydro_switch .eq. 1) write(*,'("location_file : ", a)') trim(adjustl(location_file))
 

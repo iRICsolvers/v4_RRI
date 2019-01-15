@@ -3,5 +3,5 @@
 	<Configurations>
 		<Configuration Name="Debug|Win32"/>
 		<Configuration Name="Release|Win32"/>
-		<Configuration Name="Debug|x64" CommandArguments="case1.cgn" WorkingDirectory="D:\RiverLink Dropbox\2018\18-018_pwri_rri-dias\02_work\dias\past\00_base_rri"/>
-		<Configuration Name="Release|x64" CommandArguments="case1.cgn" WorkingDirectory="D:\RiverLink Dropbox\2018\18-018_pwri_rri-dias\02_work\dias\past\00_base_rri"/></Configurations></VisualStudioUserFile>
+		<Configuration Name="Debug|x64" CommandArguments="case1.cgn" WorkingDirectory="D:\RiverLink Dropbox\2018\18-018_pwri_rri-dias\02_work\dias\past\00_base_rri_win"/>
+		<Configuration Name="Release|x64" CommandArguments="case1.cgn" WorkingDirectory="D:\RiverLink Dropbox\2018\18-018_pwri_rri-dias\02_work\dias\past\00_base_rri_win"/></Configurations></VisualStudioUserFile>
