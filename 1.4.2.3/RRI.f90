@@ -560,11 +560,13 @@ write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg
   (rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit), ss, sr, si, sg
 
 ! reading rainfall data
+write(*,*) trim(rainfile)
 open( 11, file = rainfile, status = 'old' )
 
 tt = 0
 do
  read(11, *, iostat = ios) t, nx_rain, ny_rain
+ write(*,*) tt, t, nx_rain, ny_rain
  do i = 1, ny_rain
   read(11, *, iostat = ios) (rdummy, j = 1, nx_rain)
  enddo
