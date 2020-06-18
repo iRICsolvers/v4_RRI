@@ -1,2 +1,2 @@
-cp -f definition.xml 		"C:\Users\riverlink\iRIC\solvers\rri"
-cp -f rri.exe 		"C:\Users\riverlink\iRIC\solvers\rri"
+cp -f definition.xml 		"D:\ProgramFiles\iRIC_dev\solvers\rri_v1"
+cp -f rri.exe 		"D:\ProgramFiles\iRIC_dev\solvers\rri_v1"
