@@ -81,96 +81,54 @@ maxt = lasth * 3600 / dt
 
 ! load data from CGNS file
 call iric_cgns_open
-!call iric_read_input_condition
 
-! dem data is now read from CGNS file
- open( 10, file = demfile, status = "old" )
- read(10,*) ctemp, nx
- read(10,*) ctemp, ny
- read(10,*) ctemp, xllcorner
- read(10,*) ctemp, yllcorner
- read(10,*) ctemp, cellsize
- read(10,*) ctemp, nodata
- close(10)
 
- allocate(gxx(nx+1,ny+1), gyy(nx+1,ny+1))
- gxx(1,1) = xllcorner
- gyy(1,1) = yllcorner
- do j=2, ny+1
-    gxx(1,j) = gxx(1,1)
-    gyy(1,j) = gyy(1,j-1) + cellsize
- end do
+!! dem data is now read from CGNS file
+! open( 10, file = demfile, status = "old" )
+! read(10,*) ctemp, nx
+! read(10,*) ctemp, ny
+! read(10,*) ctemp, xllcorner
+! read(10,*) ctemp, yllcorner
+! read(10,*) ctemp, cellsize
+! read(10,*) ctemp, nodata
+! close(10)
 
- do i=2,nx+1
-    gxx(i,1) = gxx(i-1,1) + cellsize 
-    gyy(i,1) = gyy(1,1)
- end do
- 
- do i=2,nx+1
-     do j=2,ny+1
-        gxx(i,j) = gxx(i-1,j) + cellsize 
-        gyy(i,j) = gyy(i,j-1) + cellsize
-     end do
- end do
- 
+call cg_iric_gotogridcoord2d_f(nx, ny, ierr)
+allocate(gxx(nx,ny), gyy(nx,ny))
+call cg_iric_getgridcoord2d_f(gxx, gyy, ierr)
+xllcorner = gxx(1,1); yllcorner = gyy(1,1)
+cellsize = dabs(gxx(1,2) - gxx(1,1))
+nodata = -9999
+
+
+!RRI 仕様に変更　セル数
+nx = nx-1; ny = ny-1
+
+
  allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
  allocate (zs1(nx, ny), acc1(nx, ny), dir1(nx, ny))
- call read_gis_real(demfile, zs)
+ !call read_gis_real(demfile, zs)
+ call cg_iric_read_grid_integer_cell_f('elevation_c',zs,ierr)
  
- call cg_iric_writegridcoord2d_f(nx+1, ny+1, gxx, gyy, ierr)
- 
- !debug----------
- !call cg_iric_write_sol_time_f(time, ierr)
- !
- !call cg_iric_write_sol_gridcoord2d_f(gxx, gyy, ierr)
- !do i = 1, nx
- !    do j= 1, ny
- !        zs1(i,j) = zs(ny-j+1,i)
- !    end do
- !end do
- !
- !
- !call cg_iric_write_sol_cell_real_f("zs", zs, ierr)
- !call cg_iric_write_sol_cell_real_f("zs1", zs1, ierr)
- !debug----------
-
 ! flow accumulation file
  allocate (riv(ny, nx), acc(ny, nx))
- call read_gis_int(accfile, acc)
- 
- !debug----------
- !do i = 1, nx
- !    do j= 1, ny
- !        acc1(i,j) = acc(ny-j+1,i)
- !    end do
- !end do
- !call cg_iric_write_sol_cell_integer_f("acc", acc, ierr)
- !call cg_iric_write_sol_cell_integer_f("axx1", acc1, ierr)
- !debug----------
+ !call read_gis_int(accfile, acc)
+ call cg_iric_read_grid_integer_cell_f('acc_c',acc,ierr)
+
 
 ! flow direction file
  allocate (dir(ny, nx))
- call read_gis_int(dirfile, dir)
- 
- !debug----------
- !do i = 1, nx
- !    do j= 1, ny
- !        dir1(i,j) = dir(ny-j+1,i)
- !    end do
- !end do
- !call cg_iric_write_sol_cell_integer_f("dir", dir, ierr)
- !call cg_iric_write_sol_cell_integer_f("dxx1", dir1, ierr)
- !call iric_cgns_close()
- !debug----------
- !stop
+ !call read_gis_int(dirfile, dir)
+ call cg_iric_read_grid_integer_cell_f('dir_c',dir,ierr)
  
 ! landuse file
  allocate( land(ny, nx) )
- land = 1
- if( land_switch.eq.1 ) then
-   call read_gis_int(landfile, land)
- endif
-
+ !land = 1
+ !if( land_switch.eq.1 ) then
+ !  call read_gis_int(landfile, land)
+ !endif
+call cg_iric_read_grid_integer_cell_f('landuse_c',land,ierr)
+ 
 ! land : 1 ... num_of_landuse
 write(*,*) "num_of_landuse : ", num_of_landuse
 where( land .le. 0 .or. land .gt. num_of_landuse ) land = num_of_landuse
@@ -335,7 +293,6 @@ where(riv.eq.1) hr = 0.d0
 where(domain.eq.1) hs = 0.d0
 where(domain.eq.2) hs = 0.d0
 
-!for restart
 ! for slope cells
 ! if init_slo_switch = 1 => read from file
 
@@ -560,13 +517,11 @@ write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg
   (rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit), ss, sr, si, sg
 
 ! reading rainfall data
-write(*,*) trim(rainfile)
 open( 11, file = rainfile, status = 'old' )
 
 tt = 0
 do
  read(11, *, iostat = ios) t, nx_rain, ny_rain
- write(*,*) tt, t, nx_rain, ny_rain
  do i = 1, ny_rain
   read(11, *, iostat = ios) (rdummy, j = 1, nx_rain)
  enddo
@@ -759,7 +714,7 @@ do t = 1, maxt
    ! try smaller ddt
    ddt = max( safety * ddt * (errmax ** pshrnk), 0.5d0 * ddt )
    ddt_chk_riv = ddt
-   !write(*,*) "shrink (riv): ", ddt, errmax, maxloc( vr_err )
+   write(*,*) "shrink (riv): ", ddt, errmax, maxloc( vr_err )
    if(ddt.eq.0) stop 'stepsize underflow'
    if(dam_switch .eq. 1 ) dam_vol_temp(:) = 0.d0
    go to 1
@@ -883,7 +838,7 @@ do t = 1, maxt
    ! try smaller ddt
    ddt = max( safety * ddt * (errmax ** pshrnk), 0.5d0 * ddt )
    ddt_chk_slo = ddt
-   !write(*,*) "shrink (slo): ", ddt, errmax, maxloc( hs_err )
+   write(*,*) "shrink (slo): ", ddt, errmax, maxloc( hs_err )
    if(ddt.eq.0) stop 'stepsize underflow'
    go to 3
   else
@@ -978,7 +933,7 @@ do t = 1, maxt
    ! try smaller ddt
    ddt = max( safety * ddt * (errmax ** pshrnk), 0.5d0 * ddt )
    ddt_chk_slo = ddt
-   !write(*,*) "shrink (gw): ", ddt, errmax, maxloc( hg_err )
+   write(*,*) "shrink (gw): ", ddt, errmax, maxloc( hg_err )
    if(ddt.eq.0) stop 'stepsize underflow'
    go to 5
   else
@@ -1045,9 +1000,9 @@ do t = 1, maxt
  call sub_slo_ij2idx( hs, hs_idx )
  call sub_slo_ij2idx( hg, hg_idx )
 
- !write(*,*) "max hr: ", maxval(hr), "loc : ", maxloc(hr)
- !write(*,*) "max hs: ", maxval(hs), "loc : ", maxloc(hs)
- !if(gw_switch .eq. 1) write(*,*) "max hg: ", maxval(hg), "loc : ", maxloc(hg)
+ write(*,*) "max hr: ", maxval(hr), "loc : ", maxloc(hr)
+ write(*,*) "max hs: ", maxval(hs), "loc : ", maxloc(hs)
+ if(gw_switch .eq. 1) write(*,*) "max hg: ", maxval(hg), "loc : ", maxloc(hg)
 
  !******* OUTPUT *****************************************
 
@@ -1184,8 +1139,8 @@ i = ny, 1, -1)
  ! check water balance
  if(mod(t, 1).eq.0) then
   call storage_calc(hs, hr, hg, ss, sr, si, sg)
-  !write(*, '(6e15.3)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
-!(rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit)
+  write(*, '(6e15.3)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
+(rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit)
   write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
 (rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit), ss, sr, si, sg
  endif
