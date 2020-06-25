@@ -4,9 +4,11 @@ module iric
   character(len=64):: cgns_name
   integer:: cgns_f
 
-  public iric_cgns_open, iric_cgns_close
+  public iric_cgns_open, iric_cgns_close, iric_cgns_update
   public iric_read_input_condition
   public iric_cgns_output_result
+  public iric_check_cancel
+  public iric_write_cell_real, iric_write_cell_integer
 
 contains
   subroutine iric_cgns_open()
@@ -45,6 +47,26 @@ contains
     integer:: ierr
 
     call cg_close_f(cgns_f, ierr)
+  end subroutine
+  
+  subroutine iric_cgns_update()
+    implicit none
+    integer:: ierr
+
+	call cg_iric_flush_f(cgns_name, cgns_f, ierr)
+  end subroutine
+	
+	
+  subroutine iric_check_cancel()
+    implicit none
+    integer:: ierr
+
+	 call iric_check_cancel_f(ierr)
+	 if (ierr == 1) then
+	  write(*,*) "Solver is stopped because the STOP button was clicked."	
+	  call iric_cgns_close()
+	  stop
+	 end if
   end subroutine
 
   subroutine iric_read_input_condition()
@@ -135,6 +157,52 @@ contains
     end do
 
     call cg_iric_write_sol_cell_integer_f(name, tmpv, ierr)
+  end subroutine
+  
+  subroutine iric_write_cell_real(name, v)
+    use globals
+    implicit none
+
+    character(len=*),intent(in):: name
+    double precision, dimension(:,:), allocatable, intent(in):: v
+
+    double precision, dimension(:,:), allocatable:: tmpv
+    integer:: i, j, ierr
+
+    allocate(tmpv(nx, ny))
+
+    do i = 1, nx
+      do j = 1, ny
+        tmpv(i, j) = v(ny-j+1, i)
+        !tmpv(i, j) = v(j, i)
+        !tmpv(i, j) = v(i, j)
+      end do
+	end do
+
+	call cg_iric_write_grid_real_cell_f(name, tmpv, ierr)
+  end subroutine
+  
+  subroutine iric_write_cell_integer(name, v)
+    use globals
+    implicit none
+
+    character(len=*),intent(in):: name
+    integer, dimension(:,:), allocatable, intent(in):: v
+
+    integer, dimension(:,:), allocatable:: tmpv
+    integer:: i, j, ierr
+
+    allocate(tmpv(nx, ny))
+
+    do i = 1, nx
+      do j = 1, ny
+        tmpv(i, j) = v(ny-j+1, i)
+        !tmpv(i, j) = v(j, i)
+        !tmpv(i, j) = v(i, j)
+      end do
+	end do
+
+	call cg_iric_write_grid_integer_cell_f(name, tmpv, ierr)
   end subroutine
 
   subroutine iric_read_grid()
@@ -258,7 +326,7 @@ contains
   end subroutine
 
   subroutine iric_cgns_output_result( &
-    qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
+    qp_t, hs, hr, hg, qr_ave, qs_ave, qg_ave)
     use globals
 
     double precision, dimension(:,:), allocatable, intent(in):: &
@@ -281,7 +349,6 @@ contains
                  rain_rate(i,j) = qp_t(i,j) * 3600.d0 * 1000.d0
              end do
          end do
-                
       
       call iric_write_result_real('zs', zs)
       call iric_write_result_integer('acc', acc)

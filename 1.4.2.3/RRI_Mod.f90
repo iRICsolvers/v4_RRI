@@ -81,6 +81,7 @@ real(8) cellsize_rain_x, cellsize_rain_y
 
 integer utm
 integer eight_dir
+integer data_check_only
 
 real(8), save :: ns_river
 integer, save :: num_of_landuse

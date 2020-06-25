@@ -6,824 +6,487 @@
 					copyright="Takahiro Sayama , RiverLINK Co., Ltd. ,  Mitsui Consultants Co., Ltd."
 					release="2018.1.1"
 					homepage="http://i-ric.org"
-					executable="rri.exe"
+					executable="go.bat"
 					iterationtype="time"
 					gridtype="structured2d">
 
 <CalculationCondition>
 
-  <Tab name="Main" caption="条件">
-    <Item name="rrifile" caption="RRI Input File" >
-      <Definition valueType="filename" default="Select File" />
-    </Item>
-  </Tab>
-  
-  
-	<!--<Tab name="FileControl" caption="地形条件">
-		--><!-- RRI_Input  L1 バージョン情報--><!--
-		<Item name="RRI_version" caption="RRI Version【L1】" >
-				--><!-- RRI_version →RRIソースでは、format_version--><!--
-			<Definition valueType="string" default="RRI Input Format Ver1.4.2" />
-		</Item>
-		
-		--><!-- RRI_Input  L2 = blank --><!--
-		
-		--><!-- RRI_Input  L4	DEMファイルのパス（地形データ） --><!--
-		<Item name="demfile" caption="DEMファイル" >
-			<Definition valueType="filename" default="Select File" />
-		</Item>
-		
-		--><!-- RRI_Input  L6	dirファイルのパス（流下方向データ） --><!--
-		<Item name="dirfile" caption="DIRファイル" >
-			<Definition valueType="filename" default="Select File" />
-		</Item>
-		
-		--><!-- RRI_Input  L5	accファイルのパス（累積流量データ） --><!--
-		<Item name="accfile" caption="ACCファイル" >
-			<Definition valueType="filename" default="Select File" />
-		</Item>
+  <!-- 
+  ***** Options *****
+  -->
 
-   
-		--><!-- RRI_Input  L7	（Null） --><!--
-	</Tab>
-  
-  <Tab name="rain" caption="降雨条件">
-    --><!-- RRI_Input  L3 Rainファイルのパス（雨量データ） --><!--
-    <Item name="rainfile" caption="ファイル指定" >
-      <Definition valueType="filename" default="Select File" />
-    </Item>
-
-    --><!-- RRI_Input  L14	雨量データの南西座標値（経度）lon --><!--
-    <Item name="xllcorner_rain" caption="雨量データの南西座標値（経度）lon" >
-      <Definition valueType="real" default="110.200000" />
-    </Item>
-
-    --><!-- RRI_Input  L15	雨量データの南西座標値（緯度）lat --><!--
-    <Item name="yllcorner_rain" caption="雨量データの南西座標値（緯度）lat" >
-      <Definition valueType="real" default="-8.300000" />
-    </Item>
-
-    --><!-- RRI_Input  L16	雨量データの空間解像度（経度␣緯度の順） --><!--
-    <Item name="cellsize_rain_x"  caption="雨量データの空間解像度 経度">
-      <Definition valueType="real" default="0.0083333333" />
-    </Item>
-    <Item name="cellsize_rain_y" caption="雨量データの空間解像度 緯度">
-      <Definition valueType="real" default="0.0083333333" />
-    </Item>
-  </Tab>
-
-  <Tab name="evaporation" caption="蒸発散">
-    <Item name="evp_switch" caption="蒸発散の考慮フラグ">
+  <Tab name="options" caption="Base Conditions">
+    <Label caption="RRI_Input_Format_Ver1_4_2 for iRIC" align="right"/>
+    <Item name="run_type" caption="Run Type" >
       <Definition valueType="integer" default="0">
-        <Enumeration value="0" caption="設定しない" />
-        <Enumeration value="1" caption="設定する" />
-        <Enumeration value="2" caption="設定する（GAから無）" />
+        <Enumeration value="0" caption="Data Check Only" />
+        <Enumeration value="1" caption="Run" />
       </Definition>
     </Item>
 
-    <Item name="evpfile" caption="ファイル指定" >
-      <Definition valueType="filename" default="Select File" >
-      <Dependency>
-        <Condition type="or">
-          <Condition type="isEqual" target="evp_switch" value="1" />
-          <Condition type="isEqual" target="evp_switch" value="2" />
-        </Condition>
-        <Action type="enable" />
-      </Dependency>
-     </Definition>
-    </Item>
+    <GroupBox caption="Base Parameters">
+      <Item name="utm" caption="Coordinate System" >
+        <Definition valueType="integer" default="0">
+          <Enumeration value="0" caption="LatLon" />
+          <Enumeration value="1" caption="UTM" />
+        </Definition>
+      </Item>
+    
+      <Item name="eight_dir" caption="Number for DIR Directions" >
+        <Definition valueType="integer" default="1">
+          <Enumeration value="0" caption="4" />
+          <Enumeration value="1" caption="8" />
+        </Definition>
+      </Item>
+    </GroupBox>
 
-    --><!-- RRI_Input  L14	雨量データの南西座標値（経度）lon --><!--
-    <Item name="xllcorner_evp" caption="蒸発散データの南西座標値（経度）lon" >
-      <Definition valueType="real" default="110.200000" >
-        <Dependency>
-          <Condition type="or">
-            <Condition type="isEqual" target="evp_switch" value="1" />
-            <Condition type="isEqual" target="evp_switch" value="2" />
-          </Condition>
-          <Action type="enable" />
-        </Dependency>
-      </Definition>
-    </Item>
+    <GroupBox caption="Rain Data file">
+      <Item name="rainfile" caption="Rain File" >
+        <Definition valueType="filename" default="./rain/rain.dat">
+        </Definition>
+      </Item>
+    </GroupBox>
 
-    --><!-- RRI_Input  L15	雨量データの南西座標値（緯度）lat --><!--
-    <Item name="yllcorner_evp" caption="蒸発散データの南西座標値（緯度）lat" >
-      <Definition valueType="real" default="-8.300000" >
-        <Dependency>
-        <Condition type="or">
-          <Condition type="isEqual" target="evp_switch" value="1" />
-          <Condition type="isEqual" target="evp_switch" value="2" />
-        </Condition>
-        <Action type="enable" />
-      </Dependency>
-     </Definition>
-    </Item>
+    <GroupBox caption="Geographic Data file">
+      <Item name="demfile" caption="Dem File" >
+        <Definition valueType="filename" default="./topo/elv_export.asc">
+        </Definition>
+      </Item>
 
-    --><!-- RRI_Input  L16	雨量データの空間解像度（経度␣緯度の順） --><!--
-    <Item name="cellsize_evp_x"  caption="蒸発散データの空間解像度 経度">
-      <Definition valueType="real" default="0.0083333333" >
-        <Dependency>
-          <Condition type="or">
-            <Condition type="isEqual" target="evp_switch" value="1" />
-            <Condition type="isEqual" target="evp_switch" value="2" />
-          </Condition>
-          <Action type="enable" />
-        </Dependency>
-      </Definition>
-    </Item>
-    <Item name="cellsize_evp_y" caption="蒸発散データの空間解像度 緯度">
-      <Definition valueType="real" default="0.0083333333">
-        <Dependency>
-          <Condition type="or">
-            <Condition type="isEqual" target="evp_switch" value="1" />
-            <Condition type="isEqual" target="evp_switch" value="2" />
-          </Condition>
-          <Action type="enable" />
-        </Dependency>
-      </Definition>
-    </Item>
+      <Item name="accfile" caption="Acc File" >
+        <Definition valueType="filename" default="./topo/upg_export.asc">
+        </Definition>
+      </Item>
 
+      <Item name="dirfile" caption="Dir File" >
+        <Definition valueType="filename" default="./topo/dir_export.asc">
+        </Definition>
+      </Item>
+    </GroupBox>
+
+    <GroupBox caption="River Shape Parameters">
+      <GridLayout withSpacer="true">
+        <Label row="0" col="0" caption="Width : Wc, Ws"/>
+        <Item row="0" col="1" name="width_param_c">
+          <Definition valueType="real" default="5.0">
+          </Definition>
+        </Item>
+       
+        <Item row="0" col="2" name="width_param_s" caption="width_param_s" >
+          <Definition valueType="real" default="0.35">
+          </Definition>
+        </Item>
+
+        <Label row="1" col="0" caption="Depth : Dc, Ds" />
+        <Item row="1" col="1" name="depth_param_c" caption="depth_param_c" >
+          <Definition valueType="real" default="0.95">
+          </Definition>
+        </Item>
+        <Item row="1" col="2" name="depth_param_s" caption="depth_param_s" >
+          <Definition valueType="real" default="0.2">
+          </Definition>
+        </Item>
+
+        <Label row="2" col="0" caption="Height : Height, Limit" />
+        <Item row="2" col="1" name="height_param" caption="height_param" >
+          <Definition valueType="real" default="2.0">
+          </Definition>
+        </Item>
+        <Item row="2" col="2" name="height_limit_param" caption="height_limit_param" >
+          <Definition valueType="integer" default="1000"  max ="100000">
+          </Definition>
+        </Item>
+        
+      </GridLayout>
+    </GroupBox>
+   
   </Tab>
+
+ <!--
+  ***** Time Contorol Parameters *****
+  --> 
   
+  <Tab name="time_ctrl" caption="Time Control">
+    <Item name="lasth" caption="Simulation Time[hour]" >
+      <Definition valueType="integer" default="12" max ="1000000">
+      </Definition>
+    </Item>
 
-	<Tab name="Basic_Condition" caption="基本条件">
-		--><!-- RRI_Input  L8	地形や雨量データの座標指定方法 --><!--
-		<Item name="utm" caption="座標系                        【L8】" >
-			<Definition valueType="integer" default="0">
-				<Enumeration caption="緯度経度" value="0" />
-				<Enumeration caption="UTM" value="1" />
-			</Definition>
-		</Item>
+    <Item name="dt" caption="Time Step for Slope Simulation[sec]" >
+      <Definition valueType="integer" default="600"  max ="3600">
+      </Definition>
+    </Item>
 
-		--><!-- RRI_Input  L9	二次元モデルの移動方向 --><!--
-		<Item name="eight_dir" caption="移動方向                     【L9】" >
-			<Definition valueType="integer" default="1">
-				<Enumeration value="0" caption="4方向" />
-				<Enumeration value="1" caption="8方向" />
-			</Definition>
-		</Item>
+    <Item name="dt_riv" caption="Time Step for River Simulation[sec]" >
+      <Definition valueType="integer" default="60"  max="3600">
+      </Definition>
+    </Item>
 
-		--><!-- RRI_Input  L10	シミュレーション期間 --><!--
-		<Item name="lasth" caption="シミュレーション期間(hr)     【L10】" >
-			<Definition valueType="integer" default="24" max="20000" />
-		</Item>
-		
-		--><!-- RRI_Input  L11	氾濫原のシミュレーション時間ステップ --><!--
-		<Item name="dt" caption="氾濫原計算時間ステップ(s)【L11】" >
-			<Definition valueType="integer" default="600" max="20000" />
-		</Item>
-		
-		--><!-- RRI_Input  L12	河道内のシミュレーション時間ステップ --><!--
-		<Item name="dt_riv" caption="河道計算時間ステップ(s)   【L12】" >
-			<Definition valueType="integer" default="60" max="20000" />
-		</Item>
-		
-		--><!-- RRI_Input  L13	出力ファイル数 --><!--
-		<Item name="outnum" caption="出力ファイル数（=シミュレーション期間/出力時間）【L13】" >
-			<Definition valueType="integer" default="24" max="100000" />
-		</Item>
-	</Tab>-->
+    <Item name="outnum" caption="Number for Output" >
+      <Definition valueType="integer" default="13"  max ="10000">
+      </Definition>
+    </Item>
+  </Tab>
 
-  
-  
-	<!--<Tab name="Rain_Evap" caption="降雨・蒸発散⇒iRIC内設定が望ましい" >
-		<GridLayout>
-			<Label row="0" col="1" caption="       降雨【L3,14～16】" />
-			<Label row="0" col="2" caption="       蒸発散【L74～78】" />
-	
-			<Label row="1" col="0" caption="設定の有無                            【L74】" />
-			<Label row="2" col="0" caption="ファイル                            【L3】【L75】" />
-			<Label row="3" col="0" caption="南西座標値［経度(度)/X(m)］【L14】【L76】" />
-			<Label row="4" col="0" caption="南西座標値［緯度(度)/Y(m)］【L15】【L77】" />
-			<Label row="5" col="0" caption="空間解像度［経度(度)/X(m)］【L16】【L78】" />
-			<Label row="6" col="0" caption="空間解像度［緯度(度)/X(m)］【L16】【L78】" />
+  <!--
+  ***** River Simulation Parameters *****
+  -->
+  <Tab name="river_sim" caption="River Simulation Parameters">
+    <Item name="ns_river" caption="Manning Roughness for River Region" >
+      <Definition valueType="real" default="0.03">
+      </Definition>
+    </Item>
+    <Item name="riv_thresh" caption="threshold of flow accumulation" >
+      <Definition valueType="integer" default="100"  max ="100000">
+      </Definition>
+    </Item>
+  </Tab>
 
-			<Label row="1" col="1" caption="設定する（必須）" />
+  <!--
+  ***** Slope Simulation Parameters *****
+  -->
+  <Tab name="slope_sim" caption="Slope Simulation Parameters">
+    <Label caption="Please Specify Slope Simulation Parameters at Land Use Parameters." />
+  </Tab>
 
-			--><!-- RRI_Input  L3 Rainファイルのパス（雨量データ） --><!--
-			<Item row="2" col="1" name="rainfile" >
-				<Definition valueType="filename" default="Select File" />
-			</Item>--><!--
+  <!--
+  ***** initial condition for hotstart *****
+  -->
+  <Tab name="initial_files" caption="Initial Condition for Hotstart">
+    <GroupBox caption="Settings">
+      <GridLayout>
+        <Label row="0" col="0" caption="initfile_slo" />
+        <Item  row="0" col="1" name="initfile_slo" >
+          <Definition valueType="filename" default="./init/hs_init_dummy.out">
+            <Condition type="isEqual" target="init_slo_switch" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="0" col="2" name="init_slo_switch">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
 
-			
+        <Label row="1" col="0" caption="initfile_riv" />
+        <Item  row="1" col="1" name="initfile_riv" >
+          <Definition valueType="filename" default="./init/hr_init_dummy.out">
+            <Condition type="isEqual" target="init_riv_switch" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="1" col="2" name="init_riv_switch">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
 
-			--><!-- RRI_Input  L17	（Null） --><!--
+        <Label row="2" col="0" caption="initfile_gw" />
+        <Item  row="2" col="1" name="initfile_gw" >
+          <Definition valueType="filename" default="./init/hg_init_dummy.out">
+            <Condition type="isEqual" target="init_gw_switch" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="2" col="2" name="init_gw_switch">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
 
-			--><!-- RRI_Input  L74	蒸発散の与え方（設定しない(0) or 設定する(1) or GAなし(2)） --><!--
-			<Item row="1" col="2" name="evp_switch" >
-				<Definition valueType="integer" default="0">
-					<Enumeration value="0" caption="設定しない" />
-					<Enumeration value="1" caption="設定する" />
-					<Enumeration value="2" caption="設定する（GAから無）" />
-				</Definition>
-			</Item>
-		
-			--><!-- RRI_Input  L75	蒸発散設定ファイルのパス --><!--
-			<Item row="2" col="2" name="evpfile" >
-				<Definition valueType="filename" default="Select File" >
-					<Dependency>
-						<Condition type="or">
-							<Condition type="isEqual" target="evp_switch" value="1" />
-							<Condition type="isEqual" target="evp_switch" value="2" />
-						</Condition>
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-		
-			--><!-- RRI_Input  L76	蒸発散データの南西座標値（経度） --><!--
-			<Item row="3" col="2" name="xllcorner_evp" >
-				<Definition valueType="real" default="135.0" >
-					<Dependency>
-						<Condition type="or">
-							<Condition type="isEqual" target="evp_switch" value="1" />
-							<Condition type="isEqual" target="evp_switch" value="2" />
-						</Condition>
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-		
-			--><!-- RRI_Input  L77	蒸発散データの南西座標値（緯度） --><!--
-			<Item row="4" col="2" name="yllcorner_evp" >
-				<Definition valueType="real" default="34.65" >
-					<Dependency>
-						<Condition type="or">
-							<Condition type="isEqual" target="evp_switch" value="1" />
-							<Condition type="isEqual" target="evp_switch" value="2" />
-						</Condition>
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-		
-			--><!-- RRI_Input  L78	蒸発散データの空間解像度（経度␣緯度の順） --><!--
-			<Item row="5" col="2" name="cellsize_evp_x" >
-				<Definition valueType="real" default="0.0102062072" >
-					<Dependency>
-						<Condition type="or">
-							<Condition type="isEqual" target="evp_switch" value="1" />
-							<Condition type="isEqual" target="evp_switch" value="2" />
-						</Condition>
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="6" col="2" name="cellsize_evp_y" >
-				<Definition valueType="real" default="0.0102062072" >
-					<Dependency>
-						<Condition type="or">
-							<Condition type="isEqual" target="evp_switch" value="1" />
-							<Condition type="isEqual" target="evp_switch" value="2" />
-						</Condition>
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-		
-			--><!-- RRI_Input  L79	（Null） --><!--
-		</GridLayout>
-	</Tab>-->
-
-	<!--<Tab name="River_Condition" caption="河道条件">
-		<GroupBox>
-			--><!-- RRI_Input  L18	河道の粗度係数（マニング） --><!--
-			<Item name="ns_river" caption="河道粗度（m^(-1/3)s）【L18】" >
-				<Definition valueType="real" default="0.030" />
-			</Item>
-		</GroupBox>
-
-		--><!-- RRI_Input  L80	河道延長の与え方（設定しない(0) or 設定する(1)） --><!--
-		<GroupBox>
-			<Item name="sec_length_switch" caption="河道延長の任意設定【L80】">
-				<Definition valueType="integer" default="0">
-					<Enumeration value="0" caption="設定しない" />
-					<Enumeration value="1" caption="設定する（地理情報で設定）" />
-				</Definition>
-			</Item>
-		</GroupBox>
-
-		<GroupBox caption="河道断面">
-			<GroupBox caption="矩形断面設定">
-				--><!-- RRI_Input  L46	河道形状の与え方(自動(0) or File指定(1)） --><!--
-				<Item name="rivfile_switch" caption="  河道断面の与え方【L46】" >
-					<Definition valueType="integer" default="0">
-						<Enumeration value="0" caption="河道形状係数より" />
-						<Enumeration value="1" caption="個別に設定（地理情報で設定）" />
-					</Definition>
-				</Item>
-	
-				<GroupBox caption="河道形状係数設定" >
-					--><!-- RRI_Input  L38	河道判定の閾値（地点上流メッシュ数） --><!--
-					<GroupBox>
-						<Item name="riv_thresh" caption="河道判定の閾値（地点上流メッシュ数）【L38】">
-							<Definition valueType="integer" default="20" >
-								<Dependency>
-									<Condition type="isEqual" target="rivfile_switch" value="0" />
-									<Action type="enable" />
-								</Dependency>
-							</Definition>
-						</Item>
-					</GroupBox>
-
-					<GroupBox caption="形状変数（=C×A＾S）" >
-					<GridLayout>
-						<Label row="0" col="1" caption="                                     C" />
-						<Label row="0" col="2" caption="                                     S" />
-	
-						<Label row="1" col="0" caption="河道幅  【L39-40】" />
-						<Label row="2" col="0" caption="河道深さ【L41-42】" />
-				
-						--><!-- RRI_Input  L39	河道幅算定のための形状変数C --><!--
-						<Item row="1" col="1" name="width_param_c" caption="河道幅形状変数Cw（width=Cw×A＾Sw）【L39】" >
-							<Definition valueType="real" default="5.5" >
-								<Dependency>
-									<Condition type="isEqual" target="rivfile_switch" value="0" />
-									<Action type="enable" />
-								</Dependency>
-							</Definition>
-						</Item>
-
-						--><!-- RRI_Input  L40	河道幅算定のための形状変数S --><!--
-						<Item row="1" col="2" name="width_param_s" caption="河道幅形状変数Sw（width=Cw×A＾Sw）【L40】" >
-							<Definition valueType="real" default="0.61" >
-								<Dependency>
-									<Condition type="isEqual" target="rivfile_switch" value="0" />
-									<Action type="enable" />
-								</Dependency>
-							</Definition>
-						</Item>
-
-						--><!-- RRI_Input  L41	河道深さ算定のための形状変数C --><!--	
-						<Item row="2" col="1" name="depth_param_c" caption="河道深さ形状変数Cd（depth=Cd×A＾Sd）【L41】" >
-							<Definition valueType="real" default="0.94" >
-								<Dependency>
-									<Condition type="isEqual" target="rivfile_switch" value="0" />
-									<Action type="enable" />
-								</Dependency>
-							</Definition>
-						</Item>
-
-						--><!-- RRI_Input  L42	河道深さ算定のための形状変数S --><!--
-						<Item row="2" col="2" name="depth_param_s" caption="河道深さ形状変数Sd（depth=Cd×A＾Sd）【L42】" >
-							<Definition valueType="real" default="0.34" >
-								<Dependency>
-									<Condition type="isEqual" target="rivfile_switch" value="0" />
-									<Action type="enable" />
-								</Dependency>
-							</Definition>
-						</Item>
-					</GridLayout>
-					</GroupBox>
-
-					<GroupBox caption="堤防" >
-						--><!-- RRI_Input  L43	堤防の高さ（地盤高からの高さ） --><!--
-						<Item name="height_param" caption="堤防高【L43】" >
-							<Definition valueType="real" default="0.00" >
-								<Dependency>
-									<Condition type="isEqual" target="rivfile_switch" value="0" />
-									<Action type="enable" />
-								</Dependency>
-							</Definition>
-						</Item>
-
-						--><!-- RRI_Input  L44	堤防位置の閾値（地点上流メッシュ数） --><!--
-						<Item name="height_limit_param" caption="堤防位置の閾値（地点上流メッシュ数）【L44】" >
-							<Definition valueType="real" default="1000" >
-								<Dependency>
-									<Condition type="isEqual" target="rivfile_switch" value="0" />
-									<Action type="enable" />
-								</Dependency>
-							</Definition>
-						</Item>
-					</GroupBox>
-				</GroupBox>
-
-					--><!-- RRI_Input  L45	（Null） --><!--
-
-			</GroupBox>
-			<GroupBox caption="任意断面設定⇒iRIC内設定が望ましい">
-				--><!-- RRI_Input  L83	河道断面の与え方（設定しない(0) or 設定する(1)） --><!--
-				<Item name="sec_switch" caption="任意断面の与え方          【L83】">
-					<Definition valueType="integer" default="0">
-						<Enumeration value="0" caption="設定しない" />
-						<Enumeration value="1" caption="設定する" />
-					</Definition>
-				</Item>
-
-				--><!-- RRI_Input  L84	河道断面の設定位置ファイルのパス --><!--
-				<Item name="sec_map_file" caption="河道断面設定位置ファイル【L84】" >
-					<Definition valueType="filename" default="Select File" >
-						<Dependency>
-							<Condition type="isEqual" target="sec_switch" value="1" />
-							<Action type="enable" />
-						</Dependency>
-					</Definition>
-				</Item>
-		
-				--><!-- RRI_Input  L85	断面毎の断面特性ファイルのパス --><!--
-				<Item name="sec_file" caption="断面特性ファイル            【L85】" >
-					<Definition valueType="string" default=".\Riv\sec_" >
-						<Dependency>
-							<Condition type="isEqual" target="sec_switch" value="1" />
-							<Action type="enable" />
-						</Dependency>
-					</Definition>
-				</Item>
-				
-				--><!-- RRI_Input  L86	（Null） --><!--
-
-			</GroupBox>
-		</GroupBox>
-		
-	</Tab>-->
-
-	<!--<Tab name="Initial_Condition" caption="初期水深(ﾎｯﾄｽﾀｰﾄ用)⇒iRIC内処理が望ましい">
-		<GridLayout>
-			<Label row="0" col="1" caption="                           【L51】" />
-			<Label row="0" col="2" caption="ファイル" />
-	
-			<Label row="1" col="0" caption="斜面        【L52】" />
-			<Label row="2" col="0" caption="河道        【L53】" />
-			<Label row="3" col="0" caption="基岩        【L54】" />
-			<Label row="4" col="0" caption="GreenAmpt【L55】" />
-
-			--><!-- RRI_Input  L51	斜面の初期水深の与え方 --><!--
-			<Item row="1" col="1" name="init_slo_switch" >
-				<Definition valueType="integer" default="0">
-					<Enumeration value="0" caption="設定しない" />
-					<Enumeration value="1" caption="設定する" />
-				</Definition>
-			</Item>
-			--><!-- RRI_Input  L51 河道の初期水深の与え方 --><!--
-			<Item row="2" col="1" name="init_riv_switch" >
-				<Definition valueType="integer" default="0">
-					<Enumeration value="0" caption="設定しない" />
-					<Enumeration value="1" caption="設定する" />
-				</Definition>
-			</Item>
-			--><!-- RRI_Input  L51 基岩の初期水深の与え方 --><!--
-			<Item row="3" col="1" name="init_gw_switch" >
-				<Definition valueType="integer" default="0">
-					<Enumeration value="0" caption="設定しない" />
-					<Enumeration value="1" caption="設定する" />
-				</Definition>
-			</Item>
-			--><!-- RRI_Input  L51 GreenAmptの初期水深の与え方 --><!--
-			<Item row="4" col="1" name="init_gampt_ff_switch" >
-				<Definition valueType="integer" default="0">
-					<Enumeration value="0" caption="設定しない" />
-					<Enumeration value="1" caption="設定する" />
-				</Definition>
-			</Item>
-
-			--><!-- RRI_Input  L52	斜面における初期水深設定ファイルのパス　※単位：[m] --><!--
-			<Item row="1" col="2" name="initfile_slo" >
-				<Definition valueType="filename" default="Select File" >
-					<Dependency>
-						<Condition type="isEqual" target="init_slo_switch" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-
-			--><!-- RRI_Input  L53	河道における初期水深設定ファイルのパス　※単位：[m] --><!--
-			<Item row="2" col="2" name="initfile_riv" >
-				<Definition valueType="filename" default="Select File" >
-					<Dependency>
-						<Condition type="isEqual" target="init_riv_switch" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-
-			--><!-- RRI_Input  L54	基岩における初期水深設定ファイルのパス　※単位：[m] --><!--
-			<Item row="3" col="2" name="initfile_gw" >
-				<Definition valueType="filename" default="Select File" >
-					<Dependency>
-						<Condition type="isEqual" target="init_gw_switch" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-
-			--><!-- RRI_Input  L55	Green-Amptにおける初期水深設定ファイルのパス　※単位：[m] --><!--
-			<Item row="4" col="2" name="initfile_gampt_ff" >
-				<Definition valueType="filename" default="Select File" >
-					<Dependency>
-						<Condition type="isEqual" target="init_gampt_ff_switch" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-		
-			--><!-- RRI_Input  L56	（Null） --><!--
-		</GridLayout>
-	</Tab>
-
-	<Tab name="output" caption="出力設定⇒cgnsファイルに出力するので不要">
-		<GridLayout>
-			<Label row="0"  col="1" caption="        【L87】" />
-			<Label row="0"  col="2" caption="パス" />
-			<Label row="0"  col="3" caption="ファイル名頭出し" />
-	
-			<Label row="1"  col="0" caption="斜面水深         【L88】" />
-			<Label row="2"  col="0" caption="河道水深         【L89】" />
-			<Label row="3"  col="0" caption="基岩水深         【L90】" />
-			<Label row="4"  col="0" caption="河道流量         【L91】" />
-			<Label row="5"  col="0" caption="斜面流量(u成分)【L92】" />
-			<Label row="6"  col="0" caption="斜面流量(v成分)【L93】" />
-			<Label row="7"  col="0" caption="基岩流量(u成分)【L94】" />
-			<Label row="8"  col="0" caption="基岩流量(v成分)【L95】" />
-			<Label row="9"  col="0" caption="Green-Ampt累積水分量【L96】" />
-			<Label row="10" col="0" caption="storageファイル【L97】" />
-			<Label row="11" col="0" caption="ハイドロファイル【L99-100】⇒不要：iRIC機能で可能" />
-
-			--><!-- RRI_Input  L87	出力ファイル設定（出力(1) or 出力しない(0)） --><!--
-			<Item row="1"  col="1" name="outswitch_hs" caption="斜面水深">
-				<Definition valueType="integer" default="1">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="2"  col="1" name="outswitch_hr" caption="河道水深">
-				<Definition valueType="integer" default="1">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="3"  col="1" name="outswitch_hg" caption="基岩水深">
-				<Definition valueType="integer" default="1">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="4"  col="1" name="outswitch_qr" caption="河道流量">
-				<Definition valueType="integer" default="1">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="5"  col="1" name="outswitch_qu" caption="斜面流量(u成分)">
-				<Definition valueType="integer" default="0">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="6"  col="1" name="outswitch_qv" caption="斜面流量(v成分)">
-				<Definition valueType="integer" default="0">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="7"  col="1" name="outswitch_gu" caption="基岩流量(u成分)">
-				<Definition valueType="integer" default="0">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="8"  col="1" name="outswitch_gv" caption="基岩流量(v成分)">
-				<Definition valueType="integer" default="0">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="9"  col="1" name="outswitch_gampt_ff" caption="Green-Ampt累積水分量">
-				<Definition valueType="integer" default="0">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-			<Item row="10" col="1" name="outswitch_storage" caption="storageファイル">
-				<Definition valueType="integer" default="1">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-
-			--><!-- RRI_Input  L99	ハイドロデータ(流量)の出力設定（出力(1) or 出力しない(0)） --><!--
-			<Item row="11" col="1" name="hydro_switch" caption="ハイドロファイル">
-				<Definition valueType="integer" default="1">
-					<Enumeration value="1" caption="出力する" />
-					<Enumeration value="0" caption="出力しない" />
-				</Definition>
-			</Item>
-	
-			--><!-- RRI_Input  L88	斜面水深の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="1"  col="2" name="outfile_hs_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_hs" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="1"  col="3" name="outfile_hs_file" >
-				<Definition valueType="string" default="hs_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_hs" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="1"  col="4" caption=".out" />
-		
-			--><!-- RRI_Input  L89	河道水深の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="2"  col="2" name="outfile_hr_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_hr" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="2"  col="3" name="outfile_hr_file" >
-				<Definition valueType="string" default="hr_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_hr" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="2"  col="4" caption=".out" />
-		
-			--><!-- RRI_Input  L90	基岩水深の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="3"  col="2" name="outfile_hg_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_hg" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="3"  col="3" name="outfile_hg_file" >
-				<Definition valueType="string" default="hg_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_hg" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="3"  col="4" caption=".out" />
-		
-			--><!-- RRI_Input  L91	河道流量の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="4"  col="2" name="outfile_qr_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_qr" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="4"  col="3" name="outfile_qr_file" >
-				<Definition valueType="string" default="qr_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_qr" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="4"  col="4" caption=".out" />
-		
-			--><!-- RRI_Input  L92	斜面流量(u成分)の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="5"  col="2" name="outfile_qu_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_qu" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="5"  col="3" name="outfile_qu_file" >
-				<Definition valueType="string" default="qu_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_qu" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="5"  col="4" caption=".out" />
-		
-			--><!-- RRI_Input  L93	斜面流量(v成分)の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="6"  col="2" name="outfile_qv_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_qv" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="6"  col="3" name="outfile_qv_file" >
-				<Definition valueType="string" default="qv_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_qv" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="6"  col="4" caption=".out" />
-		
-			--><!-- RRI_Input  L94	基岩流量(u成分)の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="7"  col="2" name="outfile_gu_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_gu" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="7"  col="3" name="outfile_gu_file" >
-				<Definition valueType="string" default="gu_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_gu" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="7"  col="4" caption=".out" />
-			
-			--><!-- RRI_Input  L95	基岩流量(v成分)の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="8"  col="2" name="outfile_gv_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_gv" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="8"  col="3" name="outfile_gv_file" >
-				<Definition valueType="string" default="gv_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_gv" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="8"  col="4" caption=".out" />
-		
-			--><!-- RRI_Input  L96	Green-AmptのF(累積水分量)の出力先とファイル名のパス　※拡張子：out --><!--
-			<Item row="9"  col="2" name="outfile_gampt_ff_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_gampt_ff" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="9"  col="3" name="outfile_gampt_ff_file" >
-				<Definition valueType="string" default="gampt_ff_" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_gampt_ff" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="9"  col="4" caption=".out" />
-			
-			--><!-- RRI_Input  L97	計算結果ファイルの出力先とファイル名のパス --><!--
-			<Item row="10" col="2" name="outfile_storage_folder" >
-				<Definition valueType="foldername" default="Select Folder" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_storage" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Item row="10" col="3" name="outfile_storage_file" >
-				<Definition valueType="string" default="storage.dat" >
-					<Dependency>
-						<Condition type="isEqual" target="outswitch_storage" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="10" col="4" caption="(拡張子まで)" />
-
-			--><!-- RRI_Input  L98	（Null） --><!--
-		
-			--><!-- RRI_Input  L100	出力地点ファイルのパス＋ファイル名 --><!--
-			<Label row="11" col="2" caption="出力位置ファイル" />
-			<Item row="11" col="3" name="location_file" >
-				<Definition valueType="filename" default="./location.txt" >
-					<Dependency>
-						<Condition type="isEqual" target="hydro_switch" value="1" />
-						<Action type="enable" />
-					</Dependency>
-				</Definition>
-			</Item>
-			<Label row="11" col="4" caption="(ファイル選択)" />
+        <Label row="3" col="0" caption="initfile_gampt_ff" />
+        <Item  row="3" col="1" name="initfile_gampt_ff" >
+          <Definition valueType="filename" default="./init/gamptff_init_dummy.out">
+            <Condition type="isEqual" target="init_gampt_ff_switch" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="3" col="2" name="init_gampt_ff_switch">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
 
 
-			--><!-- iRICの基本機能で対応 --><!--
-		</GridLayout>
-   </Tab>-->
+      </GridLayout>
+    </GroupBox>
+  </Tab>
+    
+  <!--
+  ***** outputfiles *****
+  -->
+  <Tab name="output_files" caption="Output asc File format">
+    <GroupBox caption="Settings">
+      <GridLayout>
+        <Label row="0" col="0" caption="outfile_hs" />
+        <Item  row="0" col="1" name="outfile_hs" >
+          <Definition valueType="filename" default="hs_">
+            <Condition type="isEqual" target="outswitch_hs" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="0" col="2" name="outswitch_hs">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="1" col="0" caption="outfile_hr" />
+        <Item  row="1" col="1" name="outfile_hr" >
+          <Definition valueType="filename" default="hr_">
+            <Condition type="isEqual" target="outswitch_hr" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="1" col="2" name="outswitch_hr">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="2" col="0" caption="outfile_hg" />
+        <Item  row="2" col="1" name="outfile_hg" >
+          <Definition valueType="filename" default="hg_">
+            <Condition type="isEqual" target="outswitch_hg" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="2" col="2" name="outswitch_hg">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="3" col="0" caption="outfile_qr" />
+        <Item  row="3" col="1" name="outfile_qr" >
+          <Definition valueType="filename" default="qr_">
+            <Condition type="isEqual" target="outswitch_qr" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="3" col="2" name="outswitch_qr">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="4" col="0" caption="outfile_qu" />
+        <Item  row="4" col="1" name="outfile_qu" >
+          <Definition valueType="filename" default="qu_">
+            <Condition type="isEqual" target="outswitch_qu" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="4" col="2" name="outswitch_qu">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="5" col="0" caption="outfile_qv" />
+        <Item  row="5" col="1" name="outfile_qv" >
+          <Definition valueType="filename" default="qv_">
+            <Condition type="isEqual" target="outswitch_qv" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="5" col="2" name="outswitch_qv">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="6" col="0" caption="outfile_gu" />
+        <Item  row="6" col="1" name="outfile_gu" >
+          <Definition valueType="filename" default="gu_">
+            <Condition type="isEqual" target="outswitch_gu" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="6" col="2" name="outswitch_gu">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="7" col="0" caption="outfile_gv" />
+        <Item  row="7" col="1" name="outfile_gv" >
+          <Definition valueType="filename" default="gv_">
+            <Condition type="isEqual" target="outswitch_gv" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="7" col="2" name="outswitch_gv">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="8" col="0" caption="outfile_gampt_ff" />
+        <Item  row="8" col="1" name="outfile_gampt_ff" >
+          <Definition valueType="filename" default="gampt_ff_">
+            <Condition type="isEqual" target="outswitch_gampt_ff" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="8" col="2" name="outswitch_gampt_ff">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+
+        <Label row="9" col="0" caption="outfile_storage" />
+        <Item  row="9" col="1" name="outfile_storage" >
+          <Definition valueType="filename" default="storage.dat">
+            <Condition type="isEqual" target="outswitch_storage" value="1"/>
+          </Definition>
+        </Item>
+        <Item row="9" col="2" name="outswitch_storage">
+          <Definition valueType="integer" default="0">
+            <Enumeration value="0" caption="No" />
+            <Enumeration value="1" caption="Yes" />
+          </Definition>
+        </Item>
+        
+      </GridLayout>
+    </GroupBox>
+  </Tab>
+
 
 </CalculationCondition>
 
-<GridRelatedCondition>
-  <Item name="Elevation" caption="Elevation (m)">
+<GridRelatedCondition  keepOrder="true">
+  <Item name="elevation_c" caption="Elevation (m)">
     <Definition position="cell" valueType="real" default="max" />
   </Item>
+  <Item name="dir_c" caption="DIR">
+    <Definition position="cell" valueType="integer" default="0" />
+  </Item>
+  <Item name="acc_c" caption="ACC">
+    <Definition position="cell" valueType="integer" default="0" />
+  </Item>
+  <Item name="width_c" caption="Width(m)">
+    <Definition position="cell" valueType="real" default="0">
+      <Dimension name="Time" caption="Time" valueType="real"/>
+    </Definition>
+  </Item>
+  <Item name="depth_c" caption="Depth(m)">
+    <Definition position="cell" valueType="real" default="0">
+      <Dimension name="Time" caption="Time" valueType="real"/>
+    </Definition>
+  </Item>
+  <Item name="height_c" caption="Height(m)">
+    <Definition position="cell" valueType="real" default="0">
+      <Dimension name="Time" caption="Time" valueType="real"/>
+    </Definition>
+  </Item>
+  <Item name="landuse_c" caption="Land Use Parameters">
+    <Definition valueType="complex" position="cell" keepOrder="true">
+      <Item name="dif" caption="Diff or Kinematic">
+        <Definition valueType="integer" default="1">
+          <Enumeration value="0" caption="Diffusion" />
+          <Enumeration value="1" caption="Kinematic"/>
+        </Definition>
+      </Item>
+      <Item name="ns_slope" caption="Manning Roughness for Slope">
+        <Definition valueType="real" default="0.4" />
+      </Item>
+      <Item name="soildepth" caption="soildepth[m]">
+        <Definition valueType="real" default="1.0" />
+      </Item>
+      <Item name="gammaa" caption="gammaa">
+        <Definition valueType="real" default="0.475" />
+      </Item>
+      <Item name="ksv" caption="ksv[m/s]">
+        <Definition valueType="real" default="0.0" />
+      </Item>
+      <Item name="faif" caption="faif[m]">
+        <Definition valueType="real" default="0.3163" />
+      </Item>
+      <Item name="ka" caption="ka[m/s]">
+        <Definition valueType="real" default="0.0" />
+      </Item>
+      <Item name="gammam" caption="gammam">
+        <Definition valueType="real" default="0.0" />
+      </Item>
+      <Item name="beta" caption="beta">
+        <Definition valueType="real" default="8.0" />
+      </Item>
+      <Item name="ksg" caption="ksg[m/s]">
+        <Definition valueType="real" default="0.0" />
+      </Item>
+      <Item name="gammag" caption="gammag">
+        <Definition valueType="real" default="0.4" />
+      </Item>
+      <Item name="kg0" caption="kg0[m/s]">
+        <Definition valueType="real" default="0.0005" />
+      </Item>
+      <Item name="fpg" caption="fpg">
+        <Definition valueType="real" default="0.03" />
+      </Item>
+      <Item name="rgl" caption="rgl[m/s]">
+        <Definition valueType="real" default="0.5" />
+      </Item>
+    </Definition>
+  </Item>
+  <Item name="rain_c" caption="Rain(mm/h)">
+    <Definition position="cell" valueType="real" default="0">
+      <Dimension name="Time" caption="Time" valueType="real"/>
+    </Definition>
+  </Item>
+  <Item name="evaporation_c" caption="Evaporation(mm/h)">
+    <Definition position="cell" valueType="real" default="max" />
+  </Item>
+
 </GridRelatedCondition>
 
+<BoundaryCondition name="dam" caption="Dam" position="cell">
+  <Item name="name" caption="Name">
+    <Definition valueType="string" default="Dam Name" />
+  </Item>
+  <Item name="dam_volmax" caption="Storage Volume[m3]">
+    <Definition valueType="real" default="66000000" />
+  </Item>
+  <Item name="dam_floodq" caption="Constant Discharge[m3/s]">
+    <Definition valueType="real" default="20" />
+  </Item>
+</BoundaryCondition>
+  
+<BoundaryCondition name="bound_qr" caption="Time Series for River Discharge at point" position="cell">   
+  <Item name="qr_bound" caption="qr[m3/s]">
+    <Definition conditionType="functional">
+      <Parameter valueType="real" caption="Time"/>
+      <Value valueType="real" caption="qr(m3/s)"/>
+    </Definition>
+  </Item>
+</BoundaryCondition>
+
+ <BoundaryCondition name="bound_hr" caption="Time Series for River Depth at point" position="cell">
+  <Item name="hr_bound" caption="hr(m)">
+    <Definition conditionType="functional">
+      <Parameter valueType="real" caption="Time"/>
+      <Value valueType="real" caption="hr(m)"/>
+    </Definition>
+  </Item>
+</BoundaryCondition>
+
+<BoundaryCondition name="bound_qs" caption="Time Series for Slope Discharge at point" position="cell">
+  <Item name="qs_bound" caption="qs[m3/s]">
+    <Definition conditionType="functional">
+      <Parameter valueType="real" caption="Time"/>
+      <Value valueType="real" caption="qs(m3/s)"/>
+    </Definition>
+  </Item>
+</BoundaryCondition>
+
+<BoundaryCondition name="bound_hs" caption="Time Series for Slope Depth at point" position="cell">
+  <Item name="hs_bound" caption="hs[m]">
+    <Definition conditionType="functional">
+      <Parameter valueType="real" caption="Time"/>
+      <Value valueType="real" caption="hs(m)"/>
+    </Definition>
+  </Item>
+</BoundaryCondition>
+  
 </SolverDefinition>

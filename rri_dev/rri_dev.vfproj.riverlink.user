@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioUserFile ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{412E9C9B-4D10-4EFA-8FE0-200EDDBC35DD}">
 	<Configurations>
-		<Configuration Name="Debug|Win32"/>
-		<Configuration Name="Release|Win32"/>
-		<Configuration Name="Debug|x64" CommandArguments="case1.cgn" WorkingDirectory="D:\RiverLink Dropbox\2018\18-018_pwri_rri-dias\02_work\dias\past\00_base_rri_win"/>
-		<Configuration Name="Release|x64" CommandArguments="case1.cgn" WorkingDirectory="D:\RiverLink Dropbox\2018\18-018_pwri_rri-dias\02_work\dias\past\00_base_rri_win"/></Configurations></VisualStudioUserFile>
+		<Configuration Name="Debug|Win32" CommandArguments="case1.cgn" WorkingDirectory="X:\2020\20-003_hokudai_rri\02_work\rri\sample_data\tottabetsu\iric"/>
+		<Configuration Name="Release|Win32" CommandArguments="case1.cgn" WorkingDirectory="X:\2020\20-003_hokudai_rri\02_work\rri\sample_data\tottabetsu\iric"/>
+		<Configuration Name="Debug|x64" CommandArguments="case1.cgn" WorkingDirectory="X:\2020\20-003_hokudai_rri\02_work\rri\sample_data\tottabetsu\iric"/>
+		<Configuration Name="Release|x64" CommandArguments="case1.cgn" WorkingDirectory="X:\2020\20-003_hokudai_rri\02_work\rri\sample_data\tottabetsu\iric"/></Configurations></VisualStudioUserFile>

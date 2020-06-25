@@ -83,55 +83,99 @@ maxt = lasth * 3600 / dt
 call iric_cgns_open
 
 
-!! dem data is now read from CGNS file
-! open( 10, file = demfile, status = "old" )
-! read(10,*) ctemp, nx
-! read(10,*) ctemp, ny
-! read(10,*) ctemp, xllcorner
-! read(10,*) ctemp, yllcorner
-! read(10,*) ctemp, cellsize
-! read(10,*) ctemp, nodata
-! close(10)
-
-call cg_iric_gotogridcoord2d_f(nx, ny, ierr)
-allocate(gxx(nx,ny), gyy(nx,ny))
-call cg_iric_getgridcoord2d_f(gxx, gyy, ierr)
-xllcorner = gxx(1,1); yllcorner = gyy(1,1)
-cellsize = dabs(gxx(1,2) - gxx(1,1))
-nodata = -9999
-
-
+! dem data is now read from CGNS file
+ open( 10, file = demfile, status = "old" )
+ read(10,*) ctemp, nx
+ read(10,*) ctemp, ny
+ read(10,*) ctemp, xllcorner
+ read(10,*) ctemp, yllcorner
+ read(10,*) ctemp, cellsize
+ read(10,*) ctemp, nodata
+ close(10)
+!--------------------------------------------------
+!call cg_iric_gotogridcoord2d_f(nx, ny, ierr)
+!allocate(gxx(nx,ny), gyy(nx,ny))
+!call cg_iric_getgridcoord2d_f(gxx, gyy, ierr)
+!xllcorner = gxx(1,1); yllcorner = gyy(1,1)
+!cellsize = dabs(gxx(1,2) - gxx(1,1))
+!nodata = -9999
+!
+!
 !RRI 仕様に変更　セル数
-nx = nx-1; ny = ny-1
+!nx = nx-1; ny = ny-1
+ 
+xllcorner_rain = xllcorner
+yllcorner_rain = yllcorner
+cellsize_rain_x = 0.00833333333
+cellsize_rain_y = 0.00833333333
+ 
+ 
+ allocate(gxx(nx+1,ny+1), gyy(nx+1,ny+1))
+ gxx(1,1) = xllcorner
+ gyy(1,1) = yllcorner
+ do j=2, ny+1
+    gxx(1,j) = gxx(1,1)
+    gyy(1,j) = gyy(1,j-1) + cellsize
+ end do
+
+ do i=2,nx+1
+    gxx(i,1) = gxx(i-1,1) + cellsize 
+    gyy(i,1) = gyy(1,1)
+ end do
+ 
+ do i=2,nx+1
+     do j=2,ny+1
+        gxx(i,j) = gxx(i-1,j) + cellsize 
+        gyy(i,j) = gyy(i,j-1) + cellsize
+     end do
+ end do
+ 
+!--------------------------------------------------
 
 
  allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
  allocate (zs1(nx, ny), acc1(nx, ny), dir1(nx, ny))
- !call read_gis_real(demfile, zs)
- call cg_iric_read_grid_integer_cell_f('elevation_c',zs,ierr)
+ call read_gis_real(demfile, zs)
+ 
  
 ! flow accumulation file
  allocate (riv(ny, nx), acc(ny, nx))
- !call read_gis_int(accfile, acc)
- call cg_iric_read_grid_integer_cell_f('acc_c',acc,ierr)
+ call read_gis_int(accfile, acc)
+ 
 
 
 ! flow direction file
  allocate (dir(ny, nx))
- !call read_gis_int(dirfile, dir)
- call cg_iric_read_grid_integer_cell_f('dir_c',dir,ierr)
+ call read_gis_int(dirfile, dir)
+ 
  
 ! landuse file
  allocate( land(ny, nx) )
- !land = 1
- !if( land_switch.eq.1 ) then
- !  call read_gis_int(landfile, land)
- !endif
-call cg_iric_read_grid_integer_cell_f('landuse_c',land,ierr)
+ land = 1
+ if( land_switch.eq.1 ) then
+   call read_gis_int(landfile, land)
+ endif
  
 ! land : 1 ... num_of_landuse
 write(*,*) "num_of_landuse : ", num_of_landuse
 where( land .le. 0 .or. land .gt. num_of_landuse ) land = num_of_landuse
+
+!格子属性に出力
+call cg_iric_writegridcoord2d_f(nx+1, ny+1, gxx, gyy, ierr)
+call iric_write_cell_real("elevation_c", zs)
+call iric_write_cell_integer("dir_c", dir)
+call iric_write_cell_integer("acc_c", acc)
+if(data_check_only == 1) then
+	call iric_cgns_close()
+	write(*,"(a)") "***** check grid attributes *****"
+	stop
+end if
+
+!格子属性を読み込む
+call cg_iric_read_grid_integer_cell_f('elevation_c',zs,ierr)
+call cg_iric_read_grid_integer_cell_f('acc_c',acc,ierr)
+call cg_iric_read_grid_integer_cell_f('dir_c',dir,ierr)
+call cg_iric_read_grid_integer_cell_f('landuse_c',land,ierr)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! STEP 2: CALC PREPARATION
@@ -1114,6 +1158,7 @@ i = ny, 1, -1)
   if(outswitch_gv .ne. 0) close(107)
   if(outswitch_gampt_ff .ne. 0) close(108)
 
+  !iRIC Output
   call iric_cgns_output_result(qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
 
   if( tec_switch .eq. 1 ) then
@@ -1144,6 +1189,13 @@ i = ny, 1, -1)
   write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
 (rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit), ss, sr, si, sg
  endif
+
+ !iRIC Cancel check and Flush
+ call iric_check_cancel()
+
+        
+ !Update CGNS
+ call iric_cgns_update()
 
 enddo
 

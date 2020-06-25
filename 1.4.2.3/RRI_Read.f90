@@ -41,22 +41,24 @@ write(*,*)
 !外部ファイル　→　格子属性として設定
 !--------------------------------------------------
 !read(1,'(a)') rainfile
+call cg_iric_read_string_f("rainfile", rainfile, ier)
+
 !read(1,'(a)') demfile
+call cg_iric_read_string_f("demfile", demfile, ier)
+
 !read(1,'(a)') accfile
+call cg_iric_read_string_f("accfile", accfile, ier)
+
 !read(1,'(a)') dirfile
-!
-!!rainfile = trim(rri_dir)//rainfile(3:len(rainfile))
-!!demfile = trim(rri_dir)//demfile(3:len(demfile))
-!!accfile = trim(rri_dir)//accfile(3:len(accfile))
-!!dirfile = trim(rri_dir)//dirfile(3:len(dirfile))
-!
-!write(*,'("rainfile : ", a)') trim(adjustl(rainfile))
-!write(*,'("demfile : ", a)') trim(adjustl(demfile))
-!write(*,'("accfile : ", a)') trim(adjustl(accfile))
-!write(*,'("dirfile : ", a)') trim(adjustl(dirfile))
+call cg_iric_read_string_f("dirfile", dirfile, ier)
+
+write(*,'("rainfile : ", a)') trim(adjustl(rainfile))
+write(*,'("demfile : ", a)') trim(adjustl(demfile))
+write(*,'("accfile : ", a)') trim(adjustl(accfile))
+write(*,'("dirfile : ", a)') trim(adjustl(dirfile))
 !
 !read(1,*)
-!write(*,*)
+write(*,*)
 
 !--------------------------------------------------
 !基本オプション
@@ -66,6 +68,9 @@ call cg_iric_read_integer_f("utm", utm, ier)
 
 !read(1,*) eight_dir
 call cg_iric_read_integer_f("eight_dir", eight_dir, ier)
+
+call cg_iric_read_integer_f("data_check_only", data_check_only, ier)
+
 
 write(*,'("utm : ", i5)') utm
 write(*,'("eight_dir : ", i5)') eight_dir
