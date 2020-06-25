@@ -5,7 +5,10 @@
 
 ! DEM Adjustment Program
 !
+use iric
 implicit none
+
+include 'cgnslib_f.h'
 
 character*256 infile, infile_dem, infile_dir, infile_acc
 character*256 outfile_adem, outfile_adir, outfile_slo
@@ -33,30 +36,54 @@ real(8) length, dis, dif, slope
 integer i, j, k, l, ii, jj, iii, jjj, ios
 
 real(8), dimension(:,:), allocatable :: dem, adem, slo
-integer, dimension(:,:), allocatable :: dir, acc, adir
+integer, dimension(:,:), allocatable :: dir, acc, adir, riv
+real(8), dimension(:,:), allocatable :: width, depth, height
 integer, dimension(:,:), allocatable :: upstream
 real(8), dimension(:), allocatable :: total_length
 integer, dimension(:), allocatable :: upstream_i, upstream_j, upstream_i_temp, upstream_j_temp
 integer switch, s1_i, s1_j, s2_i, s2_j, numup, kk, longest_kk
 real(8) longest_length
 
+integer riv_thresh
+real(8) width_param_c, width_param_s 
+real(8) depth_param_c, depth_param_s 
+integer height_limit_param
+real(8) height_param 
+
 character*256 ctemp
 character*20 ctemp2
 
-! STEP 0 : Open Files
-open(1, file = infile, status = "old")
-read(1, '(a)') infile_dem
-read(1, '(a)') infile_dir
-read(1, '(a)') infile_acc
-read(1, '(a)') outfile_adem
-read(1, '(a)') outfile_adir
-!read(1, '(a)') outfile_slo
+integer :: ier, cgns_f, icount
+character(len=64):: cgns_name
+real(8), allocatable, save :: gxx(:,:), gyy(:,:)
+!--------------------------------------------------
 
-open(10, file = infile_dem, status = "old")
-open(20, file = infile_dir, status = "old")
-open(30, file = infile_acc, status = "old")
-open(40, file = outfile_adem)
-open(50, file = outfile_adir)
+
+! Start opne CGNS and Read file name
+call iric_cgns_open()
+call cg_iric_read_string_f("demfile", infile_dem, ier)
+call cg_iric_read_string_f("accfile", infile_acc, ier)
+call cg_iric_read_string_f("dirfile", infile_dir, ier)
+! End opne CGNS and Read file name
+
+!Output file name
+outfile_adem = "./topo/adem.txt"
+outfile_adir = "./topo/adir.txt"
+
+!! STEP 0 : Open Files
+!open(1, file = infile, status = "old")
+!read(1, '(a)') infile_dem
+!read(1, '(a)') infile_dir
+!read(1, '(a)') infile_acc
+!read(1, '(a)') outfile_adem
+!read(1, '(a)') outfile_adir
+!!read(1, '(a)') outfile_slo
+
+open(10, file = trim(infile_dem), status = "old")
+open(20, file = trim(infile_dir), status = "old")
+open(30, file = trim(infile_acc), status = "old")
+open(40, file = trim(outfile_adem))
+open(50, file = trim(outfile_adir))
 !open(60, file = outfile_slo)
 
 ! STEP 1 : Reading File
@@ -68,6 +95,28 @@ read(10, *) ctemp, cellsize
 read(10, *) ctemp, nodata
 
 allocate( dem(ny, nx), dir(ny, nx), acc(ny, nx), adem(ny, nx), adir(ny, nx), slo(ny, nx), upstream(ny, nx) )
+
+
+! Start generate grid shape for CGNS output
+allocate(gxx(nx+1,ny+1), gyy(nx+1,ny+1))
+gxx(1,1) = xllcorner; gyy(1,1) = yllcorner
+do j=2, ny+1
+	gxx(1,j) = gxx(1,1)
+	gyy(1,j) = gyy(1,j-1) + cellsize
+end do
+
+do i=2,nx+1
+	gxx(i,1) = gxx(i-1,1) + cellsize 
+	gyy(i,1) = gyy(1,1)
+end do
+ 
+do i=2,nx+1
+    do j=2,ny+1
+		gxx(i,j) = gxx(i-1,j) + cellsize 
+		gyy(i,j) = gyy(i,j-1) + cellsize
+    end do
+end do
+! End generate grid shape for CGNS output
 
 rewind(10)
 
@@ -283,7 +332,7 @@ write(*,*) "Done STEP 6"
 upstream_i_temp(:) = upstream_i(:)
 upstream_j_temp(:) = upstream_j(:)
 do k = 1, numup
- write(*,*) "S7", k, "/", numup
+ !write(*,*) "S7", k, "/", numup
  longest_length = 0.d0
  do kk = 1, numup
   if( total_length(kk) .ge. longest_length ) then
@@ -306,7 +355,7 @@ where( adem .gt. -50.d0 .and. adem .le. 0.d0 ) adem = 0.d0
 
 ! lifting
 do k = 1, numup
- write(*,*) "l: ", k, "/", numup
+ !write(*,*) "l: ", k, "/", numup
 1110 continue
  i = upstream_i(k)
  j = upstream_j(k)
@@ -325,7 +374,7 @@ enddo
 
 ! carving
 do k = 1, numup
- write(*,*) "c: ", k, "/", numup
+ !write(*,*) "c: ", k, "/", numup
 1111 continue
  i = upstream_i(k)
  j = upstream_j(k)
@@ -343,7 +392,7 @@ enddo
 
 ! lifting and carving
 do k = 1, numup
- write(*,*) "cf: ", k, "/", numup
+ !write(*,*) "cf: ", k, "/", numup
 1112 continue
  i = upstream_i(k)
  j = upstream_j(k)
@@ -393,6 +442,41 @@ do
  j = jj
 enddo
 close(1000)
+
+
+! river widhth, depth, leavy height, river length, river area ratio
+allocate ( riv(ny, nx), width(ny, nx), depth(ny, nx), height(ny, nx))
+width = 0.d0
+depth = 0.d0
+height = 0.d0
+
+call cg_iric_read_integer_f("riv_thresh", riv_thresh, ier)
+call cg_iric_read_real_f("width_param_c", width_param_c, ier)
+call cg_iric_read_real_f("width_param_s", width_param_s, ier)
+call cg_iric_read_real_f("depth_param_c", depth_param_c, ier)
+call cg_iric_read_real_f("depth_param_s", depth_param_s, ier)
+call cg_iric_read_real_f("height_param", height_param, ier)
+call cg_iric_read_real_f("height_limit_param", height_limit_param, ier)
+
+
+riv = 0 ! slope cell
+if( riv_thresh .gt. 0 ) then
+ where(acc .gt. riv_thresh) riv = 1 ! river cell
+endif
+
+where(riv.eq.1) width = width_param_c * ( acc * dx * dy * 1.d-6 ) ** width_param_s
+where(riv.eq.1) depth = depth_param_c * ( acc * dx * dy * 1.d-6 ) ** depth_param_s
+where(riv.eq.1 .and. acc.gt.height_limit_param) height = height_param
+
+!CGNSファイルに出力
+call cg_iric_writegridcoord2d_f(nx+1, ny+1, gxx, gyy, ier)
+call iric_write_cell_real("elevation_c", nx, ny, adem)
+call iric_write_cell_integer("dir_c", nx, ny, dir)
+call iric_write_cell_integer("acc_c", nx, ny, acc)
+call iric_write_cell_real("width_c", nx, ny, width)
+call iric_write_cell_real("depth_c", nx, ny, depth)
+call iric_write_cell_real("height_c", nx, ny, height)
+call iric_cgns_close()
 
 end
 
