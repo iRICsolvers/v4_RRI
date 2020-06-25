@@ -9,6 +9,7 @@ module iric
   public iric_cgns_output_result
   public iric_check_cancel
   public iric_write_cell_real, iric_write_cell_integer
+  public iric_read_cell_attr_int, iric_read_cell_attr_real
 
 contains
   subroutine iric_cgns_open()
@@ -81,14 +82,15 @@ contains
     integer, intent(out):: v(ny, nx)
 
     integer, dimension(:,:), allocatable:: tmpv
-    integer:: i, j, ierr
+    integer:: i, j, jj, ierr
 
     allocate(tmpv(nx, ny))
     call cg_iric_read_grid_integer_cell_f(name, tmpv, ierr)
 
     do i = 1, nx
       do j = 1, ny
-        v(j, i) = tmpv(i, j)
+		  jj = ny - j + 1
+		  v(j, i) = tmpv(i, jj)
       end do
     end do
   end subroutine
@@ -101,14 +103,15 @@ contains
     double precision, intent(out):: v(ny, nx)
 
     double precision, dimension(:,:), allocatable:: tmpv
-    integer:: i, j, ierr
+    integer:: i, j, jj, ierr
 
     allocate(tmpv(nx, ny))
     call cg_iric_read_grid_real_cell_f(name, tmpv, ierr)
 
     do i = 1, nx
       do j = 1, ny
-        v(j, i) = tmpv(i, j)
+		  jj = ny - j + 1
+		  v(j, i) = tmpv(i, jj)
       end do
     end do
   end subroutine
@@ -340,48 +343,37 @@ contains
 
     call cg_iric_write_sol_time_f(time, ierr)
 
-    !call cg_iric_write_sol_gridcoord2d_f(gxx, gyy, ierr)
     
-    if (outswitch_hs /= 0) then
-        allocate(rain_rate(1:ny, 1:nx))
-        do i=1,ny
-             do j=1,nx
-                 rain_rate(i,j) = qp_t(i,j) * 3600.d0 * 1000.d0
-             end do
-         end do
-      
-      call iric_write_result_real('zs', zs)
-      call iric_write_result_integer('acc', acc)
-      call iric_write_result_integer('dir', dir)
-      call iric_write_result_integer('land', land)
-      
-      call iric_write_result_real('qp_t', rain_rate)
-      call iric_write_result_real('hs', hs)
-    end if
-    if (outswitch_hr /= 0) then
-      call iric_write_result_real('hr', hr)
-    end if
-    if (outswitch_hg /= 0) then
-      call iric_write_result_real('hg', hg)
-    end if
-    if (outswitch_qr /= 0) then
-      call iric_write_result_real('qr', qr_ave)
-    end if
-    if (outswitch_qu /= 0) then
-      call iric_write_qu(qs_ave)
-    end if
-    if (outswitch_qv /= 0) then
-      call iric_write_qv(qs_ave)
-    end if
-    if (outswitch_gu /= 0) then
-      call iric_write_gu(qg_ave)
-    end if
-    if (outswitch_gv /= 0) then
-      call iric_write_gv(qg_ave)
-    end if
-    if (outswitch_gampt_ff /= 0) then
-      call iric_write_result_real('gampt_ff', gampt_ff)
-    end if
+    allocate(rain_rate(1:ny, 1:nx))
+    do i=1,ny
+        do j=1,nx
+            rain_rate(i,j) = qp_t(i,j) * 3600.d0 * 1000.d0
+        end do
+    end do
+    call iric_write_result_real('qp_t', rain_rate)
+    call iric_write_result_real('hs', hs)
+	call iric_write_result_real('hr', hr)
+	call iric_write_result_real('qr', qr_ave)
+	call iric_write_qu(qs_ave)
+	call iric_write_qv(qs_ave)
+	call iric_write_result_real('hg', hg)
+	call iric_write_gu(qg_ave)
+	call iric_write_gv(qg_ave)
+	call iric_write_result_real('gampt_ff', gampt_ff)
+    deallocate(rain_rate)
+	
+    !if (outswitch_hg /= 0) then
+    !  call iric_write_result_real('hg', hg)
+    !end if
+    !if (outswitch_gu /= 0) then
+    !  call iric_write_gu(qg_ave)
+    !end if
+    !if (outswitch_gv /= 0) then
+    !  call iric_write_gv(qg_ave)
+    !end if
+    !if (outswitch_gampt_ff /= 0) then
+    !  call iric_write_result_real('gampt_ff', gampt_ff)
+    !end if
     
     !flush
     call cg_iric_flush_f(cgns_name, cgns_f, ierr)
