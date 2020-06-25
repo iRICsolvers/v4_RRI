@@ -42,6 +42,7 @@ real(8), allocatable :: gampt_ff_idx(:), gampt_f_idx(:)
 !real(8), allocatable :: rdummy_dim(:)
 
 ! other variable
+integer ni, nj
 integer i, j, t, k, ios, itemp, jtemp, tt, ii, jj
 integer out_next
 real(8) out_dt
@@ -62,15 +63,17 @@ parameter( hydro_file = "hydro.txt" )
 integer, allocatable :: hydro_i(:), hydro_j(:)
 integer maxhydro
 
-
-integer, dimension(:,:), allocatable :: acc1, dir1
-real(8), dimension(:,:), allocatable :: zs1
 integer :: ierr
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! STEP 0: FILE NAME AND PARAMETER SETTING
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 call RRI_Read
+if(run_type == 0) then
+	call iric_cgns_close()
+	write(*,"(a)") "***** check grid attributes *****"
+	stop
+end if
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! STEP 1: FILE READING
@@ -82,100 +85,43 @@ maxt = lasth * 3600 / dt
 ! load data from CGNS file
 call iric_cgns_open
 
+!read grid
+call cg_iric_gotogridcoord2d_f(ni, nj, ierr)
+allocate(gxx(ni,nj), gyy(ni,nj))
+call cg_iric_getgridcoord2d_f(gxx, gyy, ierr)
+xllcorner = gxx(1,1); yllcorner = gyy(1,1)
+cellsize = dabs(gxx(2,1) - gxx(1,1))
+nodata = -9999
 
-! dem data is now read from CGNS file
- open( 10, file = demfile, status = "old" )
- read(10,*) ctemp, nx
- read(10,*) ctemp, ny
- read(10,*) ctemp, xllcorner
- read(10,*) ctemp, yllcorner
- read(10,*) ctemp, cellsize
- read(10,*) ctemp, nodata
- close(10)
-!--------------------------------------------------
-!call cg_iric_gotogridcoord2d_f(nx, ny, ierr)
-!allocate(gxx(nx,ny), gyy(nx,ny))
-!call cg_iric_getgridcoord2d_f(gxx, gyy, ierr)
-!xllcorner = gxx(1,1); yllcorner = gyy(1,1)
-!cellsize = dabs(gxx(1,2) - gxx(1,1))
-!nodata = -9999
-!
-!
-!RRI 仕様に変更　セル数
-!nx = nx-1; ny = ny-1
- 
+!change nx, ny as cell numbers
+nx = ni-1; ny = nj-1
+
+!as temporary setting
 xllcorner_rain = xllcorner
 yllcorner_rain = yllcorner
 cellsize_rain_x = 0.00833333333
 cellsize_rain_y = 0.00833333333
- 
- 
- allocate(gxx(nx+1,ny+1), gyy(nx+1,ny+1))
- gxx(1,1) = xllcorner
- gyy(1,1) = yllcorner
- do j=2, ny+1
-    gxx(1,j) = gxx(1,1)
-    gyy(1,j) = gyy(1,j-1) + cellsize
- end do
 
- do i=2,nx+1
-    gxx(i,1) = gxx(i-1,1) + cellsize 
-    gyy(i,1) = gyy(1,1)
- end do
- 
- do i=2,nx+1
-     do j=2,ny+1
-        gxx(i,j) = gxx(i-1,j) + cellsize 
-        gyy(i,j) = gyy(i,j-1) + cellsize
-     end do
- end do
- 
-!--------------------------------------------------
+allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
+call iric_read_cell_attr_real('elevation_c',zs)
 
+allocate (riv(ny, nx), acc(ny, nx))
+call iric_read_cell_attr_int('acc_c',acc)
 
- allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
- allocate (zs1(nx, ny), acc1(nx, ny), dir1(nx, ny))
- call read_gis_real(demfile, zs)
- 
- 
-! flow accumulation file
- allocate (riv(ny, nx), acc(ny, nx))
- call read_gis_int(accfile, acc)
- 
+allocate (dir(ny, nx))
+call iric_read_cell_attr_int('dir_c',dir)
 
-
-! flow direction file
- allocate (dir(ny, nx))
- call read_gis_int(dirfile, dir)
- 
- 
-! landuse file
- allocate( land(ny, nx) )
- land = 1
- if( land_switch.eq.1 ) then
-   call read_gis_int(landfile, land)
- endif
+allocate( land(ny, nx) )
+land = 1
+if( land_switch.eq.1 ) then
+call read_gis_int(landfile, land)
+endif
  
 ! land : 1 ... num_of_landuse
 write(*,*) "num_of_landuse : ", num_of_landuse
 where( land .le. 0 .or. land .gt. num_of_landuse ) land = num_of_landuse
 
-!格子属性に出力
-call cg_iric_writegridcoord2d_f(nx+1, ny+1, gxx, gyy, ierr)
-call iric_write_cell_real("elevation_c", zs)
-call iric_write_cell_integer("dir_c", dir)
-call iric_write_cell_integer("acc_c", acc)
-if(data_check_only == 1) then
-	call iric_cgns_close()
-	write(*,"(a)") "***** check grid attributes *****"
-	stop
-end if
 
-!格子属性を読み込む
-call cg_iric_read_grid_integer_cell_f('elevation_c',zs,ierr)
-call cg_iric_read_grid_integer_cell_f('acc_c',acc,ierr)
-call cg_iric_read_grid_integer_cell_f('dir_c',dir,ierr)
-call cg_iric_read_grid_integer_cell_f('landuse_c',land,ierr)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! STEP 2: CALC PREPARATION
@@ -238,9 +184,13 @@ if( riv_thresh .gt. 0 ) then
  where(acc .gt. riv_thresh) riv = 1 ! river cell
 endif
 
-where(riv.eq.1) width = width_param_c * ( acc * dx * dy * 1.d-6 ) ** width_param_s
-where(riv.eq.1) depth = depth_param_c * ( acc * dx * dy * 1.d-6 ) ** depth_param_s
-where(riv.eq.1 .and. acc.gt.height_limit_param) height = height_param
+!where(riv.eq.1) width = width_param_c * ( acc * dx * dy * 1.d-6 ) ** width_param_s
+!where(riv.eq.1) depth = depth_param_c * ( acc * dx * dy * 1.d-6 ) ** depth_param_s
+!where(riv.eq.1 .and. acc.gt.height_limit_param) height = height_param
+
+call iric_read_cell_attr_real('width_c',width)
+call iric_read_cell_attr_real('depth_c',depth)
+call iric_read_cell_attr_real('height_c',height)
 
 ! river data is replaced by the information in files
 if( rivfile_switch .ge. 1 ) then
@@ -554,10 +504,10 @@ pevp_sum = 0.d0
 sout = 0.d0
 si = 0.d0
 sg = 0.d0
-open( 1000, file = outfile_storage )
+if(outswitch_storage == 1) open( 1000, file = outfile_storage )
 call storage_calc(hs, hr, hg, ss, sr, si, sg)
 sinit = ss + sr + si + sg
-write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
+if(outswitch_storage == 1) write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
   (rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit), ss, sr, si, sg
 
 ! reading rainfall data
@@ -1186,7 +1136,7 @@ i = ny, 1, -1)
   call storage_calc(hs, hr, hg, ss, sr, si, sg)
   write(*, '(6e15.3)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
 (rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit)
-  write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
+  if(outswitch_storage == 1) write(1000, '(1000e15.7)') rain_sum, pevp_sum, aevp_sum, sout, ss + sr + si + sg, &
 (rain_sum - aevp_sum - sout - (ss + sr + si + sg) + sinit), ss, sr, si, sg
  endif
 

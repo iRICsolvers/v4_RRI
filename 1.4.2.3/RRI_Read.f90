@@ -31,11 +31,14 @@ call cg_iric_init_f(cgns_f, ier)
 !RRI バージョン情報
 !--------------------------------------------------
 !read(1,'(a)') format_version
-call cg_iric_read_string_f("rri_ver", format_version, ier)
+!call cg_iric_read_string_f("rri_ver", format_version, ier)
+!
+!write(*,'("format_version : ", a)') trim(adjustl(format_version))
+!if( format_version .ne. "Ver1_4_2 for iRIC" ) stop "This RRI model requires RRI_Input_Format_Ver1_4_2"
+!write(*,*)
 
-write(*,'("format_version : ", a)') trim(adjustl(format_version))
-if( format_version .ne. "Ver1_4_2 for iRIC" ) stop "This RRI model requires RRI_Input_Format_Ver1_4_2"
-write(*,*)
+!Run Type
+call cg_iric_read_integer_f("run_type", run_type, ier)
 
 !--------------------------------------------------
 !外部ファイル　→　格子属性として設定
@@ -68,9 +71,6 @@ call cg_iric_read_integer_f("utm", utm, ier)
 
 !read(1,*) eight_dir
 call cg_iric_read_integer_f("eight_dir", eight_dir, ier)
-
-call cg_iric_read_integer_f("data_check_only", data_check_only, ier)
-
 
 write(*,'("utm : ", i5)') utm
 write(*,'("eight_dir : ", i5)') eight_dir
@@ -214,7 +214,7 @@ write(*,*)
 
 
 !--------------------------------------------------
-!河道パラメータ
+!河道パラメータ　→　wc,ws,dc,dsで指定する
 !--------------------------------------------------
 !read(1,*) ns_river
 call cg_iric_read_real_f("ns_river", ns_river, ier)
@@ -242,7 +242,9 @@ call cg_iric_read_real_f("height_param", height_param, ier)
 call cg_iric_read_real_f("height_limit_param", height_limit_param, ier)
 
 !read(1,*) rivfile_switch
-call cg_iric_read_integer_f("rivfile_switch", rivfile_switch, ier)
+!call cg_iric_read_integer_f("rivfile_switch", rivfile_switch, ier)
+!rivfile_switchは利用しない
+rivfile_switch = 0
 
 !read(1,'(a)') widthfile
 !read(1,'(a)') depthfile
@@ -300,7 +302,7 @@ write(*,*)
 
 
 !--------------------------------------------------
-!hs, hr境界条件　→　未実装　要確認
+!hs, hr境界条件　→　境界条件設定に実装
 !--------------------------------------------------
 !read(1,*) bound_slo_wlev_switch, bound_riv_wlev_switch
 !read(1,'(a)') boundfile_slo_wlev
@@ -308,12 +310,11 @@ write(*,*)
 !if(bound_slo_wlev_switch.ne.0) write(*,'("boundfile_slo_wlev : ", a)') trim(adjustl(boundfile_slo_wlev))
 !if(bound_riv_wlev_switch.ne.0) write(*,'("boundfile_riv_wlev : ", a)') trim(adjustl(boundfile_riv_wlev))
 !read(1,*)
-write(*,"(a)") "bound_slo_wlev_switch, bound_riv_wlev_switch have not implemented yet."
-write(*,*)
+!write(*,*)
 
 
 !--------------------------------------------------
-!qs, qr境界条件　→　未実装　要確認
+!qs, qr境界条件　→　境界条件設定に実装
 !--------------------------------------------------
 !read(1,*) bound_slo_disc_switch, bound_riv_disc_switch
 !read(1,'(a)') boundfile_slo_disc
@@ -321,8 +322,7 @@ write(*,*)
 !if(bound_slo_disc_switch.ne.0) write(*,'("boundfile_slo_disc : ", a)') trim(adjustl(boundfile_slo_disc))
 !if(bound_riv_disc_switch.ne.0) write(*,'("boundfile_riv_disc : ", a)') trim(adjustl(boundfile_riv_disc))
 !read(1,*)
-write(*,"(a)") "bound_slo_disc_switch, bound_riv_disc_switch have not implemented yet."
-write(*,*)
+!write(*,*)
 
 !--------------------------------------------------
 !土地利用条件　→　格子属性として与える
@@ -332,29 +332,27 @@ write(*,*)
 !if(land_switch.eq.1) write(*,'("landfile : ", a)') trim(adjustl(landfile))
 !
 !read(1,*)
-write(*,"(a)") "landuse can be set as the grid attribute."
-write(*,*)
+!write(*,*)
 
 !--------------------------------------------------
-!Dam条件　→　境界条件属性として与える
+!Dam条件　→　境界条件設定に実装
 !--------------------------------------------------
 !read(1,*) dam_switch
 !read(1,'(a)') damfile
 !if(dam_switch.eq.1) write(*,'("damfile : ", a)') trim(adjustl(damfile))
 !read(1,*)
-write(*,"(a)") "Dam condition can be set as the boundary condition."
-write(*,*)
+!write(*,*)
 
 !--------------------------------------------------
-!div条件　→　未実装　要確認
+!div条件　→　境界条件設定に実装
 !--------------------------------------------------
 !read(1,*) div_switch
 !call cg_iric_read_integer_f("div_switch", div_switch, ier)
 !read(1,'(a)') divfile
 !if(div_switch.eq.1) write(*,'("divfile : ", a)') trim(adjustl(divfile))
 !read(1,*)
-write(*,"(a)") "div condition has not implemented yet."
-write(*,*)
+!write(*,"(a)") "div condition has not implemented yet."
+!write(*,*)
 
 !--------------------------------------------------
 !蒸発条件　→　格子属性として与える
@@ -371,25 +369,26 @@ write(*,*)
 ! write(*,'("cellsize_evp_x : ", f15.5, " cellsize_evp_y : ", f15.5)') cellsize_evp_x, cellsize_evp_y
 !endif
 !read(1,*)
-write(*,"(a)") "evp condition can be set as the grid attribute."
-write(*,*)
+!write(*,"(a)") "evp condition can be set as the grid attribute."
+!write(*,*)
 
 !--------------------------------------------------
-!河道断面データ　→　未実装　要確認
+!河道断面データ　→　実装しない
 !--------------------------------------------------
 !read(1,*) sec_length_switch
-!read(1,'(a)') sec_length_file
+!read(1,'(a)') sec_length_file	!これはセルごとに河道長を設定するファイル
+
 !if(sec_length_switch.eq.1) write(*,'("sec_length : ", a)') trim(adjustl(sec_length_file))
 !read(1,*)
 !write(*,*)
 !read(1,*) sec_switch
-!read(1,'(a)') sec_map_file
-!read(1,'(a)') sec_file
+!read(1,'(a)') sec_map_file	!これはセルごとにsecfileのidを指定するファイル
+!read(1,'(a)') sec_file		!これはsection形状のファイル　なければwc,ws,dc,dsで指定された値となる
 !if(sec_switch.eq.1) write(*,'("sec_map_file : ", a)') trim(adjustl(sec_map_file))
 !if(sec_switch.eq.1) write(*,'("sec_file : ", a)') trim(adjustl(sec_file))
 !read(1,*)
-write(*,"(a)") "Cross section condition has not implemented yet."
-write(*,*)
+!write(*,"(a)") "Cross section condition has not implemented yet."
+!write(*,*)
 
 
 !--------------------------------------------------
@@ -400,7 +399,7 @@ write(*,*)
 !read(1,'(a)') embbfile
 !if(emb_switch.eq.1) write(*,'("embrfile : ", a)') trim(adjustl(embrfile))
 !if(emb_switch.eq.1) write(*,'("embbfile : ", a)') trim(adjustl(embbfile))
-write(*,*)
+!write(*,*)
 
 !--------------------------------------------------
 !計算結果出力・ファイル
