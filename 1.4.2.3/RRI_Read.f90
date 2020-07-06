@@ -67,10 +67,12 @@ write(*,*)
 !基本オプション
 !--------------------------------------------------
 !read(1,*) utm
-call cg_iric_read_integer_f("utm", utm, ier)
+!call cg_iric_read_integer_f("utm", utm, ier)
+utm = 0
 
 !read(1,*) eight_dir
-call cg_iric_read_integer_f("eight_dir", eight_dir, ier)
+!call cg_iric_read_integer_f("eight_dir", eight_dir, ier)
+eight_dir = 1
 
 write(*,'("utm : ", i5)') utm
 write(*,'("eight_dir : ", i5)') eight_dir
@@ -103,35 +105,52 @@ write(*,*)
 !read(1,*) xllcorner_rain
 !read(1,*) yllcorner_rain
 !read(1,*) cellsize_rain_x, cellsize_rain_y
-!write(*,'("xllcorner_rain : ", f15.5)') xllcorner_rain
-!write(*,'("yllcorner_rain : ", f15.5)') yllcorner_rain
-!write(*,'("cellsize_rain_x : ", f15.5, "  cellsize_rain_y : ", f15.5)') cellsize_rain_x, cellsize_rain_y
-write(*,"(a)") "Rain data can be set as the grid attribute.　"
+
+call cg_iric_read_real_f("xllcorner_rain", xllcorner_rain, ier)
+call cg_iric_read_real_f("yllcorner_rain", yllcorner_rain, ier)
+call cg_iric_read_real_f("cellsize_rain_x", cellsize_rain_x, ier)
+call cg_iric_read_real_f("cellsize_rain_y", cellsize_rain_y, ier)
+
+write(*,'("xllcorner_rain : ", f15.5)') xllcorner_rain
+write(*,'("yllcorner_rain : ", f15.5)') yllcorner_rain
+write(*,'("cellsize_rain_x : ", f15.5, "  cellsize_rain_y : ", f15.5)') cellsize_rain_x, cellsize_rain_y
+
 write(*,*)
 
 !--------------------------------------------------
 !slopeパラメータ　→　格子セル属性　複合条件として設定
 !--------------------------------------------------
 !read(1,*) num_of_landuse
-call cg_iric_read_complex_count_f("landuse_c", num_of_landuse, ier)
+!call cg_iric_read_complex_count_f("landuse_c", num_of_landuse, ier)
+!RRI for iRIC version
+!Number of Land use type is 3 as fixed.
+num_of_landuse = 3
 !
 allocate( dif(num_of_landuse) )
 allocate( ns_slope(num_of_landuse), soildepth(num_of_landuse) )
 allocate( gammaa(num_of_landuse) )
 !
-do i = 1, num_of_landuse
-	!read(1,*) (dif(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_integer_f("landuse_c", i, "dif", dif(i), ier)
+!dif
+call cg_iric_read_integer_f("dif_1", dif(1), ier)
+call cg_iric_read_integer_f("dif_2", dif(2), ier)
+call cg_iric_read_integer_f("dif_3", dif(3), ier)
 
-	!read(1,*) (ns_slope(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "ns_slope", ns_slope(i), ier)
+!ns_slope
+call cg_iric_read_real_f("ns_slope_1", ns_slope(1), ier)
+call cg_iric_read_real_f("ns_slope_2", ns_slope(2), ier)
+call cg_iric_read_real_f("ns_slope_3", ns_slope(3), ier)
 
-	!read(1,*) (soildepth(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "soildepth", soildepth(i), ier)
+!solid depth
+call cg_iric_read_real_f("soildepth_1", soildepth(1), ier)
+call cg_iric_read_real_f("soildepth_2", soildepth(2), ier)
+call cg_iric_read_real_f("soildepth_3", soildepth(3), ier)
 
-	!read(1,*) (gammaa(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "gammaa", gammaa(i), ier)
-end do
+!Porosity
+call cg_iric_read_real_f("gammaa_1", gammaa(1), ier)
+call cg_iric_read_real_f("gammaa_2", gammaa(2), ier)
+call cg_iric_read_real_f("gammaa_3", gammaa(3), ier)
+
+
 !
 
 write(*,'("num_of_landuse : ", i5)') num_of_landuse
@@ -146,13 +165,17 @@ write(*,*)
 !
 allocate( ksv(num_of_landuse), faif(num_of_landuse) )
 !
-do i = 1, num_of_landuse
-	!read(1,*) (ksv(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "ksv", ksv(i), ier)
+!ksv
+call cg_iric_read_real_f("ksv_1", ksv(1), ier)
+call cg_iric_read_real_f("ksv_2", ksv(2), ier)
+call cg_iric_read_real_f("ksv_2", ksv(3), ier)
 
-	!read(1,*) (faif(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "faif", faif(i), ier)
-end do
+!Sf
+call cg_iric_read_real_f("faif_1", faif(1), ier)
+call cg_iric_read_real_f("faif_2", faif(2), ier)
+call cg_iric_read_real_f("faif_3", faif(3), ier)
+
+
 !
 write(*,'("ksv : ", 100e12.3)') (ksv(i), i = 1, num_of_landuse)
 write(*,'("faif : ", 100f12.3)') (faif(i), i = 1, num_of_landuse)
@@ -162,17 +185,20 @@ write(*,*)
 !
 allocate( ka(num_of_landuse), gammam(num_of_landuse), beta(num_of_landuse) )
 !
+!ka
+call cg_iric_read_real_f("ka_1", ka(1), ier)
+call cg_iric_read_real_f("ka_2", ka(2), ier)
+call cg_iric_read_real_f("ka_3", ka(3), ier)
 
-do i = 1, num_of_landuse
-	!read(1,*) (ka(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "ka", ka(i), ier)
+!Unsat. porosity
+call cg_iric_read_real_f("gammam_1", gammam(1), ier)
+call cg_iric_read_real_f("gammam_2", gammam(2), ier)
+call cg_iric_read_real_f("gammam_3", gammam(3), ier)
 
-	!read(1,*) (gammam(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "gammam", gammam(i), ier)
-
-	!read(1,*) (beta(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "beta", beta(i), ier)
-end do
+!beta
+call cg_iric_read_real_f("beta_1", beta(1), ier)
+call cg_iric_read_real_f("beta_2", beta(2), ier)
+call cg_iric_read_real_f("beta_3", beta(3), ier)
 
 write(*,'("ka : ", 100e12.3)') (ka(i), i = 1, num_of_landuse)
 write(*,'("gammam : ", 100f12.3)') (gammam(i), i = 1, num_of_landuse)
@@ -187,22 +213,10 @@ write(*,*)
 !
 allocate( ksg(num_of_landuse), gammag(num_of_landuse), kg0(num_of_landuse), fpg(num_of_landuse), rgl(num_of_landuse) )
 !
-do i = 1, num_of_landuse
-	!read(1,*) (ksg(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "ksg", ksg(i), ier)
-	
-	!read(1,*) (gammag(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "gammag", gammag(i), ier)
-	
-	!read(1,*) (kg0(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "kg0", kg0(i), ier)
-	
-	!read(1,*) (fpg(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "fpg", fpg(i), ier)
-	
-	!read(1,*) (rgl(i), i = 1, num_of_landuse)
-	call cg_iric_read_complex_real_f("landuse_c", i, "rgl", rgl(i), ier)
-end do
+! ksg = 0.0 means that this model has not been implemented into iRIC version. ****
+!
+ksg = 0.0; gammag= 0.0; kg0=0.0; fpg=0.0; rgl=0.0
+
 !
 write(*,'("ksg : ", 100e12.3)') (ksg(i), i = 1, num_of_landuse)
 write(*,'("gammag : ", 100f12.3)') (gammag(i), i = 1, num_of_landuse)
@@ -355,7 +369,7 @@ write(*,*)
 !write(*,*)
 
 !--------------------------------------------------
-!蒸発条件　→　格子属性として与える
+!蒸発条件　→　
 !--------------------------------------------------
 !read(1,*) evp_switch
 !read(1,'(a)') evpfile

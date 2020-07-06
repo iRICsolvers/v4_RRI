@@ -96,11 +96,6 @@ nodata = -9999
 !change nx, ny as cell numbers
 nx = ni-1; ny = nj-1
 
-!as temporary setting
-xllcorner_rain = xllcorner
-yllcorner_rain = yllcorner
-cellsize_rain_x = 0.00833333333
-cellsize_rain_y = 0.00833333333
 
 allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
 call iric_read_cell_attr_real('elevation_c',zs)
@@ -112,10 +107,11 @@ allocate (dir(ny, nx))
 call iric_read_cell_attr_int('dir_c',dir)
 
 allocate( land(ny, nx) )
-land = 1
-if( land_switch.eq.1 ) then
-call read_gis_int(landfile, land)
-endif
+call iric_read_cell_attr_int('landuse_c',dir)
+!land = 1
+!if( land_switch.eq.1 ) then
+!call read_gis_int(landfile, land)
+!endif
  
 ! land : 1 ... num_of_landuse
 write(*,*) "num_of_landuse : ", num_of_landuse

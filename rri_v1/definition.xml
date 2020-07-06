@@ -20,12 +20,13 @@
     <Label caption="RRI_Input_Format_Ver1_4_2 for iRIC" align="right"/>
     <Item name="run_type" caption="Run Type" >
       <Definition valueType="integer" default="0">
-        <Enumeration value="0" caption="Data Check Only" />
-        <Enumeration value="1" caption="Run" />
+        <Enumeration value="0" caption="Make Geographic Condition Only" />
+        <Enumeration value="1" caption="Make Geographic Condition and Run" />
+        <Enumeration value="2" caption="Run Only" />
       </Definition>
     </Item>
 
-    <GroupBox caption="Base Parameters">
+    <!--<GroupBox caption="Base Parameters">
       <Item name="utm" caption="Coordinate System" >
         <Definition valueType="integer" default="0">
           <Enumeration value="0" caption="LatLon" />
@@ -39,14 +40,7 @@
           <Enumeration value="1" caption="8" />
         </Definition>
       </Item>
-    </GroupBox>
-
-    <GroupBox caption="Rain Data file">
-      <Item name="rainfile" caption="Rain File" >
-        <Definition valueType="filename" default="./rain/rain.dat">
-        </Definition>
-      </Item>
-    </GroupBox>
+    </GroupBox>-->
 
     <GroupBox caption="Geographic Data file">
       <Item name="demfile" caption="Dem File" >
@@ -103,6 +97,41 @@
    
   </Tab>
 
+  <Tab name="rain_data" caption="Rain and Evaporation">
+    
+
+    <GroupBox caption="Rain">
+      <Item name="rainfile" caption="Rain File" >
+        <Definition valueType="filename" default="./rain/rain.dat">
+        </Definition>
+      </Item>
+      <Item row="0" col="0" name="xllcorner_rain" caption="xllcorner_rain" >
+        <Definition valueType="real" default="140">
+        </Definition>
+      </Item>
+      <Item row="0" col="1" name="yllcorner_rain" caption="yllcorner_rain" >
+        <Definition valueType="real" default="39">
+        </Definition>
+      </Item>
+      <Item row="1" col="0" name="cellsize_rain_x" caption="cellsize_rain_x" >
+        <Definition valueType="real" default="0.0125">
+        </Definition>
+      </Item>
+      <Item row="1" col="1" name="cellsize_rain_y" caption="cellsize_rain_y" >
+        <Definition valueType="real" default="0.00833333">
+        </Definition>
+      </Item>
+    </GroupBox>
+
+    <GroupBox caption="Evaporation">
+      <Item name="evaporation_rate" caption="Evaporation Rate[mm/h]" >
+        <Definition valueType="real" default="0.0">
+        </Definition>
+      </Item>
+    </GroupBox>
+  </Tab>
+  
+
  <!--
   ***** Time Contorol Parameters *****
   --> 
@@ -147,7 +176,142 @@
   ***** Slope Simulation Parameters *****
   -->
   <Tab name="slope_sim" caption="Slope Simulation Parameters">
-    <Label caption="Please Specify Slope Simulation Parameters at Land Use Parameters." />
+    <GroupBox caption="Green-Ampt infiltration model parameters">
+      <GridLayout>
+        <Label row="0" col="1" caption="Region 1" align="center"/>
+        <Label row="0" col="2" caption="Region 2" align="center" />
+        <Label row="0" col="3" caption="Region 3" align="center" />
+
+        <Label row="0" col="0" caption="" />
+        <Label row="1" col="0" caption="Diff or Kinematic" />
+        <Label row="2" col="0" caption="Manning Roughness for Slope" />
+        <Label row="3" col="0" caption="soildepth[m]" />
+        <Label row="4" col="0" caption="Porosity [-]" />
+
+        
+        <Item row="1" col="1" name="dif_1">
+          <Definition valueType="integer" default="1">
+            <Enumeration value="0" caption="Kinematic" />
+            <Enumeration value="1" caption="Diffusion"/>
+          </Definition>
+        </Item>
+        <Item row="2" col="1" name="ns_slope_1">
+          <Definition valueType="real" default="0.15" />
+        </Item>
+        <Item row="3" col="1" name="soildepth_1">
+          <Definition valueType="real" default="1.0" />
+        </Item>
+        <Item row="4" col="1" name="gammaa_1">
+          <Definition valueType="real" default="0.4" />
+        </Item>
+
+        
+        <Item row="1" col="2" name="dif_2">
+          <Definition valueType="integer" default="1">
+            <Enumeration value="0" caption="Kinematic" />
+            <Enumeration value="1" caption="Diffusion"/>
+          </Definition>
+        </Item>
+        <Item row="2" col="2" name="ns_slope_2">
+          <Definition valueType="real" default="0.15" />
+        </Item>
+        <Item row="3" col="2" name="soildepth_2">
+          <Definition valueType="real" default="1.0" />
+        </Item>
+        <Item row="4" col="2" name="gammaa_2">
+          <Definition valueType="real" default="0.4" />
+        </Item>
+
+        <Item row="1" col="3" name="dif_3">
+          <Definition valueType="integer" default="1">
+            <Enumeration value="0" caption="Kinematic" />
+            <Enumeration value="1" caption="Diffusion"/>
+          </Definition>
+        </Item>
+        <Item row="2" col="3" name="ns_slope_3">
+          <Definition valueType="real" default="0.15" />
+        </Item>
+        <Item row="3" col="3" name="soildepth_3">
+          <Definition valueType="real" default="1.0" />
+        </Item>
+        <Item row="4" col="3" name="gammaa_3">
+          <Definition valueType="real" default="0.4" />
+        </Item>
+
+      </GridLayout>
+    </GroupBox>
+
+    <GroupBox caption="Green-Ampt infiltration model parameters">
+      <GridLayout>
+        
+        
+        <Label row="1" col="0" caption="ksv[m/s]                   " />
+        <Label row="2" col="0" caption="Sf[m]" />
+
+        <Item row="1" col="1" name="ksv_1">
+          <Definition valueType="real" default="5.556e-7" />
+        </Item>
+        <Item row="2" col="1" name="faif_1">
+          <Definition valueType="real" default="0.273" />
+        </Item>
+
+        <Item row="1" col="2" name="ksv_2">
+          <Definition valueType="real" default="6.056e-7" />
+        </Item>
+        <Item row="2" col="2" name="faif_2">
+          <Definition valueType="real" default="0.1101" />
+        </Item>
+
+        <Item row="1" col="3" name="ksv_3">
+          <Definition valueType="real" default="0.0" />
+        </Item>
+        <Item row="2" col="3" name="faif_3">
+          <Definition valueType="real" default="0.0" />
+        </Item>
+          
+      </GridLayout>
+    </GroupBox>
+
+    <GroupBox caption="lateral subsurface and surface model parameters">
+      <GridLayout>
+        <Label row="1" col="0" caption="ka[m/s]" />
+        <Label row="2" col="0" caption="Unsat. porosity [-]        " />
+        <Label row="3" col="0" caption="beta" />
+
+        <!--type1-->
+        <Item row="1" col="1" name="ka_1">
+          <Definition valueType="real" default="0.0" />
+        </Item>
+        <Item row="2" col="1" name="gammam_1">
+          <Definition valueType="real" default="0.0" />
+        </Item>
+        <Item row="3" col="1" name="beta_1">
+          <Definition valueType="real" default="8.0" />
+        </Item>
+
+        <!--type2--> 
+        <Item row="1" col="2" name="ka_2" caption="ka[m/s]">
+          <Definition valueType="real" default="0.1" />
+        </Item>
+        <Item row="2" col="2" name="gammam_2" caption="Unsat. porosity [-]">
+          <Definition valueType="real" default="0.0" />
+        </Item>
+        <Item row="3" col="2" name="beta_2" caption="beta">
+          <Definition valueType="real" default="8.0" />
+        </Item>
+
+        <!--type3-->
+        <Item row="1" col="3" name="ka_3" caption="ka[m/s]">
+          <Definition valueType="real" default="0.1" />
+        </Item>
+        <Item row="2" col="3" name="gammam_3" caption="Unsat. porosity [-]">
+          <Definition valueType="real" default="0.0" />
+        </Item>
+        <Item row="3" col="3" name="beta_3" caption="beta">
+          <Definition valueType="real" default="8.0" />
+        </Item>
+      </GridLayout>
+    </GroupBox>
   </Tab>
 
   <!--
@@ -356,137 +520,106 @@
 
 </CalculationCondition>
 
-<GridRelatedCondition  keepOrder="true">
-  <Item name="elevation_c" caption="Elevation (m)">
-    <Definition position="cell" valueType="real" default="max" />
-  </Item>
-  <Item name="dir_c" caption="DIR">
-    <Definition position="cell" valueType="integer" default="0" />
-  </Item>
-  <Item name="acc_c" caption="ACC">
-    <Definition position="cell" valueType="integer" default="0" />
-  </Item>
-  <Item name="width_c" caption="Width(m)">
-    <Definition position="cell" valueType="real" default="0">
-      <Dimension name="Time" caption="Time" valueType="real"/>
-    </Definition>
-  </Item>
-  <Item name="depth_c" caption="Depth(m)">
-    <Definition position="cell" valueType="real" default="0">
-      <Dimension name="Time" caption="Time" valueType="real"/>
-    </Definition>
-  </Item>
-  <Item name="height_c" caption="Height(m)">
-    <Definition position="cell" valueType="real" default="0">
-      <Dimension name="Time" caption="Time" valueType="real"/>
-    </Definition>
-  </Item>
-  <Item name="landuse_c" caption="Land Use Parameters">
-    <Definition valueType="complex" position="cell" keepOrder="true">
-      <Item name="dif" caption="Diff or Kinematic">
-        <Definition valueType="integer" default="1">
-          <Enumeration value="0" caption="Diffusion" />
-          <Enumeration value="1" caption="Kinematic"/>
-        </Definition>
-      </Item>
-      <Item name="ns_slope" caption="Manning Roughness for Slope">
-        <Definition valueType="real" default="0.4" />
-      </Item>
-      <Item name="soildepth" caption="soildepth[m]">
-        <Definition valueType="real" default="1.0" />
-      </Item>
-      <Item name="gammaa" caption="gammaa">
-        <Definition valueType="real" default="0.475" />
-      </Item>
-      <Item name="ksv" caption="ksv[m/s]">
-        <Definition valueType="real" default="0.0" />
-      </Item>
-      <Item name="faif" caption="faif[m]">
-        <Definition valueType="real" default="0.3163" />
-      </Item>
-      <Item name="ka" caption="ka[m/s]">
-        <Definition valueType="real" default="0.0" />
-      </Item>
-      <Item name="gammam" caption="gammam">
-        <Definition valueType="real" default="0.0" />
-      </Item>
-      <Item name="beta" caption="beta">
-        <Definition valueType="real" default="8.0" />
-      </Item>
-      <Item name="ksg" caption="ksg[m/s]">
-        <Definition valueType="real" default="0.0" />
-      </Item>
-      <Item name="gammag" caption="gammag">
-        <Definition valueType="real" default="0.4" />
-      </Item>
-      <Item name="kg0" caption="kg0[m/s]">
-        <Definition valueType="real" default="0.0005" />
-      </Item>
-      <Item name="fpg" caption="fpg">
-        <Definition valueType="real" default="0.03" />
-      </Item>
-      <Item name="rgl" caption="rgl[m/s]">
-        <Definition valueType="real" default="0.5" />
-      </Item>
-    </Definition>
-  </Item>
-  <Item name="rain_c" caption="Rain(mm/h)">
-    <Definition position="cell" valueType="real" default="0">
-      <Dimension name="Time" caption="Time" valueType="real"/>
-    </Definition>
-  </Item>
-  <Item name="evaporation_c" caption="Evaporation(mm/h)">
-    <Definition position="cell" valueType="real" default="max" />
-  </Item>
+  <GridRelatedCondition  keepOrder="true">
+    <Item name="elevation_c" caption="Elevation [m]">
+      <Definition position="cell" valueType="real" default="max" />
+    </Item>
+    <Item name="dir_c" caption="DIR">
+      <Definition position="cell" valueType="integer" default="0" />
+    </Item>
+    <Item name="acc_c" caption="ACC">
+      <Definition position="cell" valueType="integer" default="0" />
+    </Item>
+    <Item name="width_c" caption="Width[m]">
+      <Definition position="cell" valueType="real" default="0">
+        <Dimension name="Time" caption="Time" valueType="real"/>
+      </Definition>
+    </Item>
+    <Item name="depth_c" caption="Depth[m]">
+      <Definition position="cell" valueType="real" default="0">
+        <Dimension name="Time" caption="Time" valueType="real"/>
+      </Definition>
+    </Item>
+    <Item name="height_c" caption="Height[m]">
+      <Definition position="cell" valueType="real" default="0">
+        <Dimension name="Time" caption="Time" valueType="real"/>
+      </Definition>
+    </Item>
+    <Item name="landuse_c" caption="Land Use Type">
+      <Definition  position="cell" valueType="integer" default="1">
+        <Enumeration value="1" caption="Region 1"/>
+        <Enumeration value="2" caption="Region 2" />
+        <Enumeration value="3" caption="Region 3"/>
+      </Definition>
+    </Item>
+    <Item name="rain_c" caption="Rain[mm/h]: Data Check Only">
+      <Definition position="cell" valueType="real" default="0">
+        <Dimension name="Time" caption="Time" valueType="real"/>
+      </Definition>
+    </Item>
+    <!--<Item name="evaporation_c" caption="Evaporation[mm/h]">
+      <Definition position="cell" valueType="real" default="max" />
+    </Item>-->
 
-</GridRelatedCondition>
+  </GridRelatedCondition>
 
-<BoundaryCondition name="dam" caption="Dam" position="cell">
-  <Item name="name" caption="Name">
-    <Definition valueType="string" default="Dam Name" />
-  </Item>
-  <Item name="dam_volmax" caption="Storage Volume[m3]">
-    <Definition valueType="real" default="66000000" />
-  </Item>
-  <Item name="dam_floodq" caption="Constant Discharge[m3/s]">
-    <Definition valueType="real" default="20" />
-  </Item>
-</BoundaryCondition>
+  <BoundaryCondition name="dam" caption="Dam" position="cell">
+    <Item name="name" caption="Name">
+      <Definition valueType="string" default="Dam Name" />
+    </Item>
+    <Item name="dam_volmax" caption="Storage Volume[m3]">
+      <Definition valueType="real" default="66000000" />
+    </Item>
+    <Item name="dam_floodq" caption="Constant Discharge[m3/s]">
+      <Definition valueType="real" default="20" />
+    </Item>
+  </BoundaryCondition>
   
-<BoundaryCondition name="bound_qr" caption="Time Series for River Discharge at point" position="cell">   
-  <Item name="qr_bound" caption="qr[m3/s]">
-    <Definition conditionType="functional">
-      <Parameter valueType="real" caption="Time"/>
-      <Value valueType="real" caption="qr(m3/s)"/>
-    </Definition>
-  </Item>
-</BoundaryCondition>
+  <BoundaryCondition name="bound_qr" caption="Time Series for River Discharge at point" position="cell">   
+    <Item name="qr_bound" caption="qr[m3/s]">
+      <Definition conditionType="functional">
+        <Parameter valueType="real" caption="Time"/>
+        <Value valueType="real" caption="qr[m3/s]"/>
+      </Definition>
+    </Item>
+  </BoundaryCondition>
 
- <BoundaryCondition name="bound_hr" caption="Time Series for River Depth at point" position="cell">
-  <Item name="hr_bound" caption="hr(m)">
-    <Definition conditionType="functional">
-      <Parameter valueType="real" caption="Time"/>
-      <Value valueType="real" caption="hr(m)"/>
-    </Definition>
-  </Item>
-</BoundaryCondition>
+   <BoundaryCondition name="bound_hr" caption="Time Series for River Depth at point" position="cell">
+    <Item name="hr_bound" caption="hr[m]">
+      <Definition conditionType="functional">
+        <Parameter valueType="real" caption="Time"/>
+        <Value valueType="real" caption="hr[m]"/>
+      </Definition>
+    </Item>
+  </BoundaryCondition>
 
-<BoundaryCondition name="bound_qs" caption="Time Series for Slope Discharge at point" position="cell">
-  <Item name="qs_bound" caption="qs[m3/s]">
-    <Definition conditionType="functional">
-      <Parameter valueType="real" caption="Time"/>
-      <Value valueType="real" caption="qs(m3/s)"/>
-    </Definition>
-  </Item>
-</BoundaryCondition>
+  <BoundaryCondition name="bound_qs" caption="Time Series for Slope Discharge at point" position="cell">
+    <Item name="qs_bound" caption="qs[m3/s]">
+      <Definition conditionType="functional">
+        <Parameter valueType="real" caption="Time"/>
+        <Value valueType="real" caption="qs[m3/s]"/>
+      </Definition>
+    </Item>
+  </BoundaryCondition>
 
-<BoundaryCondition name="bound_hs" caption="Time Series for Slope Depth at point" position="cell">
-  <Item name="hs_bound" caption="hs[m]">
-    <Definition conditionType="functional">
-      <Parameter valueType="real" caption="Time"/>
-      <Value valueType="real" caption="hs(m)"/>
-    </Definition>
-  </Item>
-</BoundaryCondition>
-  
+  <BoundaryCondition name="bound_hs" caption="Time Series for Slope Depth at point" position="cell">
+    <Item name="hs_bound" caption="hs[m]">
+      <Definition conditionType="functional">
+        <Parameter valueType="real" caption="Time"/>
+        <Value valueType="real" caption="hs[m]"/>
+      </Definition>
+    </Item>
+  </BoundaryCondition>
+
+  <BoundaryCondition name="div" caption="DivSet" position="cell">
+    <Item name="div_loc_i" caption="div_loc_i">
+      <Definition valueType="integer" default="1">
+      </Definition>
+    </Item>
+    <Item name="div_loc_j" caption="div_loc_j">
+      <Definition valueType="integer" default="1">
+      </Definition>
+    </Item>
+  </BoundaryCondition>
+
 </SolverDefinition>
