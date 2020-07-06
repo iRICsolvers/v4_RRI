@@ -1,5 +1,0 @@
-./topo/dem.txt
-./topo/dir.txt
-./topo/acc.txt
-./topo/adem.txt
-./topo/adir.txt
