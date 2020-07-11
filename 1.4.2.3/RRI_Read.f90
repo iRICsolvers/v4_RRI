@@ -7,7 +7,7 @@ use tecout_mod
 implicit none
 include 'cgnslib_f.h'
 
-integer i
+integer i, num_of_bound_point
 character*256 format_version
 
 integer :: ier, cgns_f, icount
@@ -23,7 +23,7 @@ else
     write(*,"(a)") "You should specify an argument."
     stop
 endif
-call cg_open_f(cgns_name, CG_MODE_READ, cgns_f, ier)
+call cg_open_f(cgns_name, CG_MODE_MODIFY, cgns_f, ier)
 if (ier /= 0) stop "cg_open_f failed"
 call cg_iric_init_f(cgns_f, ier)
 
@@ -124,7 +124,7 @@ write(*,*)
 !call cg_iric_read_complex_count_f("landuse_c", num_of_landuse, ier)
 !RRI for iRIC version
 !Number of Land use type is 3 as fixed.
-num_of_landuse = 3
+num_of_landuse = 5
 !
 allocate( dif(num_of_landuse) )
 allocate( ns_slope(num_of_landuse), soildepth(num_of_landuse) )
@@ -134,21 +134,30 @@ allocate( gammaa(num_of_landuse) )
 call cg_iric_read_integer_f("dif_1", dif(1), ier)
 call cg_iric_read_integer_f("dif_2", dif(2), ier)
 call cg_iric_read_integer_f("dif_3", dif(3), ier)
+call cg_iric_read_integer_f("dif_4", dif(4), ier)
+call cg_iric_read_integer_f("dif_4", dif(5), ier)
+
 
 !ns_slope
 call cg_iric_read_real_f("ns_slope_1", ns_slope(1), ier)
 call cg_iric_read_real_f("ns_slope_2", ns_slope(2), ier)
 call cg_iric_read_real_f("ns_slope_3", ns_slope(3), ier)
+call cg_iric_read_real_f("ns_slope_4", ns_slope(4), ier)
+call cg_iric_read_real_f("ns_slope_5", ns_slope(5), ier)
 
 !solid depth
 call cg_iric_read_real_f("soildepth_1", soildepth(1), ier)
 call cg_iric_read_real_f("soildepth_2", soildepth(2), ier)
 call cg_iric_read_real_f("soildepth_3", soildepth(3), ier)
+call cg_iric_read_real_f("soildepth_4", soildepth(4), ier)
+call cg_iric_read_real_f("soildepth_5", soildepth(5), ier)
 
 !Porosity
 call cg_iric_read_real_f("gammaa_1", gammaa(1), ier)
 call cg_iric_read_real_f("gammaa_2", gammaa(2), ier)
 call cg_iric_read_real_f("gammaa_3", gammaa(3), ier)
+call cg_iric_read_real_f("gammaa_4", gammaa(4), ier)
+call cg_iric_read_real_f("gammaa_5", gammaa(5), ier)
 
 
 !
@@ -168,13 +177,16 @@ allocate( ksv(num_of_landuse), faif(num_of_landuse) )
 !ksv
 call cg_iric_read_real_f("ksv_1", ksv(1), ier)
 call cg_iric_read_real_f("ksv_2", ksv(2), ier)
-call cg_iric_read_real_f("ksv_2", ksv(3), ier)
+call cg_iric_read_real_f("ksv_3", ksv(3), ier)
+call cg_iric_read_real_f("ksv_4", ksv(4), ier)
+call cg_iric_read_real_f("ksv_5", ksv(5), ier)
 
 !Sf
 call cg_iric_read_real_f("faif_1", faif(1), ier)
 call cg_iric_read_real_f("faif_2", faif(2), ier)
 call cg_iric_read_real_f("faif_3", faif(3), ier)
-
+call cg_iric_read_real_f("faif_4", faif(4), ier)
+call cg_iric_read_real_f("faif_5", faif(5), ier)
 
 !
 write(*,'("ksv : ", 100e12.3)') (ksv(i), i = 1, num_of_landuse)
@@ -189,16 +201,22 @@ allocate( ka(num_of_landuse), gammam(num_of_landuse), beta(num_of_landuse) )
 call cg_iric_read_real_f("ka_1", ka(1), ier)
 call cg_iric_read_real_f("ka_2", ka(2), ier)
 call cg_iric_read_real_f("ka_3", ka(3), ier)
+call cg_iric_read_real_f("ka_4", ka(4), ier)
+call cg_iric_read_real_f("ka_5", ka(5), ier)
 
 !Unsat. porosity
 call cg_iric_read_real_f("gammam_1", gammam(1), ier)
 call cg_iric_read_real_f("gammam_2", gammam(2), ier)
 call cg_iric_read_real_f("gammam_3", gammam(3), ier)
+call cg_iric_read_real_f("gammam_4", gammam(4), ier)
+call cg_iric_read_real_f("gammam_5", gammam(5), ier)
 
 !beta
 call cg_iric_read_real_f("beta_1", beta(1), ier)
 call cg_iric_read_real_f("beta_2", beta(2), ier)
 call cg_iric_read_real_f("beta_3", beta(3), ier)
+call cg_iric_read_real_f("beta_4", beta(4), ier)
+call cg_iric_read_real_f("beta_5", beta(5), ier)
 
 write(*,'("ka : ", 100e12.3)') (ka(i), i = 1, num_of_landuse)
 write(*,'("gammam : ", 100f12.3)') (gammam(i), i = 1, num_of_landuse)
@@ -318,6 +336,14 @@ write(*,*)
 !--------------------------------------------------
 !hs, hr‹«ŠEðŒ@¨@‹«ŠEðŒÝ’è‚ÉŽÀ‘•
 !--------------------------------------------------
+bound_slo_wlev_switch = 0; bound_riv_wlev_switch = 0
+call cg_iric_read_bc_count_f("bound_hs", num_of_bound_point)
+if(num_of_bound_point > 0) bound_slo_wlev_switch = 1
+
+call cg_iric_read_bc_count_f("bound_hr", num_of_bound_point)
+if(num_of_bound_point > 0) bound_riv_wlev_switch = 1
+
+
 !read(1,*) bound_slo_wlev_switch, bound_riv_wlev_switch
 !read(1,'(a)') boundfile_slo_wlev
 !read(1,'(a)') boundfile_riv_wlev
@@ -330,6 +356,14 @@ write(*,*)
 !--------------------------------------------------
 !qs, qr‹«ŠEðŒ@¨@‹«ŠEðŒÝ’è‚ÉŽÀ‘•
 !--------------------------------------------------
+bound_slo_disc_switch = 0; bound_riv_disc_switch = 0
+call cg_iric_read_bc_count_f("bound_qs", num_of_bound_point)
+if(num_of_bound_point > 0) bound_slo_disc_switch = 1
+
+call cg_iric_read_bc_count_f("bound_qr", num_of_bound_point)
+if(num_of_bound_point > 0) bound_riv_disc_switch = 1
+
+
 !read(1,*) bound_slo_disc_switch, bound_riv_disc_switch
 !read(1,'(a)') boundfile_slo_disc
 !read(1,'(a)') boundfile_riv_disc
@@ -351,6 +385,9 @@ write(*,*)
 !--------------------------------------------------
 !DamðŒ@¨@‹«ŠEðŒÝ’è‚ÉŽÀ‘•
 !--------------------------------------------------
+dam_switch = 0
+call cg_iric_read_bc_count_f("dam", dam_num)
+if(dam_num > 0) dam_switch = 1
 !read(1,*) dam_switch
 !read(1,'(a)') damfile
 !if(dam_switch.eq.1) write(*,'("damfile : ", a)') trim(adjustl(damfile))
@@ -360,6 +397,9 @@ write(*,*)
 !--------------------------------------------------
 !divðŒ@¨@‹«ŠEðŒÝ’è‚ÉŽÀ‘•
 !--------------------------------------------------
+div_id_max = 0
+call cg_iric_read_bc_count_f("div", div_id_max)
+if(div_id_max > 0) div_switch = 1
 !read(1,*) div_switch
 !call cg_iric_read_integer_f("div_switch", div_switch, ier)
 !read(1,'(a)') divfile

@@ -4,17 +4,20 @@
 subroutine dam_read
 use globals
 use dam_mod
+use iric
 implicit none
     
 integer :: i
+integer :: size, ier
+integer, dimension(2) :: tmp_idx
     
 allocate( damflg(riv_count), dam_qin(riv_count) )
 damflg(:) = 0
 
 if( dam_switch.eq.1 ) then
 
- open(99, file=Damfile, status="old" )
- read(99,*) dam_num
+ !open(99, file=Damfile, status="old" )
+ !read(99,*) dam_num
  allocate( dam_name(dam_num), dam_kind(dam_num) &
            , dam_ix(dam_num), dam_iy(dam_num) &
            , dam_vol(dam_num), dam_vol_temp(dam_num) &
@@ -26,11 +29,27 @@ if( dam_switch.eq.1 ) then
  dam_state(:) = 0
 
  do i = 1, dam_num
-  read(99,*) dam_name(i), dam_iy(i), dam_ix(i), dam_volmax(i), dam_floodq(i)
+  !read(99,*) dam_name(i), dam_iy(i), dam_ix(i), dam_volmax(i), dam_floodq(i)
+  
+  call cg_iric_read_bc_indicessize_f("dam", i, size, ier)
+  if(size /= 1)then
+    write(*,*) "Error: A boundary condition for dam can be specified on only one cell for one."
+    call iric_cgns_close()
+    stop
+  end if
+  call cg_iric_read_bc_indices_f("dam", i, tmp_idx, ier)
+  
+  dam_iy(i) = ny - tmp_idx(2) + 1
+  dam_ix(i) = tmp_idx(1)
+
+  call cg_iric_read_bc_real_f("dam", i, "dam_volmax", dam_volmax(i), ier)
+  call cg_iric_read_bc_real_f("dam", i, "dam_floodq", dam_floodq(i), ier)
+  
+   
   dam_loc(i) = riv_ij2idx( dam_iy(i), dam_ix(i) )
   damflg(dam_loc(i)) = i
  end do     
- close(99)
+ !close(99)
 end if
 end subroutine dam_read
 
