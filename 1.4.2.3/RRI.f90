@@ -56,12 +56,14 @@ real(8) ddt_chk_riv, ddt_chk_slo
 character*256 ctemp
 character*6 t_char
 integer div_org_i, div_org_j, div_dest_i, div_dest_j
+integer :: tmp_idx(2), tmp_ii, tmp_jj, size, ier
 
 ! calcHydro
 character*256 hydro_file
 parameter( hydro_file = "hydro.txt" )
 integer, allocatable :: hydro_i(:), hydro_j(:)
 integer maxhydro
+
 
 integer :: ierr
 
@@ -96,7 +98,6 @@ nodata = -9999
 !change nx, ny as cell numbers
 nx = ni-1; ny = nj-1
 
-
 allocate (zs(ny, nx), zb(ny, nx), zb_riv(ny, nx), domain(ny, nx))
 call iric_read_cell_attr_real('elevation_c',zs)
 
@@ -107,7 +108,7 @@ allocate (dir(ny, nx))
 call iric_read_cell_attr_int('dir_c',dir)
 
 allocate( land(ny, nx) )
-call iric_read_cell_attr_int('landuse_c',dir)
+call iric_read_cell_attr_int('landuse_c', land)
 !land = 1
 !if( land_switch.eq.1 ) then
 !call read_gis_int(landfile, land)
@@ -358,25 +359,41 @@ endif
 call read_bound
 
 ! div file
-div_id_max = 0
+!div_id_max = 0
 if( div_switch.eq.1 ) then
- open( 20, file = divfile, status = "old" )
- do
-  read(20, *, iostat = ios) div_org_i, div_org_j, div_dest_i, div_dest_j
-  if(ios .ne. 0) exit
-  div_id_max = div_id_max + 1
- enddo
- write(*,*) "div_id_max : ", div_id_max
+ !open( 20, file = divfile, status = "old" )
+ !do
+ ! read(20, *, iostat = ios) div_org_i, div_org_j, div_dest_i, div_dest_j
+ ! if(ios .ne. 0) exit
+ ! div_id_max = div_id_max + 1
+ !enddo
+ !write(*,*) "div_id_max : ", div_id_max
  allocate( div_org_idx(div_id_max), div_dest_idx(div_id_max), div_rate(div_id_max) )
- rewind(20)
+ !rewind(20)
 
  do k = 1, div_id_max
-  read(20, *) div_org_i, div_org_j, div_dest_i, div_dest_j, div_rate(k)
+  !read(20, *) div_org_i, div_org_j, div_dest_i, div_dest_j, div_rate(k)
+  call cg_iric_read_bc_indicessize_f("div", k, size, ier)
+  if(size /= 1) then
+    write(*,*) "Error:Number of indicessize setting div must be one."
+    stop
+  end if
+     
+  call cg_iric_read_bc_indices_f("div", k, tmp_idx, ier)
+  div_org_i = ny - tmp_idx(2) + 1
+  div_org_j = tmp_idx(1)
+  call cg_iric_read_bc_integer_f("div", k, "div_dest_i", tmp_ii, ier)
+  call cg_iric_read_bc_integer_f("div", k, "div_dest_j", tmp_jj, ier)
+  call cg_iric_read_bc_real_f("div", k, "div_rate", div_rate(k), ier)
+  
+  div_dest_i = ny - tmp_jj + 1
+  div_dest_j = tmp_ii
+  
   div_org_idx(k) = riv_ij2idx( div_org_i, div_org_j )
   div_dest_idx(k) = riv_ij2idx( div_dest_i, div_dest_j )
  enddo
  write(*,*) "done: reading div file"
- close(20)
+ !close(20)
 endif
 
 ! emb file
@@ -610,7 +627,12 @@ call iric_cgns_output_result(qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
 do t = 1, maxt
 
  if(mod(t, 1).eq.0) write(*,*) t, "/", maxt
-
+ 
+ !******* Comunication with iRIC GUI  ******************************
+ 
+ call iric_check_cancel()
+ call iric_cgns_update()
+ 
  !******* RIVER CALCULATION ******************************
  if( riv_thresh .lt. 0 ) go to 2
 
