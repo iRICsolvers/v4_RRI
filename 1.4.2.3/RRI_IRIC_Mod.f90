@@ -350,14 +350,14 @@ contains
 	call cg_iric_write_sol_real_f("dummy", tmpv, ierr)
 	deallocate(tmpv)
 	
-    allocate(rain_rate(1:ny, 1:nx))
+    allocate(rain_rate(1:ny, 1:nx), rain_vol(1:ny, 1:nx))
     do i=1,ny
         do j=1,nx
             rain_rate(i,j) = qp_t(i,j) * 3600.d0 * 1000.d0
 			rain_vol(i,j) = sum_qp_t(i,j) * 1000.d0
         end do
 	end do
-	call iric_write_result_real('total_qp_t[mm]', rain_rate)
+	call iric_write_result_real('total_qp_t[mm]', rain_vol)
     call iric_write_result_real('qp_t[mm/h]', rain_rate)
     call iric_write_result_real('hs[m]', hs)
 	call iric_write_result_real('hr[m]', hr)
@@ -369,6 +369,7 @@ contains
 	call iric_write_gv(qg_ave)
 	call iric_write_result_real('gampt_ff', gampt_ff)
     deallocate(rain_rate)
+	deallocate(rain_vol)
 	
     !if (outswitch_hg /= 0) then
     !  call iric_write_result_real('hg', hg)

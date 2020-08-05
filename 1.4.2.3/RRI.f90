@@ -554,8 +554,6 @@ do tt = 0, tt_max_rain
 enddo
 ! unit convert from (mm/h) to (m/s)
 qp = qp / 3600.d0 / 1000.d0
-qp_t = qp(0,:,:)
-
 
 do j = 1, nx
  rain_j(j) = int( (xllcorner + (dble(j) - 0.5d0) * cellsize - xllcorner_rain) / cellsize_rain_x ) + 1
@@ -625,6 +623,16 @@ out_dt = dble(maxt) / dble(outnum)
 out_dt = max(1.d0, out_dt)
 out_next = nint(out_dt)
 tt = 0
+
+! rainfall for initial value
+  do i = 1, ny
+   if(rain_i(i) .lt. 1 .or. rain_i(i) .gt. ny_rain ) cycle
+   do j = 1, nx
+    if(rain_j(j) .lt. 1 .or. rain_j(j) .gt. nx_rain ) cycle
+    qp_t(i, j) = qp(0, rain_i(i), rain_j(j))
+   enddo
+  enddo
+
 
 !èâä˙ílèoóÕ
 call iric_cgns_output_result(sum_qp_t, qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
