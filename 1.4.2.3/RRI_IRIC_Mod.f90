@@ -329,34 +329,42 @@ contains
   end subroutine
 
   subroutine iric_cgns_output_result( &
-    qp_t, hs, hr, hg, qr_ave, qs_ave, qg_ave)
+    sum_qp_t, qp_t, hs, hr, hg, qr_ave, qs_ave, qg_ave)
     use globals
 
     double precision, dimension(:,:), allocatable, intent(in):: &
-      qp_t,hs, hr, hg, qr_ave
+      sum_qp_t, qp_t,hs, hr, hg, qr_ave
     double precision, dimension(:,:,:), allocatable, intent(in):: &
       qs_ave, qg_ave
 
-    double precision, dimension(:,:), allocatable :: rain_rate
+    double precision, dimension(:,:), allocatable :: rain_rate, rain_vol
+	double precision, dimension(:,:), allocatable :: tmpv
     integer :: i, j
     integer:: ierr
 
     call cg_iric_write_sol_time_f(time, ierr)
-
     
+	!node valueが出力されていないとグラフが表示できないための仮出力
+	allocate(tmpv(1:ny+1, 1:nx+1))
+	tmpv = 0.0d0
+	call cg_iric_write_sol_real_f("dummy", tmpv, ierr)
+	deallocate(tmpv)
+	
     allocate(rain_rate(1:ny, 1:nx))
     do i=1,ny
         do j=1,nx
             rain_rate(i,j) = qp_t(i,j) * 3600.d0 * 1000.d0
+			rain_vol(i,j) = sum_qp_t(i,j) * 1000.d0
         end do
-    end do
-    call iric_write_result_real('qp_t', rain_rate)
-    call iric_write_result_real('hs', hs)
-	call iric_write_result_real('hr', hr)
-	call iric_write_result_real('qr', qr_ave)
+	end do
+	call iric_write_result_real('total_qp_t[mm]', rain_rate)
+    call iric_write_result_real('qp_t[mm/h]', rain_rate)
+    call iric_write_result_real('hs[m]', hs)
+	call iric_write_result_real('hr[m]', hr)
+	call iric_write_result_real('qr[m3_s]', qr_ave)
 	call iric_write_qu(qs_ave)
 	call iric_write_qv(qs_ave)
-	call iric_write_result_real('hg', hg)
+	call iric_write_result_real('hg[m]', hg)
 	call iric_write_gu(qg_ave)
 	call iric_write_gv(qg_ave)
 	call iric_write_result_real('gampt_ff', gampt_ff)

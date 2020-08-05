@@ -24,6 +24,7 @@ integer tt_max_rain
 integer, allocatable :: t_rain(:)
 integer nx_rain, ny_rain
 real(8), allocatable :: qp(:,:,:), qp_t(:,:), qp_t_idx(:)
+real(8), allocatable :: sum_qp_t(:,:)
 
 ! calculation variable
 real(8) rho, total_area
@@ -540,6 +541,8 @@ enddo
 tt_max_rain = tt - 1
 
 allocate( t_rain(0:tt_max_rain), qp(0:tt_max_rain, ny_rain, nx_rain), qp_t(ny, nx) )
+allocate( sum_qp_t(ny, nx) )
+sum_qp_t = 0.0d0
 rewind(11)
 
 qp = 0.d0
@@ -551,6 +554,8 @@ do tt = 0, tt_max_rain
 enddo
 ! unit convert from (mm/h) to (m/s)
 qp = qp / 3600.d0 / 1000.d0
+qp_t = qp(0,:,:)
+
 
 do j = 1, nx
  rain_j(j) = int( (xllcorner + (dble(j) - 0.5d0) * cellsize - xllcorner_rain) / cellsize_rain_x ) + 1
@@ -622,7 +627,7 @@ out_next = nint(out_dt)
 tt = 0
 
 !èâä˙ílèoóÕ
-call iric_cgns_output_result(qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
+call iric_cgns_output_result(sum_qp_t, qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
 
 do t = 1, maxt
 
@@ -1016,6 +1021,11 @@ do t = 1, maxt
  write(*,*) "max hs: ", maxval(hs), "loc : ", maxloc(hs)
  if(gw_switch .eq. 1) write(*,*) "max hg: ", maxval(hg), "loc : ", maxloc(hg)
 
+ !***** count total rain volume *****
+ 
+ sum_qp_t = sum_qp_t + qp_t * dt
+ 
+ 
  !******* OUTPUT *****************************************
 
  ! For TSAS Output
@@ -1127,7 +1137,7 @@ i = ny, 1, -1)
   if(outswitch_gampt_ff .ne. 0) close(108)
 
   !iRIC Output
-  call iric_cgns_output_result(qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
+  call iric_cgns_output_result(sum_qp_t, qp_t, hs,hr,hg,qr_ave,qs_ave,qg_ave)
 
   if( tec_switch .eq. 1 ) then
    if (tt .eq. 1) then

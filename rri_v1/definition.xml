@@ -21,7 +21,7 @@
     <Item name="run_type" caption="Run Type" >
       <Definition valueType="integer" default="0">
         <Enumeration value="0" caption="Make Geographic Condition Only" />
-        <Enumeration value="1" caption="Make Geographic Condition and Run" />
+        <!-- <Enumeration value="1" caption="Make Geographic Condition and Run" /> -->
         <Enumeration value="2" caption="Run Only" />
       </Definition>
     </Item>
@@ -61,7 +61,7 @@
 
     <GroupBox caption="River Shape Parameters">
       <GridLayout withSpacer="true">
-        <Label row="0" col="0" caption="Width : Wc, Ws"/>
+        <Label row="0" col="0" caption="Width : Cw, Sw"/>
         <Item row="0" col="1" name="width_param_c">
           <Definition valueType="real" default="5.0">
           </Definition>
@@ -72,7 +72,7 @@
           </Definition>
         </Item>
 
-        <Label row="1" col="0" caption="Depth : Dc, Ds" />
+        <Label row="1" col="0" caption="Depth : Cd, Sd" />
         <Item row="1" col="1" name="depth_param_c" caption="depth_param_c" >
           <Definition valueType="real" default="0.95">
           </Definition>
