@@ -358,7 +358,7 @@ contains
         end do
 	end do
 	call iric_write_result_real('total_qp_t[mm]', rain_vol)
-    call iric_write_result_real('qp_t[mm/h]', rain_rate)
+    call iric_write_result_real('qp_t[mm_h]', rain_rate)
     call iric_write_result_real('hs[m]', hs)
 	call iric_write_result_real('hr[m]', hr)
 	call iric_write_result_real('qr[m3_s]', qr_ave)
