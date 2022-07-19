@@ -1,3 +1,5 @@
+call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
+
 del *.obj *.mod
 ifort /MD /c /Qopenmp /O3 /nostandard-realloc-lhs ../1.4.2.3/RRI_Mod.f90
 ifort /MD /c /Qopenmp /O3  /nostandard-realloc-lhs ../1.4.2.3/RRI_Mod2.f90
