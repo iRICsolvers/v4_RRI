@@ -9,7 +9,7 @@ program RRI
     use runge_mod
     use dam_mod, only: dam_switch, dam_vol_temp
     use tecout_mod
-    use iric
+    use RRI_iric
     implicit none
 
 ! variable definition

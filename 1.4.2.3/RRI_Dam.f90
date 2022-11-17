@@ -4,7 +4,7 @@
 subroutine dam_read
     use globals
     use dam_mod
-    use iric
+    use RRI_iric
     implicit none
 
     integer :: i

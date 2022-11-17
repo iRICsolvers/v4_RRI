@@ -1,4 +1,4 @@
-module iric
+module RRI_iric
     implicit none
     private
     character(len=64):: cgns_name
