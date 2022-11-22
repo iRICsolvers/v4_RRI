@@ -11,8 +11,7 @@ subroutine RRI_Read
     integer i, num_of_bound_point
     character*256 format_version
 
-    integer :: ier, cgns_f, icount
-    character(len=64):: cgns_name
+    integer :: ier
 
 !--------------------------------------------------
 !CGNSファイルを開く
@@ -24,7 +23,7 @@ subroutine RRI_Read
         write (*, "(a)") "You should specify an argument."
         stop
     end if
-    call cg_iric_open(cgns_name, CG_MODE_MODIFY, cgns_f, ier)
+    call cg_iric_open(cgns_name, IRIC_MODE_MODIFY, cgns_f, ier)
     if (ier /= 0) stop "cg_iric_open failed"
 
 !--------------------------------------------------
@@ -268,7 +267,7 @@ subroutine RRI_Read
 !read(1,*) height_param
 !read(1,*) height_limit_param
     call cg_iric_read_real(cgns_f, "height_param", height_param, ier)
-    call cg_iric_read_real(cgns_f, "height_limit_param", height_limit_param, ier)
+    call cg_iric_read_integer(cgns_f, "height_limit_param", height_limit_param, ier)
 
 !read(1,*) rivfile_switch
 !call cg_iric_read_integer(cgns_f, "rivfile_switch", rivfile_switch, ier)
