@@ -7,10 +7,9 @@
 !
 program demAdjust2
 
+    use RRI_iric
     use iric
     implicit none
-
-    include 'cgnslib_f.h'
 
     character*256 infile, infile_dem, infile_dir, infile_acc
     character*256 outfile_adem, outfile_adir, outfile_slo
@@ -62,9 +61,9 @@ program demAdjust2
 
     ! Start opne CGNS and Read file name
     call iric_cgns_open()
-    call cg_iric_read_string_f("demfile", infile_dem, ier)
-    call cg_iric_read_string_f("accfile", infile_acc, ier)
-    call cg_iric_read_string_f("dirfile", infile_dir, ier)
+    call cg_iric_read_string(cgns_f, "demfile", infile_dem, ier)
+    call cg_iric_read_string(cgns_f, "accfile", infile_acc, ier)
+    call cg_iric_read_string(cgns_f, "dirfile", infile_dir, ier)
     ! End opne CGNS and Read file name
 
     !Output file name
@@ -450,13 +449,13 @@ program demAdjust2
     depth = 0.d0
     height = 0.d0
 
-    call cg_iric_read_integer_f("riv_thresh", riv_thresh, ier)
-    call cg_iric_read_real_f("width_param_c", width_param_c, ier)
-    call cg_iric_read_real_f("width_param_s", width_param_s, ier)
-    call cg_iric_read_real_f("depth_param_c", depth_param_c, ier)
-    call cg_iric_read_real_f("depth_param_s", depth_param_s, ier)
-    call cg_iric_read_real_f("height_param", height_param, ier)
-    call cg_iric_read_integer_f("height_limit_param", height_limit_param, ier)
+    call cg_iric_read_integer(cgns_f, "riv_thresh", riv_thresh, ier)
+    call cg_iric_read_real(cgns_f, "width_param_c", width_param_c, ier)
+    call cg_iric_read_real(cgns_f, "width_param_s", width_param_s, ier)
+    call cg_iric_read_real(cgns_f, "depth_param_c", depth_param_c, ier)
+    call cg_iric_read_real(cgns_f, "depth_param_s", depth_param_s, ier)
+    call cg_iric_read_real(cgns_f, "height_param", height_param, ier)
+    call cg_iric_read_integer(cgns_f, "height_limit_param", height_limit_param, ier)
 
     riv = 0 ! slope cell
     if (riv_thresh .gt. 0) then
@@ -474,13 +473,16 @@ program demAdjust2
     write (*, *) "Done STEP 10"
 
     !CGNSファイルに出力
-    call cg_iric_writegridcoord2d_f(nx + 1, ny + 1, gxx, gyy, ier)
+    call cg_iric_write_sol_start(cgns_f, ier)
+    call cg_iRIC_Write_Grid2d_Coords(cgns_f, nx + 1, ny + 1, gxx, gyy, ier)
     call iric_write_cell_real("elevation_c", nx, ny, adem)
     call iric_write_cell_integer("dir_c", nx, ny, dir)
     call iric_write_cell_integer("acc_c", nx, ny, acc)
     call iric_write_cell_real("width_c", nx, ny, width)
     call iric_write_cell_real("depth_c", nx, ny, depth)
     call iric_write_cell_real("height_c", nx, ny, height)
+    call cg_iric_write_sol_end(cgns_f, ier)
+
     call iric_cgns_close()
 
 end program demAdjust2
