@@ -268,7 +268,7 @@ program RRI
 
 ! initial condition
     allocate (hs(ny, nx), hr(ny, nx), hg(ny, nx), gampt_ff(ny, nx))
-    allocate (gampt(ny, nx), qrs(ny, nx))
+    allocate (gampt_f(ny, nx), qrs(ny, nx))
 
     hr = -0.1d0
     hs = -0.1d0
