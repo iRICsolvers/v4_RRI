@@ -7,7 +7,7 @@ module RRI_iric
     character(len=64):: cgns_name
     integer:: cgns_f
 
-    public iric_cgns_open, iric_cgns_close, iric_cgns_update
+    public iric_cgns_open, iric_cgns_close
     !public iric_read_input_condition
     !public iric_cgns_output_result
     public iric_check_cancel
@@ -31,7 +31,7 @@ contains
         stop
     endif
 
-    call cg_iric_open(cgns_name, CG_MODE_MODIFY, cgns_f, ierr)
+    call cg_iric_open(cgns_name, IRIC_MODE_MODIFY, cgns_f, ierr)
     if (ierr /= 0) stop "cg_iric_open failed"
     
     ! guiにcgnsファイルを読込みであることを知らせるファイルを生成
