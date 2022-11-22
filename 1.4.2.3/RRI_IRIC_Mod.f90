@@ -4,7 +4,7 @@ module RRI_iric
 
     implicit none
     character(len=64):: cgns_name
-    integer:: cgns_f
+    integer:: cgns_f,  icount
 
     public iric_cgns_open, iric_cgns_close
     public iric_read_input_condition
@@ -16,7 +16,7 @@ contains
     subroutine iric_cgns_open()
         implicit none
 
-        integer:: ierr, icount
+        integer:: ierr
 
         !引数取得
         !icount = nargs()
