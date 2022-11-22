@@ -3,7 +3,6 @@ module RRI_iric
     use iric
 
     implicit none
-    private
     character(len=64):: cgns_name
     integer:: cgns_f
 
