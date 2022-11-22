@@ -5,6 +5,7 @@ subroutine dam_read
     use globals
     use dam_mod
     use RRI_iric
+    use iric
     implicit none
 
     integer :: i
@@ -31,19 +32,19 @@ subroutine dam_read
         do i = 1, dam_num
             !read(99,*) dam_name(i), dam_iy(i), dam_ix(i), dam_volmax(i), dam_floodq(i)
 
-            call cg_iric_read_bc_indicessize_f("dam", i, size, ier)
+            call cg_iric_read_bc_indicessize(cgns_f, "dam", i, size, ier)
             if (size /= 1) then
                 write (*, *) "Error: A boundary condition for dam can be specified on only one cell for one."
                 call iric_cgns_close()
                 stop
             end if
-            call cg_iric_read_bc_indices_f("dam", i, tmp_idx, ier)
+            call cg_iric_read_bc_indices(cgns_f, "dam", i, tmp_idx, ier)
 
             dam_iy(i) = ny - tmp_idx(2) + 1
             dam_ix(i) = tmp_idx(1)
 
-            call cg_iric_read_bc_real_f("dam", i, "dam_volmax", dam_volmax(i), ier)
-            call cg_iric_read_bc_real_f("dam", i, "dam_floodq", dam_floodq(i), ier)
+            call cg_iric_read_bc_real(cgns_f, "dam", i, "dam_volmax", dam_volmax(i), ier)
+            call cg_iric_read_bc_real(cgns_f, "dam", i, "dam_floodq", dam_floodq(i), ier)
 
             dam_loc(i) = riv_ij2idx(dam_iy(i), dam_ix(i))
             damflg(dam_loc(i)) = i

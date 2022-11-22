@@ -1,20 +1,21 @@
-module iric
-  implicit none
-  private
-  character(len=64):: cgns_name
-  integer:: cgns_f
+module RRI_iric
 
-  public iric_cgns_open, iric_cgns_close, iric_cgns_update
-  !public iric_read_input_condition
-  !public iric_cgns_output_result
-  public iric_check_cancel
-  public iric_write_cell_real, iric_write_cell_integer
+    use iric
+
+    implicit none
+    private
+    character(len=64):: cgns_name
+    integer:: cgns_f
+
+    public iric_cgns_open, iric_cgns_close, iric_cgns_update
+    !public iric_read_input_condition
+    !public iric_cgns_output_result
+    public iric_check_cancel
+    public iric_write_cell_real, iric_write_cell_integer
 
 contains
   subroutine iric_cgns_open()
     implicit none
-    include 'cgnslib_f.h'
-    include 'iriclib_f.h'
 
     integer:: ierr, icount
 
@@ -30,13 +31,11 @@ contains
         stop
     endif
 
-    call cg_open_f(cgns_name, CG_MODE_MODIFY, cgns_f, ierr)
-    if (ierr /= 0) stop "cg_open_f failed"
-    call cg_iric_init_f(cgns_f, ierr)
-    !if (ierr /= 0) stop "cg_iric_init_f failed"
+    call cg_iric_open(cgns_name, CG_MODE_MODIFY, cgns_f, ierr)
+    if (ierr /= 0) stop "cg_iric_open failed"
     
     ! guiにcgnsファイルを読込みであることを知らせるファイルを生成
-    call iric_initoption_f(IRIC_OPTION_CANCEL, ierr)
+    call iric_initoption(IRIC_OPTION_CANCEL, ierr)
 
   end subroutine
 
@@ -44,29 +43,9 @@ contains
     implicit none
     integer:: ierr
 
-    call cg_close_f(cgns_f, ierr)
+    call cg_iric_close(cgns_f, ierr)
   end subroutine
-  
-  subroutine iric_cgns_update()
-    implicit none
-    integer:: ierr
-
-	call cg_iric_flush_f(cgns_name, cgns_f, ierr)
-  end subroutine
-	
-	
-  subroutine iric_check_cancel()
-    implicit none
-    integer:: ierr
-
-	 call iric_check_cancel_f(ierr)
-	 if (ierr == 1) then
-	  write(*,*) "Solver is stopped because the STOP button was clicked."	
-	  call iric_cgns_close()
-	  stop
-	 end if
-  end subroutine
-
+  	
   !subroutine iric_read_input_condition()
   !  call iric_read_grid()
   !end subroutine
@@ -82,7 +61,7 @@ contains
   !  integer:: i, j, ierr
   !
   !  allocate(tmpv(nx, ny))
-  !  call cg_iric_read_grid_integer_cell_f(name, tmpv, ierr)
+  !  call cg_iric_read_grid_integer_cell(cgns_f, name, tmpv, ierr)
   !
   !  do i = 1, nx
   !    do j = 1, ny
@@ -102,7 +81,7 @@ contains
   !  integer:: i, j, ierr
   !
   !  allocate(tmpv(nx, ny))
-  !  call cg_iric_read_grid_real_cell_f(name, tmpv, ierr)
+  !  call cg_iric_read_grid_real_cell(cgns_f, name, tmpv, ierr)
   !
   !  do i = 1, nx
   !    do j = 1, ny
@@ -132,7 +111,7 @@ contains
       end do
     end do
 
-    call cg_iric_write_sol_cell_real_f(name, tmpv, ierr)
+    call cg_iric_write_sol_cell_real(cgns_f, name, tmpv, ierr)
   end subroutine
   
   subroutine iric_write_result_integer(name, nx, ny, v)
@@ -156,7 +135,7 @@ contains
       end do
     end do
 
-    call cg_iric_write_sol_cell_integer_f(name, tmpv, ierr)
+    call cg_iric_write_sol_cell_integer(cgns_f, name, tmpv, ierr)
   end subroutine
   
   subroutine iric_write_cell_real(name, nx, ny, v)
@@ -180,7 +159,7 @@ contains
       end do
 	end do
 
-	call cg_iric_write_grid_real_cell_f(name, tmpv, ierr)
+	call cg_iric_write_grid_real_cell(cgns_f, name, tmpv, ierr)
   end subroutine
   
   subroutine iric_write_cell_integer(name, nx, ny, v)
@@ -204,7 +183,7 @@ contains
       end do
 	end do
 
-	call cg_iric_write_grid_integer_cell_f(name, tmpv, ierr)
+	call cg_iric_write_grid_integer_cell(cgns_f, name, tmpv, ierr)
   end subroutine
 
   !subroutine iric_read_grid()
@@ -213,13 +192,13 @@ contains
   !  integer:: isize, jsize, ierr
   !  double precision, dimension(:,:), allocatable:: grid_x, grid_y
   !
-  !  call cg_iric_gotogridcoord2d_f(isize, jsize, ierr)
+  !  call cg_iRIC_Read_Grid2d_Str_Size(cgns_f, isize, jsize, ierr)
   !  print *, "isize, jsize", isize, jsize
   !  if (ierr /= 0) stop "CGNS grid read error"
   !  allocate(grid_x(isize, jsize), grid_y(isize, jsize))
   !  print *, "grid_x, grid_y allocated"
-  !  call cg_iric_getgridcoord2d_f(grid_x, grid_y, ierr)
-  !  print *, "cg_iric_getgridcoord2d_f called"
+  !  call cg_iRIC_Read_Grid2d_Coords(cgns_f, grid_x, grid_y, ierr)
+  !  print *, "cg_iRIC_Read_Grid2d_Coords called"
   !
   !  ! iRIC から読み込んだ格子はメートル単位の座標系
   !  ! utm = 1
@@ -340,9 +319,9 @@ contains
   !  integer :: i, j
   !  integer:: ierr
   !
-  !  call cg_iric_write_sol_time_f(time, ierr)
+  !  call cg_iric_write_sol_time(cgns_f, time, ierr)
   !
-  !  !call cg_iric_write_sol_gridcoord2d_f(gxx, gyy, ierr)
+  !  !call cg_iRIC_Write_Sol_Grid2d_Coords(cgns_f, gxx, gyy, ierr)
   !  
   !  if (outswitch_hs /= 0) then
   !      allocate(rain_rate(1:ny, 1:nx))
@@ -384,9 +363,6 @@ contains
   !  if (outswitch_gampt_ff /= 0) then
   !    call iric_write_result_real('gampt_ff', gampt_ff)
   !  end if
-  !  
-  !  !flush
-  !  call cg_iric_flush_f(cgns_name, cgns_f, ierr)
   !  
   !end subroutine
 

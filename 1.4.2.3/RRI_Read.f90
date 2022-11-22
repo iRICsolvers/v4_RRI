@@ -3,9 +3,10 @@ subroutine RRI_Read
     use globals
     use dam_mod
     use tecout_mod
+    use RRI_iric
+    use iric
 
     implicit none
-    include 'cgnslib_f.h'
 
     integer i, num_of_bound_point
     character*256 format_version
@@ -23,37 +24,36 @@ subroutine RRI_Read
         write (*, "(a)") "You should specify an argument."
         stop
     end if
-    call cg_open_f(cgns_name, CG_MODE_MODIFY, cgns_f, ier)
-    if (ier /= 0) stop "cg_open_f failed"
-    call cg_iric_init_f(cgns_f, ier)
+    call cg_iric_open(cgns_name, CG_MODE_MODIFY, cgns_f, ier)
+    if (ier /= 0) stop "cg_iric_open failed"
 
 !--------------------------------------------------
 !RRI バージョン情報
 !--------------------------------------------------
 !read(1,'(a)') format_version
-!call cg_iric_read_string_f("rri_ver", format_version, ier)
+!call cg_iric_read_string(cgns_f, "rri_ver", format_version, ier)
 !
 !write(*,'("format_version : ", a)') trim(adjustl(format_version))
 !if( format_version .ne. "Ver1_4_2 for iRIC" ) stop "This RRI model requires RRI_Input_Format_Ver1_4_2"
 !write(*,*)
 
 !Run Type
-    call cg_iric_read_integer_f("run_type", run_type, ier)
+    call cg_iric_read_integer(cgns_f, "run_type", run_type, ier)
 
 !--------------------------------------------------
 !外部ファイル　→　格子属性として設定
 !--------------------------------------------------
 !read(1,'(a)') rainfile
-    call cg_iric_read_string_f("rainfile", rainfile, ier)
+    call cg_iric_read_string(cgns_f, "rainfile", rainfile, ier)
 
 !read(1,'(a)') demfile
-    call cg_iric_read_string_f("demfile", demfile, ier)
+    call cg_iric_read_string(cgns_f, "demfile", demfile, ier)
 
 !read(1,'(a)') accfile
-    call cg_iric_read_string_f("accfile", accfile, ier)
+    call cg_iric_read_string(cgns_f, "accfile", accfile, ier)
 
 !read(1,'(a)') dirfile
-    call cg_iric_read_string_f("dirfile", dirfile, ier)
+    call cg_iric_read_string(cgns_f, "dirfile", dirfile, ier)
 
     write (*, '("rainfile : ", a)') trim(adjustl(rainfile))
     write (*, '("demfile : ", a)') trim(adjustl(demfile))
@@ -67,11 +67,11 @@ subroutine RRI_Read
 !基本オプション
 !--------------------------------------------------
 !read(1,*) utm
-!call cg_iric_read_integer_f("utm", utm, ier)
+!call cg_iric_read_integer(cgns_f, "utm", utm, ier)
     utm = 0
 
 !read(1,*) eight_dir
-!call cg_iric_read_integer_f("eight_dir", eight_dir, ier)
+!call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
     eight_dir = 1
 
     write (*, '("utm : ", i5)') utm
@@ -82,16 +82,16 @@ subroutine RRI_Read
 !時間条件
 !--------------------------------------------------
 !read(1,*) lasth
-    call cg_iric_read_integer_f("lasth", lasth, ier)
+    call cg_iric_read_integer(cgns_f, "lasth", lasth, ier)
 
 !read(1,*) dt
-    call cg_iric_read_integer_f("dt", dt, ier)
+    call cg_iric_read_integer(cgns_f, "dt", dt, ier)
 
 !read(1,*) dt_riv
-    call cg_iric_read_integer_f("dt_riv", dt_riv, ier)
+    call cg_iric_read_integer(cgns_f, "dt_riv", dt_riv, ier)
 
 !read(1,*) outnum
-    call cg_iric_read_integer_f("outnum", outnum, ier)
+    call cg_iric_read_integer(cgns_f, "outnum", outnum, ier)
 
     write (*, '("lasth : ", i8)') lasth
     write (*, '("dt : ", i12)') dt
@@ -106,10 +106,10 @@ subroutine RRI_Read
 !read(1,*) yllcorner_rain
 !read(1,*) cellsize_rain_x, cellsize_rain_y
 
-    call cg_iric_read_real_f("xllcorner_rain", xllcorner_rain, ier)
-    call cg_iric_read_real_f("yllcorner_rain", yllcorner_rain, ier)
-    call cg_iric_read_real_f("cellsize_rain_x", cellsize_rain_x, ier)
-    call cg_iric_read_real_f("cellsize_rain_y", cellsize_rain_y, ier)
+    call cg_iric_read_real(cgns_f, "xllcorner_rain", xllcorner_rain, ier)
+    call cg_iric_read_real(cgns_f, "yllcorner_rain", yllcorner_rain, ier)
+    call cg_iric_read_real(cgns_f, "cellsize_rain_x", cellsize_rain_x, ier)
+    call cg_iric_read_real(cgns_f, "cellsize_rain_y", cellsize_rain_y, ier)
 
     write (*, '("xllcorner_rain : ", f15.5)') xllcorner_rain
     write (*, '("yllcorner_rain : ", f15.5)') yllcorner_rain
@@ -121,7 +121,7 @@ subroutine RRI_Read
 !slopeパラメータ　→　格子セル属性　複合条件として設定
 !--------------------------------------------------
 !read(1,*) num_of_landuse
-!call cg_iric_read_complex_count_f("landuse_c", num_of_landuse, ier)
+!call cg_iric_read_complex_count(cgns_f, "landuse_c", num_of_landuse, ier)
 !RRI for iRIC version
 !Number of Land use type is 3 as fixed.
     num_of_landuse = 5
@@ -131,32 +131,32 @@ subroutine RRI_Read
     allocate (gammaa(num_of_landuse))
 !
 !dif
-    call cg_iric_read_integer_f("dif_1", dif(1), ier)
-    call cg_iric_read_integer_f("dif_2", dif(2), ier)
-    call cg_iric_read_integer_f("dif_3", dif(3), ier)
-    call cg_iric_read_integer_f("dif_4", dif(4), ier)
-    call cg_iric_read_integer_f("dif_4", dif(5), ier)
+    call cg_iric_read_integer(cgns_f, "dif_1", dif(1), ier)
+    call cg_iric_read_integer(cgns_f, "dif_2", dif(2), ier)
+    call cg_iric_read_integer(cgns_f, "dif_3", dif(3), ier)
+    call cg_iric_read_integer(cgns_f, "dif_4", dif(4), ier)
+    call cg_iric_read_integer(cgns_f, "dif_4", dif(5), ier)
 
 !ns_slope
-    call cg_iric_read_real_f("ns_slope_1", ns_slope(1), ier)
-    call cg_iric_read_real_f("ns_slope_2", ns_slope(2), ier)
-    call cg_iric_read_real_f("ns_slope_3", ns_slope(3), ier)
-    call cg_iric_read_real_f("ns_slope_4", ns_slope(4), ier)
-    call cg_iric_read_real_f("ns_slope_5", ns_slope(5), ier)
+    call cg_iric_read_real(cgns_f, "ns_slope_1", ns_slope(1), ier)
+    call cg_iric_read_real(cgns_f, "ns_slope_2", ns_slope(2), ier)
+    call cg_iric_read_real(cgns_f, "ns_slope_3", ns_slope(3), ier)
+    call cg_iric_read_real(cgns_f, "ns_slope_4", ns_slope(4), ier)
+    call cg_iric_read_real(cgns_f, "ns_slope_5", ns_slope(5), ier)
 
 !solid depth
-    call cg_iric_read_real_f("soildepth_1", soildepth(1), ier)
-    call cg_iric_read_real_f("soildepth_2", soildepth(2), ier)
-    call cg_iric_read_real_f("soildepth_3", soildepth(3), ier)
-    call cg_iric_read_real_f("soildepth_4", soildepth(4), ier)
-    call cg_iric_read_real_f("soildepth_5", soildepth(5), ier)
+    call cg_iric_read_real(cgns_f, "soildepth_1", soildepth(1), ier)
+    call cg_iric_read_real(cgns_f, "soildepth_2", soildepth(2), ier)
+    call cg_iric_read_real(cgns_f, "soildepth_3", soildepth(3), ier)
+    call cg_iric_read_real(cgns_f, "soildepth_4", soildepth(4), ier)
+    call cg_iric_read_real(cgns_f, "soildepth_5", soildepth(5), ier)
 
 !Porosity
-    call cg_iric_read_real_f("gammaa_1", gammaa(1), ier)
-    call cg_iric_read_real_f("gammaa_2", gammaa(2), ier)
-    call cg_iric_read_real_f("gammaa_3", gammaa(3), ier)
-    call cg_iric_read_real_f("gammaa_4", gammaa(4), ier)
-    call cg_iric_read_real_f("gammaa_5", gammaa(5), ier)
+    call cg_iric_read_real(cgns_f, "gammaa_1", gammaa(1), ier)
+    call cg_iric_read_real(cgns_f, "gammaa_2", gammaa(2), ier)
+    call cg_iric_read_real(cgns_f, "gammaa_3", gammaa(3), ier)
+    call cg_iric_read_real(cgns_f, "gammaa_4", gammaa(4), ier)
+    call cg_iric_read_real(cgns_f, "gammaa_5", gammaa(5), ier)
 
 !
 
@@ -173,18 +173,18 @@ subroutine RRI_Read
     allocate (ksv(num_of_landuse), faif(num_of_landuse))
 !
 !ksv
-    call cg_iric_read_real_f("ksv_1", ksv(1), ier)
-    call cg_iric_read_real_f("ksv_2", ksv(2), ier)
-    call cg_iric_read_real_f("ksv_3", ksv(3), ier)
-    call cg_iric_read_real_f("ksv_4", ksv(4), ier)
-    call cg_iric_read_real_f("ksv_5", ksv(5), ier)
+    call cg_iric_read_real(cgns_f, "ksv_1", ksv(1), ier)
+    call cg_iric_read_real(cgns_f, "ksv_2", ksv(2), ier)
+    call cg_iric_read_real(cgns_f, "ksv_3", ksv(3), ier)
+    call cg_iric_read_real(cgns_f, "ksv_4", ksv(4), ier)
+    call cg_iric_read_real(cgns_f, "ksv_5", ksv(5), ier)
 
 !Sf
-    call cg_iric_read_real_f("faif_1", faif(1), ier)
-    call cg_iric_read_real_f("faif_2", faif(2), ier)
-    call cg_iric_read_real_f("faif_3", faif(3), ier)
-    call cg_iric_read_real_f("faif_4", faif(4), ier)
-    call cg_iric_read_real_f("faif_5", faif(5), ier)
+    call cg_iric_read_real(cgns_f, "faif_1", faif(1), ier)
+    call cg_iric_read_real(cgns_f, "faif_2", faif(2), ier)
+    call cg_iric_read_real(cgns_f, "faif_3", faif(3), ier)
+    call cg_iric_read_real(cgns_f, "faif_4", faif(4), ier)
+    call cg_iric_read_real(cgns_f, "faif_5", faif(5), ier)
 
 !
     write (*, '("ksv : ", 100e12.3)') (ksv(i), i=1, num_of_landuse)
@@ -196,25 +196,25 @@ subroutine RRI_Read
     allocate (ka(num_of_landuse), gammam(num_of_landuse), beta(num_of_landuse))
 !
 !ka
-    call cg_iric_read_real_f("ka_1", ka(1), ier)
-    call cg_iric_read_real_f("ka_2", ka(2), ier)
-    call cg_iric_read_real_f("ka_3", ka(3), ier)
-    call cg_iric_read_real_f("ka_4", ka(4), ier)
-    call cg_iric_read_real_f("ka_5", ka(5), ier)
+    call cg_iric_read_real(cgns_f, "ka_1", ka(1), ier)
+    call cg_iric_read_real(cgns_f, "ka_2", ka(2), ier)
+    call cg_iric_read_real(cgns_f, "ka_3", ka(3), ier)
+    call cg_iric_read_real(cgns_f, "ka_4", ka(4), ier)
+    call cg_iric_read_real(cgns_f, "ka_5", ka(5), ier)
 
 !Unsat. porosity
-    call cg_iric_read_real_f("gammam_1", gammam(1), ier)
-    call cg_iric_read_real_f("gammam_2", gammam(2), ier)
-    call cg_iric_read_real_f("gammam_3", gammam(3), ier)
-    call cg_iric_read_real_f("gammam_4", gammam(4), ier)
-    call cg_iric_read_real_f("gammam_5", gammam(5), ier)
+    call cg_iric_read_real(cgns_f, "gammam_1", gammam(1), ier)
+    call cg_iric_read_real(cgns_f, "gammam_2", gammam(2), ier)
+    call cg_iric_read_real(cgns_f, "gammam_3", gammam(3), ier)
+    call cg_iric_read_real(cgns_f, "gammam_4", gammam(4), ier)
+    call cg_iric_read_real(cgns_f, "gammam_5", gammam(5), ier)
 
 !beta
-    call cg_iric_read_real_f("beta_1", beta(1), ier)
-    call cg_iric_read_real_f("beta_2", beta(2), ier)
-    call cg_iric_read_real_f("beta_3", beta(3), ier)
-    call cg_iric_read_real_f("beta_4", beta(4), ier)
-    call cg_iric_read_real_f("beta_5", beta(5), ier)
+    call cg_iric_read_real(cgns_f, "beta_1", beta(1), ier)
+    call cg_iric_read_real(cgns_f, "beta_2", beta(2), ier)
+    call cg_iric_read_real(cgns_f, "beta_3", beta(3), ier)
+    call cg_iric_read_real(cgns_f, "beta_4", beta(4), ier)
+    call cg_iric_read_real(cgns_f, "beta_5", beta(5), ier)
 
     write (*, '("ka : ", 100e12.3)') (ka(i), i=1, num_of_landuse)
     write (*, '("gammam : ", 100f12.3)') (gammam(i), i=1, num_of_landuse)
@@ -246,32 +246,32 @@ subroutine RRI_Read
 !河道パラメータ　→　wc,ws,dc,dsで指定する
 !--------------------------------------------------
 !read(1,*) ns_river
-    call cg_iric_read_real_f("ns_river", ns_river, ier)
+    call cg_iric_read_real(cgns_f, "ns_river", ns_river, ier)
     write (*, '("ns_river : ", f12.3)') ns_river
     write (*, *)
 
 !read(1,*) riv_thresh
-    call cg_iric_read_integer_f("riv_thresh", riv_thresh, ier)
+    call cg_iric_read_integer(cgns_f, "riv_thresh", riv_thresh, ier)
     write (*, '("riv_thresh : ", i7)') riv_thresh
     write (*, *)
 
 !read(1,*) width_param_c
 !read(1,*) width_param_s
-    call cg_iric_read_real_f("width_param_c", width_param_c, ier)
-    call cg_iric_read_real_f("width_param_s", width_param_s, ier)
+    call cg_iric_read_real(cgns_f, "width_param_c", width_param_c, ier)
+    call cg_iric_read_real(cgns_f, "width_param_s", width_param_s, ier)
 
 !read(1,*) depth_param_c
 !read(1,*) depth_param_s
-    call cg_iric_read_real_f("depth_param_c", depth_param_c, ier)
-    call cg_iric_read_real_f("depth_param_s", depth_param_s, ier)
+    call cg_iric_read_real(cgns_f, "depth_param_c", depth_param_c, ier)
+    call cg_iric_read_real(cgns_f, "depth_param_s", depth_param_s, ier)
 
 !read(1,*) height_param
 !read(1,*) height_limit_param
-    call cg_iric_read_real_f("height_param", height_param, ier)
-    call cg_iric_read_real_f("height_limit_param", height_limit_param, ier)
+    call cg_iric_read_real(cgns_f, "height_param", height_param, ier)
+    call cg_iric_read_real(cgns_f, "height_limit_param", height_limit_param, ier)
 
 !read(1,*) rivfile_switch
-!call cg_iric_read_integer_f("rivfile_switch", rivfile_switch, ier)
+!call cg_iric_read_integer(cgns_f, "rivfile_switch", rivfile_switch, ier)
 !rivfile_switchは利用しない
     rivfile_switch = 0
 
@@ -280,9 +280,9 @@ subroutine RRI_Read
 !read(1,'(a)') heightfile
     widthfile = ''; depthfile = ''; heightfile = ''
     if (rivfile_switch == 1) then
-        call cg_iric_read_string_f("widthfile", widthfile, ier)
-        call cg_iric_read_string_f("depthfile", depthfile, ier)
-        call cg_iric_read_string_f("heightfile", heightfile, ier)
+        call cg_iric_read_string(cgns_f, "widthfile", widthfile, ier)
+        call cg_iric_read_string(cgns_f, "depthfile", depthfile, ier)
+        call cg_iric_read_string(cgns_f, "heightfile", heightfile, ier)
     end if
 
     if (rivfile_switch .eq. 0) then
@@ -305,10 +305,10 @@ subroutine RRI_Read
 !hotstart用　初期条件
 !--------------------------------------------------
 !read(1,*) init_slo_switch, init_riv_switch, init_gw_switch, init_gampt_ff_switch
-    call cg_iric_read_integer_f("init_slo_switch", init_slo_switch, ier)
-    call cg_iric_read_integer_f("init_riv_switch", init_riv_switch, ier)
-    call cg_iric_read_integer_f("init_gw_switch", init_gw_switch, ier)
-    call cg_iric_read_integer_f("init_gampt_ff_switch", init_gampt_ff_switch, ier)
+    call cg_iric_read_integer(cgns_f, "init_slo_switch", init_slo_switch, ier)
+    call cg_iric_read_integer(cgns_f, "init_riv_switch", init_riv_switch, ier)
+    call cg_iric_read_integer(cgns_f, "init_gw_switch", init_gw_switch, ier)
+    call cg_iric_read_integer(cgns_f, "init_gampt_ff_switch", init_gampt_ff_switch, ier)
 
 !read(1,"(a)") initfile_slo
 !read(1,'(a)') initfile_riv
@@ -316,10 +316,10 @@ subroutine RRI_Read
 !read(1,'(a)') initfile_gampt_ff
 
     initfile_slo = ''; initfile_riv = ''; initfile_gw = ''; initfile_gampt_ff = ''
-    if (init_slo_switch == 1) call cg_iric_read_string_f("initfile_slo", initfile_slo, ier)
-    if (init_riv_switch == 1) call cg_iric_read_string_f("initfile_riv", initfile_riv, ier)
-    if (init_gw_switch == 1) call cg_iric_read_string_f("initfile_gw", initfile_gw, ier)
-    if (init_gampt_ff_switch == 1) call cg_iric_read_string_f("initfile_gampt_ff", initfile_gampt_ff, ier)
+    if (init_slo_switch == 1) call cg_iric_read_string(cgns_f, "initfile_slo", initfile_slo, ier)
+    if (init_riv_switch == 1) call cg_iric_read_string(cgns_f, "initfile_riv", initfile_riv, ier)
+    if (init_gw_switch == 1) call cg_iric_read_string(cgns_f, "initfile_gw", initfile_gw, ier)
+    if (init_gampt_ff_switch == 1) call cg_iric_read_string(cgns_f, "initfile_gampt_ff", initfile_gampt_ff, ier)
 
     if (init_slo_switch .ne. 0) write (*, '("initfile_slo : ", a)') trim(adjustl(initfile_slo))
     if (init_riv_switch .ne. 0) write (*, '("initfile_riv : ", a)') trim(adjustl(initfile_riv))
@@ -333,10 +333,10 @@ subroutine RRI_Read
 !hs, hr境界条件　→　境界条件設定に実装
 !--------------------------------------------------
     bound_slo_wlev_switch = 0; bound_riv_wlev_switch = 0
-    call cg_iric_read_bc_count_f("bound_hs", num_of_bound_point)
+    call cg_iric_read_bc_count(cgns_f, "bound_hs", num_of_bound_point)
     if (num_of_bound_point > 0) bound_slo_wlev_switch = 1
 
-    call cg_iric_read_bc_count_f("bound_hr", num_of_bound_point)
+    call cg_iric_read_bc_count(cgns_f, "bound_hr", num_of_bound_point)
     if (num_of_bound_point > 0) bound_riv_wlev_switch = 1
 
 !read(1,*) bound_slo_wlev_switch, bound_riv_wlev_switch
@@ -351,10 +351,10 @@ subroutine RRI_Read
 !qs, qr境界条件　→　境界条件設定に実装
 !--------------------------------------------------
     bound_slo_disc_switch = 0; bound_riv_disc_switch = 0
-    call cg_iric_read_bc_count_f("bound_qs", num_of_bound_point)
+    call cg_iric_read_bc_count(cgns_f, "bound_qs", num_of_bound_point)
     if (num_of_bound_point > 0) bound_slo_disc_switch = 1
 
-    call cg_iric_read_bc_count_f("bound_qr", num_of_bound_point)
+    call cg_iric_read_bc_count(cgns_f, "bound_qr", num_of_bound_point)
     if (num_of_bound_point > 0) bound_riv_disc_switch = 1
 
 !read(1,*) bound_slo_disc_switch, bound_riv_disc_switch
@@ -379,7 +379,7 @@ subroutine RRI_Read
 !Dam条件　→　境界条件設定に実装
 !--------------------------------------------------
     dam_switch = 0
-    call cg_iric_read_bc_count_f("dam", dam_num)
+    call cg_iric_read_bc_count(cgns_f, "dam", dam_num)
     if (dam_num > 0) dam_switch = 1
 !read(1,*) dam_switch
 !read(1,'(a)') damfile
@@ -391,10 +391,10 @@ subroutine RRI_Read
 !div条件　→　境界条件設定に実装
 !--------------------------------------------------
     div_id_max = 0
-    call cg_iric_read_bc_count_f("div", div_id_max)
+    call cg_iric_read_bc_count(cgns_f, "div", div_id_max)
     if (div_id_max > 0) div_switch = 1
 !read(1,*) div_switch
-!call cg_iric_read_integer_f("div_switch", div_switch, ier)
+!call cg_iric_read_integer(cgns_f, "div_switch", div_switch, ier)
 !read(1,'(a)') divfile
 !if(div_switch.eq.1) write(*,'("divfile : ", a)') trim(adjustl(divfile))
 !read(1,*)
@@ -455,53 +455,53 @@ subroutine RRI_Read
 
 !read(1,'(a)') outfile_hs
     outfile_hs = ''
-    call cg_iric_read_integer_f("outswitch_hs", outswitch_hs, ier)
-    if (outswitch_hs == 1) call cg_iric_read_string_f("outfile_hs", outfile_hs, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_hs", outswitch_hs, ier)
+    if (outswitch_hs == 1) call cg_iric_read_string(cgns_f, "outfile_hs", outfile_hs, ier)
 
 !read(1,'(a)') outfile_hr
     outfile_hr = ''
-    call cg_iric_read_integer_f("outswitch_hr", outswitch_hr, ier)
-    if (outswitch_hr == 1) call cg_iric_read_string_f("outfile_hr", outfile_hr, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_hr", outswitch_hr, ier)
+    if (outswitch_hr == 1) call cg_iric_read_string(cgns_f, "outfile_hr", outfile_hr, ier)
 
 !read(1,'(a)') outfile_hg
     outfile_hg = ''
-    call cg_iric_read_integer_f("outswitch_hg", outswitch_hg, ier)
-    if (outswitch_hg == 1) call cg_iric_read_string_f("outfile_hg", outfile_hg, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_hg", outswitch_hg, ier)
+    if (outswitch_hg == 1) call cg_iric_read_string(cgns_f, "outfile_hg", outfile_hg, ier)
 
 !read(1,'(a)') outfile_qr
     outfile_qr = ''
-    call cg_iric_read_integer_f("outswitch_qr", outswitch_qr, ier)
-    if (outswitch_qr == 1) call cg_iric_read_string_f("outfile_qr", outfile_qr, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_qr", outswitch_qr, ier)
+    if (outswitch_qr == 1) call cg_iric_read_string(cgns_f, "outfile_qr", outfile_qr, ier)
 
 !read(1,'(a)') outfile_qu
     outfile_qu = ''
-    call cg_iric_read_integer_f("outswitch_qu", outswitch_qu, ier)
-    if (outswitch_qu == 1) call cg_iric_read_string_f("outfile_qu", outfile_qu, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_qu", outswitch_qu, ier)
+    if (outswitch_qu == 1) call cg_iric_read_string(cgns_f, "outfile_qu", outfile_qu, ier)
 
 !read(1,'(a)') outfile_qv
     outfile_qv = ''
-    call cg_iric_read_integer_f("outswitch_qv", outswitch_qv, ier)
-    if (outswitch_qv == 1) call cg_iric_read_string_f("outfile_qv", outfile_qv, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_qv", outswitch_qv, ier)
+    if (outswitch_qv == 1) call cg_iric_read_string(cgns_f, "outfile_qv", outfile_qv, ier)
 
 !read(1,'(a)') outfile_gu
     outfile_gu = ''
-    call cg_iric_read_integer_f("outswitch_gu", outswitch_gu, ier)
-    if (outswitch_gu == 1) call cg_iric_read_string_f("outfile_gu", outfile_gu, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_gu", outswitch_gu, ier)
+    if (outswitch_gu == 1) call cg_iric_read_string(cgns_f, "outfile_gu", outfile_gu, ier)
 
 !read(1,'(a)') outfile_gv
     outfile_gv = ''
-    call cg_iric_read_integer_f("outswitch_gv", outswitch_gv, ier)
-    if (outswitch_gv == 1) call cg_iric_read_string_f("outfile_gv", outfile_gv, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_gv", outswitch_gv, ier)
+    if (outswitch_gv == 1) call cg_iric_read_string(cgns_f, "outfile_gv", outfile_gv, ier)
 
 !read(1,'(a)') outfile_gampt_ff
     outfile_gampt_ff = ''
-    call cg_iric_read_integer_f("outswitch_gampt_ff", outswitch_gampt_ff, ier)
-    if (outswitch_gampt_ff == 1) call cg_iric_read_string_f("outfile_gampt_ff", outfile_gampt_ff, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_gampt_ff", outswitch_gampt_ff, ier)
+    if (outswitch_gampt_ff == 1) call cg_iric_read_string(cgns_f, "outfile_gampt_ff", outfile_gampt_ff, ier)
 
 !read(1,'(a)') outfile_storage
     outfile_storage = ''
-    call cg_iric_read_integer_f("outswitch_storage", outswitch_storage, ier)
-    if (outswitch_storage == 1) call cg_iric_read_string_f("outfile_storage", outfile_storage, ier)
+    call cg_iric_read_integer(cgns_f, "outswitch_storage", outswitch_storage, ier)
+    if (outswitch_storage == 1) call cg_iric_read_string(cgns_f, "outfile_storage", outfile_storage, ier)
 
     if (outswitch_hs .ne. 0) write (*, '("outfile_hs : ", a)') trim(adjustl(outfile_hs))
     if (outswitch_hr .ne. 0) write (*, '("outfile_hr : ", a)') trim(adjustl(outfile_hr))
@@ -529,7 +529,7 @@ subroutine RRI_Read
     write (*, *)
 
 !close(1)
-    call cg_close_f(cgns_f, ier)
+    call cg_iric_close(cgns_f, ier)
 
 ! Parameter Check
     do i = 1, num_of_landuse

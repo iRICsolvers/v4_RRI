@@ -10,6 +10,7 @@ program RRI
     use dam_mod, only: dam_switch, dam_vol_temp
     use tecout_mod
     use RRI_iric
+    use iric
     implicit none
 
 ! variable definition
@@ -88,9 +89,9 @@ program RRI
     call iric_cgns_open
 
 !read grid
-    call cg_iric_gotogridcoord2d_f(ni, nj, ierr)
+    call cg_iRIC_Read_Grid2d_Str_Size(cgns_f, ni, nj, ierr)
     allocate (gxx(ni, nj), gyy(ni, nj))
-    call cg_iric_getgridcoord2d_f(gxx, gyy, ierr)
+    call cg_iRIC_Read_Grid2d_Coords(cgns_f, gxx, gyy, ierr)
     xllcorner = gxx(1, 1); yllcorner = gyy(1, 1)
     cellsize = dabs(gxx(2, 1) - gxx(1, 1))
     nodata = -9999
@@ -267,7 +268,7 @@ program RRI
 
 ! initial condition
     allocate (hs(ny, nx), hr(ny, nx), hg(ny, nx), gampt_ff(ny, nx))
-    allocate (gampt_f(ny, nx), qrs(ny, nx))
+    allocate (gampt(ny, nx), qrs(ny, nx))
 
     hr = -0.1d0
     hs = -0.1d0
@@ -371,18 +372,18 @@ program RRI
 
         do k = 1, div_id_max
             !read(20, *) div_org_i, div_org_j, div_dest_i, div_dest_j, div_rate(k)
-            call cg_iric_read_bc_indicessize_f("div", k, size, ier)
+            call cg_iric_read_bc_indicessize(cgns_f, "div", k, size, ier)
             if (size /= 1) then
                 write (*, *) "Error:Number of indicessize setting div must be one."
                 stop
             end if
 
-            call cg_iric_read_bc_indices_f("div", k, tmp_idx, ier)
+            call cg_iric_read_bc_indices(cgns_f, "div", k, tmp_idx, ier)
             div_org_i = ny - tmp_idx(2) + 1
             div_org_j = tmp_idx(1)
-            call cg_iric_read_bc_integer_f("div", k, "div_dest_i", tmp_ii, ier)
-            call cg_iric_read_bc_integer_f("div", k, "div_dest_j", tmp_jj, ier)
-            call cg_iric_read_bc_real_f("div", k, "div_rate", div_rate(k), ier)
+            call cg_iric_read_bc_integer(cgns_f, "div", k, "div_dest_i", tmp_ii, ier)
+            call cg_iric_read_bc_integer(cgns_f, "div", k, "div_dest_j", tmp_jj, ier)
+            call cg_iric_read_bc_real(cgns_f, "div", k, "div_rate", div_rate(k), ier)
 
             div_dest_i = ny - tmp_jj + 1
             div_dest_j = tmp_ii
@@ -639,8 +640,12 @@ program RRI
 
         !******* Comunication with iRIC GUI  ******************************
 
-        call iric_check_cancel()
-        call iric_cgns_update()
+        call iric_check_cancel(ierr)
+        if (ierr == 1) then
+            write (*, *) "Solver is stopped because the STOP button was clicked."
+            call iric_cgns_close()
+            stop
+        end if
 
         !******* RIVER CALCULATION ******************************
         if (riv_thresh .lt. 0) go to 2
@@ -1172,10 +1177,13 @@ program RRI
         end if
 
         !iRIC Cancel check and Flush
-        call iric_check_cancel()
+        call iric_check_cancel(ierr)
+        if (ierr == 1) then
+            write (*, *) "Solver is stopped because the STOP button was clicked."
+            call iric_cgns_close()
+            stop
+        end if
 
-        !Update CGNS
-        call iric_cgns_update()
 
     end do
 

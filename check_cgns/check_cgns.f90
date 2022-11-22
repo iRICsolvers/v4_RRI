@@ -1,8 +1,9 @@
 
-    program check_cgns
+program check_cgns
+
+    use iric
+
     implicit none
-    include 'cgnslib_f.h'
-    include 'iriclib_f.h'
 
     character(len=1024) :: fname
     integer :: ier, icount, idf
@@ -18,21 +19,20 @@
     endif
 
     ! file open
-    call cg_open_f(fname, CG_MODE_READ, idf, ier)
-    if (ier /= 0) stop "cg_open_f failed"
-    call cg_iric_init_f(idf, ier)
-
+    call cg_iric_open(fname, IRIC_MODE_READ, idf, ier)
+    if (ier /= 0) stop "cg_iric_open failed"
     
     ! get run type
-    call cg_iric_read_integer_f("run_type", run_type, ier)
+    call cg_iric_read_integer(idf, "run_type", run_type, ier)
     
     open(1,file ="runtype.txt")
     write(1,*) run_type
     close(1)
     
-    call cg_close_f(idf, ier)    
+    call cg_iric_close(idf, ier)    
     stop
-    end program
+
+end program
     
     
     

@@ -2,6 +2,9 @@
 
 subroutine read_bound
     use globals
+    use RRI_iric
+    use iric
+    
     implicit none
 
     integer num_of_bound_point
@@ -45,9 +48,9 @@ subroutine read_bound
         else ! option 1
 
             !read(17, *) num_of_bound_point
-            call cg_iric_read_bc_count_f("bound_hs", num_of_bound_point)
+            call cg_iric_read_bc_count(cgns_f, "bound_hs", num_of_bound_point)
             do i = 1, num_of_bound_point
-                call cg_iric_read_bc_functionalsize_f("bound_hs", i, "hs_bound", size, ier)
+                call cg_iric_read_bc_functionalsize(cgns_f, "bound_hs", i, "hs_bound", size, ier)
                 if (i == 1) size0 = size
                 if (size /= size0) then
                     write (*, *) "Error: Number of time series for hs_bound must be the same."
@@ -103,17 +106,17 @@ subroutine read_bound
             !read(17, *) ctemp, (bound_opt2_locj(k), k = 1, num_of_bound_point)
 
             do k = 1, num_of_bound_point
-                call cg_iric_read_bc_indicessize_f("bound_hs", k, size, ier)
+                call cg_iric_read_bc_indicessize(cgns_f, "bound_hs", k, size, ier)
                 if (size /= 1) then
                     write (*, *) "Error:Number of indicessize setting hs_bound must be one."
                     stop
                 end if
-                call cg_iric_read_bc_indices_f("bound_hs", k, tmp_idx, ier)
+                call cg_iric_read_bc_indices(cgns_f, "bound_hs", k, tmp_idx, ier)
                 bound_opt2_loci(k) = ny - tmp_idx(2) + 1
                 bound_opt2_locj(k) = tmp_idx(1)
 
-                call cg_iric_read_bc_functionalwithname_f("bound_hs", k, "hs_bound", "t_hs", tmp_p, ier)
-                call cg_iric_read_bc_functionalwithname_f("bound_hs", k, "hs_bound", "hs", tmp_v(:, k), ier)
+                call cg_iric_read_bc_functionalwithname(cgns_f, "bound_hs", k, "hs_bound", "t_hs", tmp_p, ier)
+                call cg_iric_read_bc_functionalwithname(cgns_f, "bound_hs", k, "hs_bound", "hs", tmp_v(:, k), ier)
 
             end do
 
@@ -173,9 +176,9 @@ subroutine read_bound
             !enddo
             !tt_max_bound_riv_wlev = tt - 1
 
-            call cg_iric_read_bc_count_f("bound_hr", num_of_bound_point)
+            call cg_iric_read_bc_count(cgns_f, "bound_hr", num_of_bound_point)
             do i = 1, num_of_bound_point
-                call cg_iric_read_bc_functionalsize_f("bound_hr", i, "hr_bound", size, ier)
+                call cg_iric_read_bc_functionalsize(cgns_f, "bound_hr", i, "hr_bound", size, ier)
                 if (i == 1) size0 = size
                 if (size /= size0) then
                     write (*, *) "Error: Number of time series for hr_bound must be the same."
@@ -223,17 +226,17 @@ subroutine read_bound
             !read(18, *) ctemp, (bound_opt2_locj(k), k = 1, num_of_bound_point)
 
             do k = 1, num_of_bound_point
-                call cg_iric_read_bc_indicessize_f("bound_hr", k, size, ier)
+                call cg_iric_read_bc_indicessize(cgns_f, "bound_hr", k, size, ier)
                 if (size /= 1) then
                     write (*, *) "Error:Number of indicessize setting hr_bound must be one."
                     stop
                 end if
-                call cg_iric_read_bc_indices_f("bound_hr", k, tmp_idx, ier)
+                call cg_iric_read_bc_indices(cgns_f, "bound_hr", k, tmp_idx, ier)
                 bound_opt2_loci(k) = ny - tmp_idx(2) + 1
                 bound_opt2_locj(k) = tmp_idx(1)
 
-                call cg_iric_read_bc_functionalwithname_f("bound_hr", k, "hr_bound", "t_hr", tmp_p, ier)
-                call cg_iric_read_bc_functionalwithname_f("bound_hr", k, "hr_bound", "hr", tmp_v(:, k), ier)
+                call cg_iric_read_bc_functionalwithname(cgns_f, "bound_hr", k, "hr_bound", "t_hr", tmp_p, ier)
+                call cg_iric_read_bc_functionalwithname(cgns_f, "bound_hr", k, "hr_bound", "hr", tmp_v(:, k), ier)
 
             end do
 
@@ -295,9 +298,9 @@ subroutine read_bound
             ! tt = tt + 1
             !enddo
             !tt_max_bound_slo_disc = tt - 1
-            call cg_iric_read_bc_count_f("bound_qs", num_of_bound_point)
+            call cg_iric_read_bc_count(cgns_f, "bound_qs", num_of_bound_point)
             do i = 1, num_of_bound_point
-                call cg_iric_read_bc_functionalsize_f("bound_qs", i, "qs_bound", size, ier)
+                call cg_iric_read_bc_functionalsize(cgns_f, "bound_qs", i, "qs_bound", size, ier)
                 if (i == 1) size0 = size
                 if (size /= size0) then
                     write (*, *) "Error: Number of time series for qs_bound must be the same."
@@ -344,17 +347,17 @@ subroutine read_bound
             !read(17, *) ctemp, (bound_opt2_locj(k), k = 1, num_of_bound_point)
 
             do k = 1, num_of_bound_point
-                call cg_iric_read_bc_indicessize_f("bound_qs", k, size, ier)
+                call cg_iric_read_bc_indicessize(cgns_f, "bound_qs", k, size, ier)
                 if (size /= 1) then
                     write (*, *) "Error:Number of indicessize setting qs_bound must be one."
                     stop
                 end if
-                call cg_iric_read_bc_indices_f("bound_qs", k, tmp_idx, ier)
+                call cg_iric_read_bc_indices(cgns_f, "bound_qs", k, tmp_idx, ier)
                 bound_opt2_loci(k) = ny - tmp_idx(2) + 1
                 bound_opt2_locj(k) = tmp_idx(1)
 
-                call cg_iric_read_bc_functionalwithname_f("bound_qs", k, "qs_bound", "t_qs", tmp_p, ier)
-                call cg_iric_read_bc_functionalwithname_f("bound_qs", k, "qs_bound", "qs", tmp_v(:, k), ier)
+                call cg_iric_read_bc_functionalwithname(cgns_f, "bound_qs", k, "qs_bound", "t_qs", tmp_p, ier)
+                call cg_iric_read_bc_functionalwithname(cgns_f, "bound_qs", k, "qs_bound", "qs", tmp_v(:, k), ier)
 
             end do
 
@@ -414,9 +417,9 @@ subroutine read_bound
             !enddo
             !tt_max_bound_riv_disc = tt - 1
 
-            call cg_iric_read_bc_count_f("bound_qr", num_of_bound_point)
+            call cg_iric_read_bc_count(cgns_f, "bound_qr", num_of_bound_point)
             do i = 1, num_of_bound_point
-                call cg_iric_read_bc_functionalsize_f("bound_qr", i, "qr_bound", size, ier)
+                call cg_iric_read_bc_functionalsize(cgns_f, "bound_qr", i, "qr_bound", size, ier)
                 if (i == 1) size0 = size
                 if (size /= size0) then
                     write (*, *) "Error: Number of time series for qr_bound must be the same."
@@ -463,17 +466,17 @@ subroutine read_bound
             !read(18, *) ctemp, (bound_opt2_locj(k), k = 1, num_of_bound_point)
 
             do k = 1, num_of_bound_point
-                call cg_iric_read_bc_indicessize_f("bound_qr", k, size, ier)
+                call cg_iric_read_bc_indicessize(cgns_f, "bound_qr", k, size, ier)
                 if (size /= 1) then
                     write (*, *) "Error:Number of indicessize setting qr_bound must be one."
                     stop
                 end if
-                call cg_iric_read_bc_indices_f("bound_qr", k, tmp_idx, ier)
+                call cg_iric_read_bc_indices(cgns_f, "bound_qr", k, tmp_idx, ier)
                 bound_opt2_loci(k) = ny - tmp_idx(2) + 1
                 bound_opt2_locj(k) = tmp_idx(1)
 
-                call cg_iric_read_bc_functionalwithname_f("bound_qr", k, "qr_bound", "t_qr", tmp_p, ier)
-                call cg_iric_read_bc_functionalwithname_f("bound_qr", k, "qr_bound", "qr", tmp_v(:, k), ier)
+                call cg_iric_read_bc_functionalwithname(cgns_f, "bound_qr", k, "qr_bound", "t_qr", tmp_p, ier)
+                call cg_iric_read_bc_functionalwithname(cgns_f, "bound_qr", k, "qr_bound", "qr", tmp_v(:, k), ier)
 
             end do
 
