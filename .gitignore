@@ -188,8 +188,6 @@ rri_dev/x64/Debug/vc140.pdb
 rri_dev/x64/Debug/vr2hr__genmod.f90
 rri_dev/x64/Debug/vr2hr__genmod.mod
 rri_v1/コンパイラー 18.0 UP2 インテル(R) 64 VS2015 環境.lnk
-rri_v1/rri.exe
-rri_v1/demAdjust2.exe
 rri_dev/x64/Debug/BuildLog.htm
 rri_dev/.vs/rri_dev/v14/.suo
 rri_dev/rri_dev.vfproj.riverlink.user
@@ -208,11 +206,9 @@ scaleUp/00_readme.txt
 scaleUp/make.bat
 scaleUp/scaleUp.f90
 scaleUp/scaleUp.txt
-rri_v1/rri.exe
 back/grib2nc/config.yml
 back/grib2nc/grib2nc.py
 rri_dev/rri_dev.sln
 rri_dev/rri_dev.vfproj.riverlink.user
 rri_dev/.vs/rri_dev/v14/.suo
 rri_dev/x64/Debug/BuildLog.htm
-rri_v1/rri.exe
