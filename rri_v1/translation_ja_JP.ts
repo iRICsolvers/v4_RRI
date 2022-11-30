@@ -6,51 +6,51 @@
     <context>
         <message>
             <source>Rainfall-Runoff-Inundation v1.4.2.2 64 bit</source>
-            <translation></translation>
+            <translation>Rainfall-Runoff-Inundation v1.4.2.2 64 bit</translation>
         </message>
         <message>
             <source>Base Conditions</source>
-            <translation></translation>
+            <translation>基本条件</translation>
         </message>
         <message>
             <source>RRI_Input_Format_Ver1_4_2 for iRIC</source>
-            <translation></translation>
+            <translation>RRI_Input_Format_Ver1_4_2 for iRIC</translation>
         </message>
         <message>
             <source>Run Type</source>
-            <translation></translation>
+            <translation>実行タイプ</translation>
         </message>
         <message>
             <source>Make Geographic Condition Only</source>
-            <translation></translation>
+            <translation>格子・格子属性作成</translation>
         </message>
         <message>
             <source>Run Only</source>
-            <translation></translation>
+            <translation>計算実行</translation>
         </message>
         <message>
             <source>Geographic Data file</source>
-            <translation></translation>
+            <translation>データファイル設定</translation>
         </message>
         <message>
             <source>Dem File</source>
-            <translation></translation>
+            <translation>Dem（標高）</translation>
         </message>
         <message>
             <source>Acc File</source>
-            <translation></translation>
+            <translation>Acc（上流集水ピクセル数）</translation>
         </message>
         <message>
             <source>Dir File</source>
-            <translation></translation>
+            <translation>Dir（流向）</translation>
         </message>
         <message>
             <source>River Shape Parameters</source>
-            <translation></translation>
+            <translation>河道形状パラメーター</translation>
         </message>
         <message>
             <source>Width : Cw, Sw</source>
-            <translation></translation>
+            <translation>河幅：Cw, Sw</translation>
         </message>
         <message>
             <source>width_param_s</source>
@@ -58,7 +58,7 @@
         </message>
         <message>
             <source>Depth : Cd, Sd</source>
-            <translation></translation>
+            <translation>河道深：Cd, Sd</translation>
         </message>
         <message>
             <source>depth_param_c</source>
@@ -70,7 +70,7 @@
         </message>
         <message>
             <source>Height : Height, Limit</source>
-            <translation></translation>
+            <translation>堤防高[m]・堤防セル閾値</translation>
         </message>
         <message>
             <source>height_param</source>
@@ -82,11 +82,11 @@
         </message>
         <message>
             <source>Rain</source>
-            <translation></translation>
+            <translation>降雨データ</translation>
         </message>
         <message>
             <source>Rain File</source>
-            <translation></translation>
+            <translation>降雨データファイル</translation>
         </message>
         <message>
             <source>xllcorner_rain</source>
@@ -106,39 +106,39 @@
         </message>
         <message>
             <source>Time Control</source>
-            <translation></translation>
+            <translation>時間管理</translation>
         </message>
         <message>
             <source>Simulation Time[hour]</source>
-            <translation></translation>
+            <translation>シミュレーション時間[hour]</translation>
         </message>
         <message>
             <source>Time Step for Slope Simulation[sec]</source>
-            <translation></translation>
+            <translation>斜面計算タイムステップ[sec]</translation>
         </message>
         <message>
             <source>Time Step for River Simulation[sec]</source>
-            <translation></translation>
+            <translation>河道計算タイムステップ[sec]</translation>
         </message>
         <message>
             <source>Number for Output Times(without Initial)</source>
-            <translation></translation>
+            <translation>出力回数（初期値除く）</translation>
         </message>
         <message>
             <source>River Simulation Parameters</source>
-            <translation></translation>
+            <translation>河道シミュレーション設定</translation>
         </message>
         <message>
             <source>Manning Roughness for River Region</source>
-            <translation></translation>
+            <translation>河道のマニング粗度係数</translation>
         </message>
         <message>
             <source>threshold of flow accumulation</source>
-            <translation></translation>
+            <translation>河道セル判定閾値</translation>
         </message>
         <message>
             <source>Slope Simulation Parameters</source>
-            <translation></translation>
+            <translation>斜面シミュレーション設定</translation>
         </message>
         <message>
             <source>Green-Ampt infiltration model parameters</source>
@@ -170,19 +170,19 @@
         </message>
         <message>
             <source>Diff or Kinematic</source>
-            <translation></translation>
+            <translation>Diffusion or Kinematic</translation>
         </message>
         <message>
             <source>Manning Roughness for Slope</source>
-            <translation></translation>
+            <translation>斜面のマニング粗度係数</translation>
         </message>
         <message>
             <source>soildepth[m]</source>
-            <translation></translation>
+            <translation>土層厚[m]</translation>
         </message>
         <message>
             <source>Porosity [-]</source>
-            <translation></translation>
+            <translation>土層の空隙率</translation>
         </message>
         <message>
             <source>Kinematic</source>
@@ -222,15 +222,15 @@
         </message>
         <message>
             <source>Initial Condition for Hotstart</source>
-            <translation></translation>
+            <translation>ホットスタート初期条件</translation>
         </message>
         <message>
             <source>Settings</source>
-            <translation></translation>
+            <translation>ファイル指定</translation>
         </message>
         <message>
             <source>initfile_slo</source>
-            <translation></translation>
+            <translation>斜面水深:hs</translation>
         </message>
         <message>
             <source>No</source>
@@ -242,7 +242,7 @@
         </message>
         <message>
             <source>initfile_riv</source>
-            <translation></translation>
+            <translation>河道水深:hr</translation>
         </message>
         <message>
             <source>initfile_gw</source>
@@ -254,7 +254,7 @@
         </message>
         <message>
             <source>Output asc File format</source>
-            <translation></translation>
+            <translation>ファイル出力(*.asc)</translation>
         </message>
         <message>
             <source>outfile_hs</source>
@@ -334,7 +334,7 @@
         </message>
         <message>
             <source>Dam</source>
-            <translation></translation>
+            <translation>ダム</translation>
         </message>
         <message>
             <source>Name</source>
@@ -350,7 +350,7 @@
         </message>
         <message>
             <source>Time Series for River Discharge at point</source>
-            <translation></translation>
+            <translation>河道セル流量</translation>
         </message>
         <message>
             <source>qr[m3/s]</source>
@@ -358,7 +358,7 @@
         </message>
         <message>
             <source>Time Series for River Depth at point</source>
-            <translation></translation>
+            <translation>河道セル水深</translation>
         </message>
         <message>
             <source>hr[m]</source>
@@ -366,7 +366,7 @@
         </message>
         <message>
             <source>Time Series for Slope Discharge at point</source>
-            <translation></translation>
+            <translation>斜面セル流量</translation>
         </message>
         <message>
             <source>qs[m3/s]</source>
@@ -374,7 +374,7 @@
         </message>
         <message>
             <source>Time Series for Slope Depth at point</source>
-            <translation></translation>
+            <translation>斜面セル水深</translation>
         </message>
         <message>
             <source>hs[m]</source>
@@ -382,7 +382,7 @@
         </message>
         <message>
             <source>DivSet</source>
-            <translation></translation>
+            <translation>流量分配</translation>
         </message>
         <message>
             <source>div_dest_i</source>
