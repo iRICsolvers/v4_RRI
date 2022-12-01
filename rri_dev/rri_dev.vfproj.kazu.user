@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<VisualStudioUserFile ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{412E9C9B-4D10-4EFA-8FE0-200EDDBC35DD}">
-	<Configurations>
-		<Configuration Name="Debug|Win32"/>
-		<Configuration Name="Release|Win32"/>
-		<Configuration Name="Debug|x64" CommandArguments="case1.cgn" WorkingDirectory="D:\Dropbox\01_jobs\17_11_hokudai_yasu-2\report\RRI\projects\solo30s_iric"/>
-		<Configuration Name="Release|x64" CommandArguments="case1.cgn" WorkingDirectory="D:\Dropbox\01_jobs\17_11_hokudai_yasu-2\report\RRI\projects\solo30s_iric"/></Configurations></VisualStudioUserFile>
