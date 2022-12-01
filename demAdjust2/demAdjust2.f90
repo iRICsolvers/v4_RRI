@@ -54,8 +54,7 @@ program demAdjust2
     character*256 ctemp
     character*20 ctemp2
 
-    integer :: ier, cgns_f, icount
-    character(len=64):: cgns_name
+    integer :: ier, icount
     real(8), allocatable, save :: gxx(:, :), gyy(:, :)
     !--------------------------------------------------
 
@@ -473,16 +472,12 @@ program demAdjust2
     write (*, *) "Done STEP 10"
 
     !CGNSファイルに出力
-    call cg_iric_write_sol_start(cgns_f, ier)
     call cg_iRIC_Write_Grid2d_Coords(cgns_f, nx + 1, ny + 1, gxx, gyy, ier)
     call iric_write_cell_real("elevation_c", nx, ny, adem)
     call iric_write_cell_integer("dir_c", nx, ny, dir)
     call iric_write_cell_integer("acc_c", nx, ny, acc)
     call iric_write_cell_real("width_c", nx, ny, width)
     call iric_write_cell_real("depth_c", nx, ny, depth)
-    call iric_write_cell_real("height_c", nx, ny, height)
-    call cg_iric_write_sol_end(cgns_f, ier)
-
     call iric_cgns_close()
 
 end program demAdjust2
