@@ -17,8 +17,8 @@
             <translation>RRI_Input_Format_Ver1_4_2 for iRIC</translation>
         </message>
         <message>
-            <source>Run Type</source>
-            <translation>実行タイプ</translation>
+            <source>RunType</source>
+            <translation>＞＞＞ 実行モード</translation>
         </message>
         <message>
             <source>Make Geographic Condition Only</source>

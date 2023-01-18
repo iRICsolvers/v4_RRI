@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SolverDefinition	xmlns="www.iric.net/SolverDefinition/1.0"
 					name="RRI"
-					caption="Rainfall-Runoff-Inundation v1.4.2.2 64 bit"
-					version="1.4.2.2"
-					copyright="Takahiro Sayama , RiverLINK Co., Ltd. ,  Mitsui Consultants Co., Ltd."
-					release="2018.1.1"
+					caption="RRI v1.4.2.2 on iRIC"
+					version="1.4.2.2.230131"
+					copyright="Takahiro Sayama modified by RiverLINK Co., Ltd.,  Mitsui Consultants Co., Ltd."
+					release="2023.1.31"
 					homepage="http://i-ric.org"
 					executable="go.bat"
 					iterationtype="time"
@@ -17,8 +17,8 @@
   -->
 
   <Tab name="options" caption="Base Conditions">
-    <Label caption="RRI_Input_Format_Ver1_4_2 for iRIC" align="right"/>
-    <Item name="run_type" caption="Run Type" >
+    <!-- <Label caption="RRI_Input_Format_Ver1_4_2 for iRIC" align="right"/> -->
+    <Item name="run_type" caption="RunType" >
       <Definition valueType="integer" default="0">
         <Enumeration value="0" caption="Make Geographic Condition Only" />
         <!-- <Enumeration value="1" caption="Make Geographic Condition and Run" /> -->
