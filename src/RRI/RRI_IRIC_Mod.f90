@@ -4,7 +4,7 @@ module RRI_iric
 
     implicit none
     character(len=64):: cgns_name
-    integer:: cgns_f,  icount
+    integer:: cgns_f, icount
 
     public iric_cgns_open, iric_cgns_close
     public iric_read_input_condition
@@ -299,7 +299,7 @@ contains
                 v(i, j) = ((qg_ave(2, i, j) + (qg_ave(3, i, j) + qg_ave(4, i, j))/2.d0)*area)
             end do
         end do
-        call iric_write_result_real('gu', v)
+        call iric_write_result_real('gv', v)
         deallocate (v)
     end subroutine
 
