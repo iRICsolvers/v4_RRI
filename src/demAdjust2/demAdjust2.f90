@@ -471,7 +471,7 @@ program demAdjust2
 
     write (*, *) "Done STEP 10"
 
-    !CGNSƒtƒ@ƒCƒ‹‚Éo—Í
+    !CGNSãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºåŠ›
     call cg_iRIC_Write_Grid2d_Coords(cgns_f, nx + 1, ny + 1, gxx, gyy, ier)
     call iric_write_cell_real("elevation_c", nx, ny, adem)
     call iric_write_cell_integer("dir_c", nx, ny, dir)

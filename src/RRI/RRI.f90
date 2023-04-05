@@ -631,7 +631,7 @@ program RRI
         end do
     end do
 
-!‰Šú’lo—Í
+!åˆæœŸå€¤å‡ºåŠ›
     call iric_cgns_output_result(sum_qp_t, qp_t, hs, hr, hg, qr_ave, qs_ave, qg_ave)
 
     do t = 1, maxt
@@ -1183,7 +1183,6 @@ program RRI
             call iric_cgns_close()
             stop
         end if
-
 
     end do
 

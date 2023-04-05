@@ -18,7 +18,7 @@ contains
 
         integer:: ierr
 
-        !ˆø”æ“¾
+        !å¼•æ•°å–å¾—
         !icount = nargs()
         icount = iargc()
         !if (icount ==  2) then
@@ -33,7 +33,7 @@ contains
         call cg_iric_open(cgns_name, IRIC_MODE_MODIFY, cgns_f, ierr)
         if (ierr /= 0) stop "cg_iric_open failed"
 
-        ! gui‚Écgnsƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Å‚ ‚é‚±‚Æ‚ğ’m‚ç‚¹‚éƒtƒ@ƒCƒ‹‚ğ¶¬
+        ! guiã«cgnsãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­è¾¼ã¿ã§ã‚ã‚‹ã“ã¨ã‚’çŸ¥ã‚‰ã›ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ç”Ÿæˆ
         call iric_initoption(IRIC_OPTION_CANCEL, ierr)
 
     end subroutine
@@ -197,7 +197,7 @@ contains
         call cg_iRIC_Read_Grid2d_Coords(cgns_f, grid_x, grid_y, ierr)
         print *, "cg_iRIC_Read_Grid2d_Coords called"
 
-        ! iRIC ‚©‚ç“Ç‚İ‚ñ‚¾Šiq‚Íƒ[ƒgƒ‹’PˆÊ‚ÌÀ•WŒn
+        ! iRIC ã‹ã‚‰èª­ã¿è¾¼ã‚“ã æ ¼å­ã¯ãƒ¡ãƒ¼ãƒˆãƒ«å˜ä½ã®åº§æ¨™ç³»
         ! utm = 1
         xllcorner = grid_x(1, 1)
         yllcorner = grid_y(1, 1)
@@ -320,7 +320,7 @@ contains
         call cg_iric_write_sol_start(cgns_f, ierr)
         call cg_iric_write_sol_time(cgns_f, time, ierr)
 
-        !node value‚ªo—Í‚³‚ê‚Ä‚¢‚È‚¢‚ÆƒOƒ‰ƒt‚ª•\¦‚Å‚«‚È‚¢‚½‚ß‚Ì‰¼o—Í
+        !node valueãŒå‡ºåŠ›ã•ã‚Œã¦ã„ãªã„ã¨ã‚°ãƒ©ãƒ•ãŒè¡¨ç¤ºã§ããªã„ãŸã‚ã®ä»®å‡ºåŠ›
         allocate (tmpv(1:ny + 1, 1:nx + 1))
         tmpv = 0.0d0
         call cg_iRIC_Write_Sol_Node_Real(cgns_f, "dummy", tmpv, ierr)
