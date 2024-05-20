@@ -526,17 +526,20 @@ program RRI
     open (11, file=rainfile, status='old')
 
     tt = 0
-    do
-        read (11, *, iostat=ios) t, nx_rain, ny_rain
+    do while ( .true. )
+        read (11, *, iostat=ios, end=987) t, nx_rain, ny_rain
+        !read (11, *, iostat=ios) t, nx_rain, ny_rain
+        if (ios .lt. 0) exit
         do i = 1, ny_rain
-            read (11, *, iostat=ios) (rdummy, j=1, nx_rain)
+            read (11, *, iostat=ios, end=987) (rdummy, j=1, nx_rain)
+            !read (11, *, iostat=ios) (rdummy, j=1, nx_rain)
         end do
         if (ios .lt. 0) exit
         if (ios /= 0) exit
         tt = tt + 1
 
     end do
-    tt_max_rain = tt - 1
+987 tt_max_rain = tt - 1
 
     allocate (t_rain(0:tt_max_rain), qp(0:tt_max_rain, ny_rain, nx_rain), qp_t(ny, nx))
     allocate (sum_qp_t(ny, nx))

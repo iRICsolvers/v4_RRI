@@ -1,4 +1,4 @@
-call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2022
+call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
 
 del *.obj *.mod
 ifort /MD /c /Qopenmp /O3 /nostandard-realloc-lhs ./src/RRI/iric.f90
