@@ -17,6 +17,26 @@
             <translation>RRI_Input_Format_Ver1_4_2 for iRIC</translation>
         </message>
         <message>
+            <source>Base Parameters</source>
+            <translation>基本パラメータ</translation>
+        </message>
+        <message>
+            <source>Base Conditions</source>
+            <translation>基本条件</translation>
+        </message>
+        <message>
+            <source>LatLon</source>
+            <translation>緯度経度</translation>
+        </message>
+        <message>
+            <source>Coordinate System</source>
+            <translation>座標系</translation>
+        </message>
+        <message>
+            <source>Number for DIR Directions</source>
+            <translation>流向数</translation>
+        </message>
+        <message>
             <source>RunType</source>
             <translation>＞＞＞ 実行モード</translation>
         </message>
@@ -297,40 +317,348 @@
             <translation></translation>
         </message>
         <message>
+            <source>+ RSR model</source>
+            <translation> + 土砂流出(RSR)モデル</translation>
+        </message>
+        <message>
+            <source>Sediment computation (RSR)</source>
+            <translation>土砂の解析(RSR)モデル</translation>
+        </message>
+        <message>
+            <source>Disabled</source>
+            <translation>無効</translation>
+        </message>
+        <message>
+            <source>Cell model (not recommended)</source>
+            <translation>セルごとに解析(非推奨)</translation>
+        </message>
+        <message>
+            <source>Unit channel model</source>
+            <translation>単位河道モデル</translation>
+        </message>
+        <message>
+            <source>Start time of bed deformation (hour)</source>
+            <translation>河床変動の開始時刻(hour)</translation>
+        </message>
+        <message>
+            <source>Specific gravity of sediment</source>
+            <translation>土粒子の比重</translation>
+        </message>
+        <message>
+            <source>gravitational acceleration[m2/s]</source>
+            <translation>重力加速度[m2/s]</translation>
+        </message>
+        <message>
+            <source>critical shear stress</source>
+            <translation>限界無次元掃流力</translation>
+        </message>
+        <message>
+            <source>kinematic viscosity</source>
+            <translation>動粘性係数</translation>
+        </message>
+        <message>
+            <source>karmans (von Karmans constant)</source>
+            <translation>カルマン定数</translation>
+        </message>
+        <message>
+            <source>Void_ratio</source>
+            <translation>空隙率: Void_ratio</translation>
+        </message>
+        <message>
+            <source>Bed material type</source>
+            <translation>均一粒径/混合粒径</translation>
+        </message>
+        <message>
+            <source>Uniform</source>
+            <translation>均一粒径</translation>
+        </message>
+        <message>
+            <source>Non-uniform</source>
+            <translation>混合粒径</translation>
+        </message>
+        <message>
+            <source>diameter of uniform sediment size (m)</source>
+            <translation>粒径(m)(均一粒径の場合)</translation>
+        </message>
+        <message>
+            <source>iidt (= dt_river/dt_sediment cal.)</source>
+            <translation>河床変動計算の時間刻み：iidt (= dt_river/dt_sediment cal.)</translation>
+        </message>
+        <message>
+            <source>Bedload transport formula</source>
+            <translation>掃流砂量式</translation>
+        </message>
+        <message>
+            <source>Ashida and Michiue formula</source>
+            <translation>芦田・道上式</translation>
+        </message>
+        <message>
+            <source>M.P.M formula</source>
+            <translation>M.P.M 式</translation>
+        </message>
+        <message>
+            <source>Egashira formula</source>
+            <translation>江頭らの式</translation>
+        </message>
+        <message>
+            <source>Suspended sediment erosion formula</source>
+            <translation>浮遊砂浮上量式</translation>
+        </message>
+        <message>
+            <source>Lane-Karinske formula</source>
+            <translation>Lane-Karinske 式</translation>
+        </message>
+        <message>
+            <source>Regulation</source>
+            <translation>詳細設定（オプション）</translation>
+        </message>
+        <message>
+            <source>Maximum ACC for 0th order channel</source>
+            <translation>0次河道の最大ACC</translation>
+        </message>
+        <message>
+            <source>Unit channel is not formed below this cell number</source>
+            <translation>単位河道の最小セル数</translation>
+        </message>
+        <message>
+            <source>Maximum erosion depth (m)</source>
+            <translation>最大侵食深(m)</translation>
+        </message>
+        <message>
+            <source>Minimum unit channel slope</source>
+            <translation>単位河道の最小勾配</translation>
+        </message>
+        <message>
+            <source>Maximum unit channel slope (degree)</source>
+            <translation>単位河道の最大勾配（度）</translation>
+        </message>
+        <message>
+            <source>Minimum river depth for sediment computation(m)</source>
+            <translation>流砂を計算する最小の水深(m)</translation>
+        </message>
+        <message>
+            <source>Maximum wood concentrarion</source>
+            <translation>流木濃度最大値</translation>
+        </message>
+        <message>
+            <source>Maximum SS concentration</source>
+            <translation>浮遊砂濃度の最大値</translation>
+        </message>
+        <message>
+            <source>Maximum SS at slope</source>
+            <translation>斜面の浮遊砂濃度最大値</translation>
+        </message>
+        <message>
+            <source>Iinitial flow depth(m)</source>
+            <translation>初期の河道水深(m)</translation>
+        </message>
+        <message>
+            <source>Iinitial water depth of slope cells(m):hs</source>
+            <translation>初期の斜面水深(m)</translation>
+        </message>
+        <message>
+            <source>+ Non-uniform GSDs for river and slope</source>
+            <translation>+　混合粒径土砂の粒度分布</translation>
+        </message>
+        <message>
+            <source>GSD for river channels</source>
+            <translation>河道の粒度分布</translation>
+        </message>
+        <message>
+            <source>Initial grain size distribution in mixed layer (fraction)</source>
+            <translation>表層の河床材料粒度分布(割合)</translation>
+        </message>
+        <message>
+            <source>Diameter(mm)</source>
+            <translation>粒径(mm)</translation>
+        </message>
+        <message>
+            <source>Grain size distribution in deposited layer is;</source>
+            <translation>堆積層粒度分布の与え方</translation>
+        </message>
+        <message>
+            <source>Same in mixed layer</source>
+            <translation>表層と同じ</translation>
+        </message>
+        <message>
+            <source>Given</source>
+            <translation>与える</translation>
+        </message>
+        <message>
+            <source>Initial grain size distribution in deposited layer (fraction)</source>
+            <translation>堆積層の粒度分布</translation>
+        </message>
+        <message>
+            <source>Thickness of exchange layer(m)</source>
+            <translation>交換層の厚さ(m)</translation>
+        </message>
+        <message>
+            <source>Maximum number of layers</source>
+            <translation>堆積層の最大数</translation>
+        </message>
+        <message>
+            <source>Initial number of layers</source>
+            <translation>初期の堆積層数</translation>
+        </message>
+        <message>
+            <source>Minimum bedload layer thickness(m)</source>
+            <translation>掃流砂層の最小厚さ(m)</translation>
+        </message>
+        <message>
+            <source>GSD for slope area</source>
+            <translation>斜面の粒度分布</translation>
+        </message>
+        <message>
+            <source>GSDs at slope areas (supplied to the river)</source>
+            <translation>斜面供給土砂の粒度分布</translation>
+        </message>
+        <message>
+            <source>Setting GSD at slope area(for debris flow and slope erosion);</source>
+            <translation>斜面の粒度分布の設定</translation>
+        </message>
+        <message>
+            <source>+ Landslide and debris flow</source>
+            <translation>+ 崩壊・土石流</translation>
+        </message>
+        <message>
+            <source>Landslide and debris flow computation</source>
+            <translation>崩壊・土石流の計算</translation>
+        </message>
+        <message>
+            <source>Enabled</source>
+            <translation>有効</translation>
+        </message>
+        <message>
+            <source>Parameters</source>
+            <translation>パラメータ</translation>
+        </message>
+        <message>
+            <source>cohesion (kN/m2)</source>
+            <translation>粘着力(kN/m2)</translation>
+        </message>
+        <message>
+            <source>Critical volume water content for subsurface flow</source>
+            <translation>限界含水比</translation>
+        </message>
+        <message>
+            <source>Fine material content in the debris flow</source>
+            <translation>土石流に含まれる細粒分の割合</translation>
+        </message>
+        <message>
+            <source>Width of debris flow (m)</source>
+            <translation>土石流の流動幅(m)</translation>
+        </message>
+        <message>
+            <source>Erosion depth of debris flow (m)</source>
+            <translation>土石流の侵食深(m)</translation>
+        </message>
+        <message>
+            <source>Exclude landslides below this rainfall (mm)</source>
+            <translation>この雨量以下の斜面崩壊を無視(mm)</translation>
+        </message>
+        <message>
+            <source>End this calculation at certain time</source>
+            <translation>一定時間経過以降崩壊・土石流を計算しない</translation>
+        </message>
+        <message>
+            <source>End time for LS and DF (hour)</source>
+            <translation>崩壊・土石流解析の終了時刻(hour)</translation>
+        </message>
+        <message>
+            <source>+ Sediment transportation at slope area</source>
+            <translation>+ 斜面セルの土砂輸送</translation>
+        </message>
+        <message>
+            <source>conducting the sediment tranport calculation at slope area</source>
+            <translation>斜面セルの土砂輸送解析</translation>
+        </message>
+        <message>
+            <source>Using slope erosion model</source>
+            <translation>斜面侵食モデルの使用</translation>
+        </message>
+        <message>
+            <source>Minimum flow depth for slope erosion (m)</source>
+            <translation>斜面侵食解析の最小水深</translation>
+        </message>
+        <message>
+            <source>+ Driftwood computation</source>
+            <translation>+ 流木の計算</translation>
+        </message>
+        <message>
+            <source>Driftwood computation</source>
+            <translation>流木の計算</translation>
+        </message>
+        <message>
+            <source>Standing tree density (m3/m2)</source>
+            <translation>立木の密度 (m3/m2)</translation>
+        </message>
+        <message>
+            <source>+ Advanced setting for RSR</source>
+            <translation>+ RSRモデルの詳細設定</translation>
+        </message>
+        <message>
+            <source>eps (small value for fine mesh computation)</source>
+            <translation>eps (メッシュが細かい場合この値を小さくする)</translation>
+        </message>
+        <message>
+            <source>ddt_min_riv (small value for fine mesh computation)</source>
+            <translation>ddt_min_riv (メッシュが細かい場合この値を小さくする)</translation>
+        </message>
+        <message>
+            <source>ddt_min_slo (small value for fine mesh computation)</source>
+            <translation>ddt_min_slo (メッシュが細かい場合この値を小さくする)</translation>
+        </message>
+        <message>
+            <source>Display detailed RSR results in the console</source>
+            <translation>ソルバーコンソールにRSRの詳細結果を表示する</translation>
+        </message>
+        <message>
+            <source>+ Advanced output results</source>
+            <translation>+ 計算結果出力の詳細設定</translation>
+        </message>
+        <message>
             <source>Elevation [m]</source>
-            <translation></translation>
+            <translation>標高(DEM) [m]</translation>
         </message>
         <message>
             <source>DIR</source>
-            <translation></translation>
+            <translation>流向(DIR)</translation>
         </message>
         <message>
             <source>ACC</source>
-            <translation></translation>
+            <translation>集水面積セル数(ACC)</translation>
         </message>
         <message>
             <source>Width[m]</source>
-            <translation></translation>
+            <translation>川幅(m)</translation>
         </message>
         <message>
             <source>Depth[m]</source>
-            <translation></translation>
+            <translation>河道深さ(m)</translation>
         </message>
         <message>
             <source>Height[m]</source>
-            <translation></translation>
+            <translation>堤防高[m]</translation>
         </message>
         <message>
             <source>Land Use Type</source>
-            <translation></translation>
+            <translation>土地利用</translation>
         </message>
         <message>
             <source>Rain[mm/h]: Data Check Only</source>
-            <translation></translation>
+            <translation>雨量[mm/h]:</translation>
+        </message>
+        <message>
+            <source>GrainSizeDistribution for slope area</source>
+            <translation>斜面の粒度分布</translation>
+        </message>
+        <message>
+            <source>GrainSizeDistribution for channel</source>
+            <translation>河道の粒度分布</translation>
         </message>
         <message>
             <source>Time</source>
-            <translation></translation>
+            <translation>時刻</translation>
         </message>
         <message>
             <source>Dam</source>
@@ -354,7 +682,7 @@
         </message>
         <message>
             <source>qr[m3/s]</source>
-            <translation></translation>
+            <translation>河道流量[m3/s]</translation>
         </message>
         <message>
             <source>Time Series for River Depth at point</source>
@@ -362,7 +690,7 @@
         </message>
         <message>
             <source>hr[m]</source>
-            <translation></translation>
+            <translation>河道水深[m]</translation>
         </message>
         <message>
             <source>Time Series for Slope Discharge at point</source>
@@ -370,7 +698,7 @@
         </message>
         <message>
             <source>qs[m3/s]</source>
-            <translation></translation>
+            <translation>斜面流量[m3/s]</translation>
         </message>
         <message>
             <source>Time Series for Slope Depth at point</source>
@@ -378,7 +706,7 @@
         </message>
         <message>
             <source>hs[m]</source>
-            <translation></translation>
+            <translation>斜面水深[m]</translation>
         </message>
         <message>
             <source>DivSet</source>

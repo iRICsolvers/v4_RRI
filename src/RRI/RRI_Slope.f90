@@ -74,100 +74,159 @@ subroutine funcs(hs_idx, qp_t_idx, fs_idx, qs_idx)
 end subroutine funcs
 
 ! lateral discharge (slope)
-subroutine qs_calc(hs_idx, qs_idx)
-    use globals
-    implicit none
+      subroutine qs_calc(hs_idx, qs_idx) !20231226modified 
+         use globals
+         implicit none
 
-    real(8) hs_idx(slo_count)
-    real(8) qs_idx(i4, slo_count), q
+         real(8) hs_idx(slo_count)
+         real(8) qs_idx(i4, slo_count), q
+         integer k, kk, l
+         real(8) zb_p, hs_p, ns_p, ka_p, da_p, dm_p, b_p
+         real(8) zb_n, hs_n, ns_n, ka_n, da_n, dm_n, b_n
+         real(8) dh, distance
+         real(8) lev_p, lev_n
+         real(8) len, hw
+         real(8) dhdx, dhdy
+         integer dif_p, dif_n
+         !real(8) emb
 
-    integer k, kk, l
-    real(8) zb_p, hs_p, ns_p, ka_p, da_p, dm_p, b_p
-    real(8) zb_n, hs_n, ns_n, ka_n, da_n, dm_n, b_n
-    real(8) dh, distance
-    real(8) lev_p, lev_n
-    real(8) len, hw
-    integer dif_p, dif_n
-!real(8) emb
-
-    qs_idx = 0.d0
-!emb = 0.d0
+         qs_idx = 0.d0
 
 !$omp parallel do private(kk,zb_p,hs_p,ns_p,ka_p,da_p,dm_p,b_p,dif_p,l,distance,len, &
-!$omp                     zb_n,hs_n,ns_n,ka_n,da_n,dm_n,b_n,dif_n,lev_p,lev_n,dh,hw)
-    do k = 1, slo_count
+!$omp                     zb_n,hs_n,ns_n,ka_n,da_n,dm_n,b_n,dif_n,lev_p,lev_n,dh,hw,dhdx,dhdy,q) !modified 20231226
+!added q into private 20231026
+         do k = 1, slo_count
 
-        zb_p = zb_slo_idx(k)
-        hs_p = hs_idx(k)
-        ns_p = ns_slo_idx(k)
-        ka_p = ka_idx(k)
-        da_p = da_idx(k)
-        dm_p = dm_idx(k)
-        b_p = beta_idx(k)
-        dif_p = dif_slo_idx(k)
+             zb_p = zb_slo_idx(k)
+             hs_p = hs_idx(k)
+             ns_p = ns_slo_idx(k)
+             ka_p = ka_idx(k)
+             da_p = da_idx(k)
+             dm_p = dm_idx(k)
+             b_p  = beta_idx(k)
+             dif_p = dif_slo_idx(k)
 
-        ! 8-direction: lmax = 4, 4-direction: lmax = 2
-        do l = 1, lmax ! (1: rightC2: down, 3: right down, 4: left down)
-            if (dif_p .eq. 0 .and. l .eq. 2) exit ! kinematic -> 1-direction
-            kk = down_slo_idx(l, k)
-            if (dif_p .eq. 0) kk = down_slo_1d_idx(k)
-            if (kk .eq. -1) cycle
+             dhdx = 0.d0
+             dhdy = 0.d0
 
-            distance = dis_slo_idx(l, k)
-            len = len_slo_idx(l, k)
-            if (dif_p .eq. 0) distance = dis_slo_1d_idx(k)
-            if (dif_p .eq. 0) len = len_slo_1d_idx(k)
+ ! this loop was added by Harada to compute resultant
+             if( eight_dir .eq. 0)then
+                do l = 1, lmax ! (1: right�C2: down, 3: right down, 4: left down)
+                    if( dif_p .eq. 0 .and. l .eq. 2 ) exit ! kinematic -> 1-direction
+                    kk = down_slo_idx(l, k)
+                    if( dif_p .eq. 0 ) kk = down_slo_1d_idx(k)
+                    if( kk .eq. -1 ) cycle
+   
+                    distance = dis_slo_idx(l, k)
+                    len = len_slo_idx(l, k)
+                    if( dif_p .eq. 0 ) distance = dis_slo_1d_idx(k)
+                    if( dif_p .eq. 0 ) len = len_slo_1d_idx(k)
+   
+     ! information of the destination cell
+                    zb_n = zb_slo_idx(kk)
+                    hs_n = hs_idx(kk)
+                    ns_n = ns_slo_idx(kk)
+                    ka_n = ka_idx(kk)
+                    da_n = da_idx(kk)
+                    dm_n = dm_idx(kk)
+                    b_n = beta_idx(kk)
+                    dif_n = dif_slo_idx(kk)
+   
+                    call h2lev(hs_p, k, lev_p)
+                    call h2lev(hs_n, kk, lev_n)
+   
+     ! diffusion wave
+                    dh = ((zb_p + lev_p) - (zb_n + lev_n)) / distance
+     ! 1-direction : kinematic wave
+                    if( dif_p .eq. 0 ) dh = max( (zb_p - zb_n) / distance, 0.001 )
+     !-----added to compute resultant
+                    !to avoid very small value
+                    if(dh >= 0.) dh = max(dh , 0.00001)
+                    if(dh < 0.) dh = min(dh , -0.00001)
 
-            ! information of the destination cell
-            zb_n = zb_slo_idx(kk)
-            hs_n = hs_idx(kk)
-            ns_n = ns_slo_idx(kk)
-            ka_n = ka_idx(kk)
-            da_n = da_idx(kk)
-            dm_n = dm_idx(kk)
-            b_n = beta_idx(kk)
-            dif_n = dif_slo_idx(kk)
+                    if( l.eq.1 ) then
+                        dhdx = dh
+                    else     ! l=2
+                        dhdy = dh
+                    end if
+                    
+                end do
+             end if
 
-            call h2lev(hs_p, k, lev_p)
-            call h2lev(hs_n, kk, lev_n)
+ ! 8-direction: lmax = 4, 4-direction: lmax = 2
+             do l = 1, lmax ! (1: right�C2: down, 3: right down, 4: left down)
+                 if( dif_p .eq. 0 .and. l .eq. 2 ) exit ! kinematic -> 1-direction
+                 kk = down_slo_idx(l, k)
+                 if( dif_p .eq. 0 ) kk = down_slo_1d_idx(k)
+                 if( kk .eq. -1 ) cycle
 
-            ! diffusion wave
-            dh = ((zb_p + lev_p) - (zb_n + lev_n))/distance
+                 distance = dis_slo_idx(l, k)
+                 len = len_slo_idx(l, k)
+                 if( dif_p .eq. 0 ) distance = dis_slo_1d_idx(k)
+                 if( dif_p .eq. 0 ) len = len_slo_1d_idx(k)
 
-            ! 1-direction : kinematic wave
-            if (dif_p .eq. 0) dh = max((zb_p - zb_n)/distance, 0.001)
+  ! information of the destination cell
+                 zb_n = zb_slo_idx(kk)
+                 hs_n = hs_idx(kk)
+                 ns_n = ns_slo_idx(kk)
+                 ka_n = ka_idx(kk)
+                 da_n = da_idx(kk)
+                 dm_n = dm_idx(kk)
+                 b_n = beta_idx(kk)
+                 dif_n = dif_slo_idx(kk)
 
-            ! embankment
-            !if(emb_switch.eq.1) then
-            ! if(l.eq.1) emb = emb_r_idx(k)
-            ! if(l.eq.2) emb = emb_b_idx(k)
-            ! if(l.eq.3) emb = max( emb_r_idx(k), emb_b_idx(k) )
-            ! if(l.eq.4) emb = max( emb_r_idx(kk), emb_b_idx(k) )
-            !endif
+                 if( eight_dir .eq. 1)then
 
-            ! water coming in or going out?
-            if (dh .ge. 0.d0) then
-                ! going out
-                hw = hs_p
-                !if(emb .gt. 0.d0) hw = max(hs_p - emb, 0.d0)
-                if (zb_p .lt. zb_n) hw = max(0.d0, zb_p + hs_p - zb_n)
-                call hq(ns_p, ka_p, da_p, dm_p, b_p, hw, dh, len, q)
-                qs_idx(l, k) = q
-            else
-                ! coming in
-                hw = hs_n
-                !if(emb .gt. 0.d0) hw = max(hs_n - emb, 0.d0)
-                dh = abs(dh)
-                if (zb_n .lt. zb_p) hw = max(0.d0, zb_n + hs_n - zb_p)
-                call hq(ns_n, ka_n, da_n, dm_n, b_n, hw, dh, len, q)
-                qs_idx(l, k) = -q
-            end if
+                    call h2lev(hs_p, k, lev_p)
+                    call h2lev(hs_n, kk, lev_n)
 
-        end do
-    end do
-!$omp end parallel do
+  ! diffusion wave
+                    dh = ((zb_p + lev_p) - (zb_n + lev_n)) / distance
 
-end subroutine qs_calc
+  ! 1-direction : kinematic wave
+                    if( dif_p .eq. 0 ) dh = max( (zb_p - zb_n) / distance, 0.001 )
+
+  !-----modified by Harada 2021/10/22
+                 else  !eight_dir = 0
+                    if( l .eq. 1 ) then
+                        dh = dhdx*abs(dhdx) / sqrt ( dhdx**2. + dhdy**2. )
+                    else  ! l=2 
+                        dh = dhdy*abs(dhdy) / sqrt ( dhdx**2. + dhdy**2. ) 
+                    end if
+                 end if
+  !------
+                    
+  ! embankment
+  !if(emb_switch.eq.1) then
+  ! if(l.eq.1) emb = emb_r_idx(k)
+  ! if(l.eq.2) emb = emb_b_idx(k)
+  ! if(l.eq.3) emb = max( emb_r_idx(k), emb_b_idx(k) )
+  ! if(l.eq.4) emb = max( emb_r_idx(kk), emb_b_idx(k) )
+  !endif
+
+  ! water coming in or going out?
+                 if( dh .ge. 0.d0 ) then
+   ! going out
+                     hw = hs_p
+   !if(emb .gt. 0.d0) hw = max(hs_p - emb, 0.d0)
+                     if( zb_p .lt. zb_n ) hw = max(0.d0, zb_p + hs_p - zb_n)
+                     call hq(ns_p, ka_p, da_p, dm_p, b_p, hw, dh, len, q) 
+                     qs_idx(l,k) = q
+                 else
+   ! coming in
+                     hw = hs_n
+   !if(emb .gt. 0.d0) hw = max(hs_n - emb, 0.d0)
+                     dh = abs(dh)
+                     if( zb_n .lt. zb_p ) hw = max(0.d0, zb_n + hs_n - zb_p)
+                     call hq(ns_n, ka_n, da_n, dm_n, b_n, hw, dh, len, q) 
+                     qs_idx(l,k) = -q
+                 endif
+
+             enddo
+         enddo
+
+
+      end subroutine qs_calc
 
 ! water depth and discharge relationship
 subroutine hq(ns_p, ka_p, da_p, dm_p, b_p, h, dh, len, q)

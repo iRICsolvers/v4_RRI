@@ -3,8 +3,9 @@
 ! river index setting
 subroutine riv_idx_setting
     use globals
+    use dam_mod    ! only:dam_switch, dam_num, damflg,dam_ix, dam_iy,dam_loc,dam_qin !This line is added for RSR model 20240724
     implicit none
-    integer i, j, ii, jj, k, kk ! add v1.4(k, kk)
+    integer i, j, ii, jj, k, kk, kkk, n, nn, f, l, ll, n_count ! add v1.4(k, kk) This line is added for RSR model 20240724
     real(8) distance
 
     riv_count = 0
@@ -14,13 +15,14 @@ subroutine riv_idx_setting
         end do
     end do
 
-    allocate (riv_idx2i(riv_count), riv_idx2j(riv_count), riv_ij2idx(ny, nx))
+    allocate (riv_idx2i(riv_count), riv_idx2j(riv_count))   ! This line is added for RSR model 20240724
     allocate (down_riv_idx(riv_count), domain_riv_idx(riv_count))
     allocate (width_idx(riv_count), depth_idx(riv_count))
     allocate (height_idx(riv_count), area_ratio_idx(riv_count))
     allocate (zb_riv_idx(riv_count), dis_riv_idx(riv_count))
     allocate (dif_riv_idx(riv_count))
     allocate (sec_map_idx(riv_count), len_riv_idx(riv_count)) ! add v1.4
+    allocate (damflg(riv_count))  ! This line is added for RSR model 20240724
 
     riv_count = 0
     riv_ij2idx(:, :) = 0
@@ -46,6 +48,19 @@ subroutine riv_idx_setting
 
         end do
     end do
+
+!---added for RSR model 20240724
+    damflg(:) = 0
+    do f = 1, dam_num
+        !for dam
+        if(riv(dam_iy(f),dam_ix(f))==0)then
+             write(*,*) "Error: Please set dam location on a river cell" 
+             stop
+        endif
+        dam_loc(f) = riv_ij2idx(dam_iy(f), dam_ix(f))
+        damflg(dam_loc(f)) = f
+    end do
+!---until here
 
 ! search for downstream gridcell (down_idx)
     riv_count = 0
@@ -171,8 +186,9 @@ end subroutine sub_riv_idx2ij
 ! slope index setting
 subroutine slo_idx_setting
     use globals
+    use sediment_mod !this line is added for RSR 20240724
     implicit none
-    integer i, j, ii, jj, k, l
+    integer i, j, ii, jj, k, l, n_count !this line is modified for RSR 20240724
     real(8) distance, len, l1, l2, l3
     real(8) l1_kin, l2_kin, l3_kin
 
@@ -196,7 +212,8 @@ subroutine slo_idx_setting
 
     allocate (ksv_idx(slo_count), faif_idx(slo_count), infilt_limit_idx(slo_count))
     allocate (ka_idx(slo_count), gammam_idx(slo_count), beta_idx(slo_count), da_idx(slo_count), dm_idx(slo_count))
-    allocate (ksg_idx(slo_count), gammag_idx(slo_count), kg0_idx(slo_count), fpg_idx(slo_count), rgl_idx(slo_count))
+    allocate (ksg_idx(slo_count), kgv_idx(slo_count), gammag_idx(slo_count), tg_idx(slo_count), fpg_idx(slo_count), init_cond_gw_idx(slo_count) )!this line is modified for RSR 20240724
+    allocate ( slo_riv_idx(slo_count), up_slo_idx(slo_count,8) )  !this line is modified for RSR 20240724
 
     slo_count = 0
     slo_ij2idx(:, :) = 0
@@ -216,26 +233,31 @@ subroutine slo_idx_setting
             ns_slo_idx(slo_count) = ns_slope(land(i, j))
             soildepth_idx(slo_count) = soildepth(land(i, j))
             gammaa_idx(slo_count) = gammaa(land(i, j))
-
+ 
             ksv_idx(slo_count) = ksv(land(i, j))
             faif_idx(slo_count) = faif(land(i, j))
             infilt_limit_idx(slo_count) = infilt_limit(land(i, j))
-
             ka_idx(slo_count) = ka(land(i, j))
             gammam_idx(slo_count) = gammam(land(i, j))
             beta_idx(slo_count) = beta(land(i, j))
             da_idx(slo_count) = da(land(i, j))
             dm_idx(slo_count) = dm(land(i, j))
-
             ksg_idx(slo_count) = ksg(land(i, j))
+            kgv_idx(slo_count) = kgv(land(i, j)) !this line is modified for RSR 20240724
             gammag_idx(slo_count) = gammag(land(i, j))
-            kg0_idx(slo_count) = kg0(land(i, j))
-            fpg_idx(slo_count) = fpg(land(i, j))
-            rgl_idx(slo_count) = rgl(land(i, j))
+            tg_idx(slo_count) = tg(land(i, j))   !this line is modified for RSR 20240724
+!            kg0_idx(slo_count) = kg0(land(i, j))  !20240724
+!            fpg_idx(slo_count) = fpg(land(i, j))  !20240724
+!            rgl_idx(slo_count) = rgl(land(i, j))  !20240724
+            if(riv(i,j) == 0)then    !this if is modified for RSR 20240724
+                slo_riv_idx(slo_count) = 0
+            else
+                slo_riv_idx(slo_count) = riv_ij2idx(i,j)  !added 2021/11/5 connect slope number to river number
+            end if
 
         end do
     end do
-
+    
     if (eight_dir .eq. 1) then
         ! Hromadka etal, JAIH2006 (USE THIS AS A DEFAULT)
         ! 8-direction
@@ -392,6 +414,158 @@ subroutine slo_idx_setting
         end do
     end do
 
+!---------modified for RSR model : from here to the end of this subroutine
+! searching for upstream slope cell; added by Qin 20220803
+if(slope_ero_switch==1)then    !this loop sometimes not work correctly
+slo_count = 0
+do i = 1, ny
+ do j =1, nx
+   n_count = 0
+  if(domain(i,j).eq.0) cycle
+  slo_count = slo_count + 1
+
+  ! right
+   ii = i
+   jj = j + 1
+
+!pause'right'
+
+  if( dir(ii,jj).eq.16 ) then
+  if(domain(ii,jj).eq.0) goto 10
+   n_count = n_count + 1 
+   up_slo_idx(slo_count,n_count) = slo_ij2idx(ii, jj)
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'right'
+endif
+
+10 continue
+
+  ! right down
+   ii = i + 1
+   jj = j + 1
+
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'right down'
+
+  if( dir(ii,jj).eq.32 ) then
+if(domain(ii,jj).eq.0 ) goto 20
+   n_count = n_count + 1 
+   up_slo_idx(slo_count,n_count) =slo_ij2idx(ii, jj)
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'right down'
+  endif
+
+20 continue
+
+  ! down
+   ii = i + 1
+   jj = j
+
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'down'
+
+  if( dir(ii,jj).eq.64 ) then
+if(domain(ii,jj).eq.0 .or. riv(ii,jj).ne.1) goto 30
+   n_count = n_count + 1 
+   up_slo_idx(slo_count,n_count) = slo_ij2idx(ii, jj)
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'down'
+  endif
+
+30 continue
+
+  ! left down
+   ii = i + 1
+   jj = j - 1
+
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'left down'
+
+  if( dir(ii,jj).eq.128 ) then
+if(domain(ii,jj).eq.0 .or. riv(ii,jj).ne.1) goto 40
+   n_count = n_count + 1 
+   up_slo_idx(slo_count,n_count) = slo_ij2idx(ii, jj)
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'left down'
+  endif
+
+40 continue
+
+  ! left
+   ii = i
+   jj = j - 1
+
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'left'
+
+  if( dir(ii,jj).eq.1 ) then
+if(domain(ii,jj).eq.0 .or. riv(ii,jj).ne.1) goto 50
+   n_count = n_count + 1 
+   up_slo_idx(slo_count,n_count) = slo_ij2idx(ii, jj)
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'left'
+  endif
+
+50 continue
+
+  ! left up
+   ii = i - 1
+   jj = j - 1
+
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'left up'
+
+
+  if( dir(ii,jj).eq.2 ) then
+if(domain(ii,jj).eq.0 .or. riv(ii,jj).ne.1) goto 60
+   n_count = n_count + 1 
+   up_slo_idx(slo_count,n_count) = slo_ij2idx(ii, jj)
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'left up'
+  endif
+
+60 continue
+
+  ! up
+   ii = i - 1
+   jj = j
+
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'up'
+
+  if( dir(ii,jj).eq.4 ) then
+if(domain(ii,jj).eq.0 .or. riv(ii,jj).ne.1) goto 70
+   n_count = n_count + 1 
+   up_slo_idx(slo_count,n_count) = slo_ij2idx(ii, jj)
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'up'
+  endif
+
+70 continue
+
+  ! right up
+   ii = i - 1
+   jj = j + 1
+
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'right up'
+
+  if( dir(ii,jj).eq.8 ) then
+if(domain(ii,jj).eq.0 .or. riv(ii,jj).ne.1) goto 80
+   n_count = n_count + 1 
+   up_slo_idx(slo_count,n_count) = slo_ij2idx(ii, jj)
+!write(*,'(a,5i)') 'i/j/ii/jj/dir=', j, i, jj, ii, dir(ii,jj)
+!pause'right up'
+  endif
+
+80 continue
+
+enddo
+enddo
+
+write(*,*) "Finished slope idx setting"
+end if
+
 end subroutine slo_idx_setting
 
 ! 2D -> 1D (ij2idx)
@@ -425,7 +599,7 @@ end subroutine sub_slo_idx2ij
 
 ! 2D -> 1D (ij2idx)
 subroutine sub_slo_idx2ij4(a_idx, a)
-    use globals
+    use globals   
     implicit none
 
     real(8) a_idx(i4, slo_count), a(i4, ny, nx)

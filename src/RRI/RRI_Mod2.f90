@@ -3,10 +3,10 @@
 module runge_mod
 
     real(8) eps, ddt_min_riv, ddt_min_slo
-! for standard simulation
-    parameter(eps=0.01d0)
-    parameter(ddt_min_riv=0.1d0)
-    parameter(ddt_min_slo=1.d0)
+! for standard simulation     !moved to RRI.f90 20240724
+!    parameter(eps=0.01d0)
+!    parameter(ddt_min_riv=0.1d0)
+!    parameter(ddt_min_slo=1.d0)
 
 ! for detailed simulation
 !parameter( eps = 0.001d0 )

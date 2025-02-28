@@ -213,6 +213,7 @@ end
 
 subroutine sec_h2b(h, k, b)
     use globals
+    use dam_mod !modified for dam
     implicit none
 
     real(8) h, b
@@ -220,8 +221,12 @@ subroutine sec_h2b(h, k, b)
 
     id = sec_map_idx(k)
     if (id .le. 0) then
-
-        b = width_idx(k)
+        !modified for dam 
+        if(damflg(k)>0)then
+            b = area*area_ratio_idx(k)/ len_riv_idx(k)
+        else
+            b = width_idx(k)
+        endif    
 
     else
 

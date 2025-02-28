@@ -304,13 +304,17 @@ contains
     end subroutine
 
     subroutine iric_cgns_output_result( &
-        sum_qp_t, qp_t, hs, hr, hg, qr_ave, qs_ave, qg_ave)
+        sum_qp_t, qp_t, hs, hr, hg, qr_ave, qs_ave, qg_ave, &
+        qsb, qss, sumdzb, sumqsb, sumqss)
         use globals
+        use sediment_mod
 
         double precision, dimension(:, :), allocatable, intent(in):: &
             sum_qp_t, qp_t, hs, hr, hg, qr_ave
         double precision, dimension(:, :, :), allocatable, intent(in):: &
             qs_ave, qg_ave
+        double precision, dimension(:, :), allocatable, intent(in):: &      !added for RSR 20240724
+            qsb, qss, sumdzb, sumqsb, sumqss
 
         double precision, dimension(:, :), allocatable :: rain_rate, rain_vol
         double precision, dimension(:, :), allocatable :: tmpv
@@ -333,9 +337,11 @@ contains
                 rain_vol(i, j) = sum_qp_t(i, j)*1000.d0
             end do
         end do
+
         call iric_write_result_real('total_qp_t[mm]', rain_vol)
         call iric_write_result_real('qp_t[mm_h]', rain_rate)
         call iric_write_result_real('hs[m]', hs)
+        call iric_write_result_real('Surface depth[m]', h_surf)
         call iric_write_result_real('hr[m]', hr)
         call iric_write_result_real('qr[m3_s]', qr_ave)
         call iric_write_qu(qs_ave)
@@ -344,6 +350,31 @@ contains
         call iric_write_gu(qg_ave)
         call iric_write_gv(qg_ave)
         call iric_write_result_real('gampt_ff', gampt_ff)
+!-----For RSR model 20240724
+
+        if(sed_switch .ne. 0)then
+            call iric_write_result_real('Bedload transport rate[m3_s]', qsb)
+            call iric_write_result_real('Suspended sediment transport rate[m3_s]', qss)
+            call iric_write_result_real('Elevation change[m]', sumdzb)
+            call iric_write_result_real('Total bedload transport[m3]', sumqsb)
+            call iric_write_result_real('Total S.S. transport[m3]', sumqss)
+            call iric_write_result_real('Mean diameter [mm]', dmean_out)
+            if(slo_sedi_cal_switch>0) then !for slope erosion
+             call iric_write_result_real('dzslo', dzslo)
+            ! call iric_write_result_real('Sediment concentration of slope cell[m3/m3]',ss_slope_ij)
+            ! call iric_write_result_real ('Sediment inflow discharge from slope to unit channel [m3/s]',inflow_sedi_ij)
+             !call iric_write_result_real ('Sediment overflow discharge from unit channel [m3/s]', overflow_sedi_ij)            
+             call iric_write_result_real ('Total sediment supply volume from slope to unit channel[m3]', slo_supply)
+             call iric_write_result_real ('Total sediment overflow volume from unit channel[m3]', overflow_sed_sum) 
+            endif
+            if(debris_switch==1) call iric_write_result_real('Land slide occurence', LS)
+            if(debris_switch==1) call iric_write_result_real('Elevation change (debris flow) [m]', dzslo_mspnt)
+            if(debris_switch==1) call iric_write_result_real('Total sediment supply from debris flow [m3]', debri_sup_sum_ij)            
+            if(j_drf==1) call iric_write_result_real('Wood_deposition [m3_m2]', vw2d)
+            if(j_drf==1) call iric_write_result_real('Wood_concentration', cw2d)
+        end if
+
+!-----RSR until here
         deallocate (rain_rate)
         deallocate (rain_vol)
 

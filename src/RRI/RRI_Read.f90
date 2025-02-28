@@ -3,6 +3,8 @@ subroutine RRI_Read
     use globals
     use dam_mod
     use tecout_mod
+    use sediment_mod    !added for RSR model 20240724
+    use runge_mod       !added for RSR model 20240724
     use RRI_iric
     use iric
 
@@ -12,7 +14,6 @@ subroutine RRI_Read
     character*256 format_version
 
     integer :: ier
-
 !--------------------------------------------------
 !CGNSファイルを開く
 !--------------------------------------------------
@@ -66,13 +67,13 @@ subroutine RRI_Read
 !基本オプション
 !--------------------------------------------------
 !read(1,*) utm
-!call cg_iric_read_integer(cgns_f, "utm", utm, ier)
-    utm = 0
+call cg_iric_read_integer(cgns_f, "utm", utm, ier)
+!    utm = 0
 
 !read(1,*) eight_dir
-!call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
-    eight_dir = 1
-
+call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
+   ! eight_dir = 1
+!    eight_dir = 0 !using 4 direction 20240808
     write (*, '("utm : ", i5)') utm
     write (*, '("eight_dir : ", i5)') eight_dir
     write (*, *)
@@ -380,6 +381,10 @@ subroutine RRI_Read
     dam_switch = 0
     call cg_iric_read_bc_count(cgns_f, "dam", dam_num)
     if (dam_num > 0) dam_switch = 1
+    !for dam
+    if(dam_switch>0)then
+    write(*,'("Number of dam : ", i7)') dam_num
+    endif
 !read(1,*) dam_switch
 !read(1,'(a)') damfile
 !if(dam_switch.eq.1) write(*,'("damfile : ", a)') trim(adjustl(damfile))
@@ -516,6 +521,169 @@ subroutine RRI_Read
 !read(1,*)
     write (*, *)
 
+ !------added for RSR model 20240724
+    allocate( kgv(num_of_landuse), tg(num_of_landuse))
+
+    call cg_iric_read_integer(cgns_f, "sed_switch", sed_switch, ier)
+    write (*, '("sed_switch : ", i7)') sed_switch
+    write (*, *)
+    !In case sediment computation, read the following
+    if (sed_switch >= 1)then
+        call cg_iric_read_real(cgns_f, "t_beddeform_start", t_beddeform_start, ier)
+        write (*, '("t_beddeform_start(hour): ", f12.1)') t_beddeform_start
+        t_beddeform_start = t_beddeform_start*3600.
+        call cg_iric_read_real(cgns_f, "s", s, ier)
+        write (*, '("s : ", f12.2)') s
+        call cg_iric_read_real(cgns_f, "grav", grav, ier)
+        write (*, '("grav : ", f12.2)') grav
+        call cg_iric_read_real(cgns_f, "t_Crit", t_Crit, ier)
+        write (*, '("t_Crit : ", f12.3)') t_Crit
+        call cg_iric_read_real(cgns_f, "kin_visc", kin_visc, ier)
+        write (*, '("kin_visc : ", f12.3)') kin_visc
+        call cg_iric_read_real(cgns_f, "karmans", karmans, ier)
+        write (*, '("karmans : ", f12.1)') karmans
+        call cg_iric_read_real(cgns_f, "lambda", lambda, ier)
+        write (*, '("lambda : ", f12.1)') lambda
+        write (*, *)
+        call cg_iric_read_integer(cgns_f, "sed_type_switch", sed_type_switch, ier)
+        write (*, '("sed_type_switch : ", i7)') sed_type_switch
+        call cg_iric_read_real(cgns_f, "ds_river", ds_river, ier)
+        write (*, '("ds_river : ", f12.5)') ds_river
+        call cg_iric_read_integer(cgns_f, "iidt", iidt, ier)
+        write (*, '("iidt : ", i7)') iidt
+        call cg_iric_read_integer(cgns_f, "isedeq", isedeq, ier)
+        write (*, '("isedeq : ", i7)') isedeq
+        call cg_iric_read_integer(cgns_f, "isuseq", isuseq, ier)
+        write (*, '("isuseq : ", i7)') isuseq
+        write (*, *)
+        !Regulations
+!        call cg_iric_read_integer(cgns_f, "max_acc_0th_riv", max_acc_0th_riv, ier)
+!        write (*, '("max_acc_0th_riv : ", i7)') max_acc_0th_riv
+        call cg_iric_read_integer(cgns_f, "min_num_cell_link", min_num_cell_link, ier)
+        write (*, '("min_num_cell_link : ", i7)') min_num_cell_link
+        call cg_iric_read_real(cgns_f, "perosion", perosion, ier)
+        write (*, '("perosion : ", f12.5)') perosion
+        call cg_iric_read_real(cgns_f, "min_slope", min_slope, ier)
+        write (*, '("min_slope : ", f12.5)') min_slope
+        call cg_iric_read_real(cgns_f, "max_slope", max_slope, ier)
+        write (*, '("max_slope : ", f12.2)') max_slope
+        call cg_iric_read_real(cgns_f, "min_hr", min_hr, ier)
+        write (*, '("min_hr : ", f12.5)') min_hr
+        call cg_iric_read_real(cgns_f, "alpha_ss1", alpha_ss1, ier)
+        write (*, '("alpha_ss1 : ", f12.5)') alpha_ss1
+        call cg_iric_read_real(cgns_f, "alpha_ss2", alpha_ss2, ier)
+        write (*, '("alpha_ss2 : ", f12.5)') alpha_ss2
+        call cg_iric_read_real(cgns_f, "thresh_ss", thresh_ss, ier)
+        write (*, '("thresh_ss : ", f12.5)') thresh_ss
+        call cg_iric_read_real(cgns_f, "hr0", hr0, ier)
+        write (*, '("Initial flow depth : ", f12.5)') hr0
+        call cg_iric_read_real(cgns_f, "hs0", hs0, ier)
+        write (*, '("Initial water depth of slope cells: ", f12.5)') hs0
+        !call cg_iric_read_integer(cgns_f, "cut_overdepo_switch", cut_overdepo_switch, ier) !tentatively turned of 20250122
+         !write (*, '("Enforcing sediment overflow: ", i7)') cut_overdepo_switch
+        !Non-uniform
+        if(sed_type_switch ==2)then
+            call cg_iric_read_real(cgns_f, "Em", Em, ier)
+            write (*, '("Em : ", f12.5)') Em
+            call cg_iric_read_integer(cgns_f, "no_of_layers", no_of_layers, ier)
+            write (*, '("no_of_layers : ", i7)') no_of_layers
+            call cg_iric_read_integer(cgns_f, "Nl", Nl, ier)
+            write (*, '("Nl : ", i7)') Nl
+            call cg_iric_read_real(cgns_f, "Emc", Emc, ier)
+            write (*, '("Emc : ", f12.5)') Emc
+        end if
+
+        call cg_iric_read_integer(cgns_f, "detail_console", detail_console, ier)
+
+    end if
+
+ !------Landslide and debris flow 20240724
+    call cg_iric_read_integer(cgns_f, "debris_switch", debris_switch, ier)
+    write (*, '("debris_switch : ", i7)') debris_switch
+    if (debris_switch >= 1)then
+        call cg_iric_read_real(cgns_f, "cohe", cohe, ier)
+        write (*, '("cohesion: ", f12.2)') cohe
+        call cg_iric_read_real(cgns_f, "pwc", pwc, ier)
+        write (*, '("pwc: ", f12.2)') pwc
+        call cg_iric_read_real(cgns_f, "pf", pf, ier)
+        write (*, '("pf: ", f12.2)') pf
+        call cg_iric_read_real(cgns_f, "b_mp", b_mp, ier)
+        write (*, '("b_mp: ", f12.2)') b_mp
+        call cg_iric_read_real(cgns_f, "d_mp_ini", d_mp_ini, ier)
+        write (*, '("d_mp_ini: ", f12.2)') d_mp_ini
+        call cg_iric_read_real(cgns_f, "L_rain_ini", L_rain_ini, ier)
+        write (*, '("L_rain_ini: ", f12.2)') L_rain_ini
+        call cg_iric_read_integer(cgns_f, "debris_end_switch", debris_end_switch, ier)
+        write (*, '("debris_end_switch: ", i7)') debris_end_switch
+        if(debris_end_switch==1)then
+            call cg_iric_read_real(cgns_f, "T_bebris_off", T_bebris_off, ier)
+            write (*, '("T_bebris_off(hour): ", f12.2)') T_bebris_off
+            T_bebris_off = T_bebris_off*3600.
+        else
+            T_bebris_off = 1000000000.
+        end if            
+    end if
+
+ !------Slope erosion 20240724
+ !---modified for slope erosion
+    call cg_iric_read_integer(cgns_f, "slo_sedi_cal_switch", slo_sedi_cal_switch, ier)
+    write (*, '("slo_sedi_cal_switch : ", i7)') slo_sedi_cal_switch
+    if(slo_sedi_cal_switch>0) then
+        call cg_iric_read_integer(cgns_f, "slope_ero_switch", slope_ero_switch, ier)
+        write (*, '("slope_ero_switch : ", i7)') slope_ero_switch
+        if(slope_ero_switch>0)then
+        nm_cell =9 !tentative
+        allocate (B_gully_r(nm_cell+1), D_gully(nm_cell+1))
+        do i = 0, nm_cell
+        write(cm,'(i1)') i
+        gullyB_label = 'B_gully_r_'//trim(cm)  
+        gullyD_label = 'D_gully_'//trim(cm)  
+        call cg_iric_read_real(cgns_f, gullyB_label, B_gully_r(i+1), ier)      
+        call cg_iric_read_real(cgns_f, gullyD_label, D_gully(i+1), ier)     
+        enddo
+        endif
+
+        call cg_iric_read_real(cgns_f, "modirate_to_slo_dt", modirate_to_slo_dt, ier)
+        write (*, '("modirate_to_slo_dt: ", f12.2)') modirate_to_slo_dt
+        dt_slo_sed = dt/modirate_to_slo_dt 
+        call cg_iric_read_real(cgns_f, "surflowdepth", surflowdepth, ier)
+        write (*, '("surflowdepth: ", f12.2)') surflowdepth
+    else
+    slope_ero_switch= 0    
+    end if
+
+ !------Driftwood 20240724
+    call cg_iric_read_integer(cgns_f, "j_drf", j_drf, ier)
+    write (*, '("j_drf : ", i7)') j_drf
+    call cg_iric_read_real(cgns_f, "Wood_density", Wood_density, ier)
+    write (*, '("Wood_density : ", f12.5)') Wood_density
+
+ !------Advanced setting eps 20240724
+        call cg_iric_read_real(cgns_f, "eps", eps, ier)
+        write (*, '("eps: ", f12.5)') eps
+        call cg_iric_read_real(cgns_f, "ddt_min_riv", ddt_min_riv, ier)
+        write (*, '("ddt_min_riv: ", f12.5)') ddt_min_riv
+        call cg_iric_read_real(cgns_f, "ddt_min_slo", ddt_min_slo, ier)
+        write (*, '("ddt_min_slo: ", f12.5)') ddt_min_slo
+
+ !------Advanced output setting 20240724
+    outfile_test = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_test", outswitch_test, ier)
+    if (outswitch_test == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_test", outfile_test, ier)
+        write(*,'("outfile_test : ", a)') trim(adjustl(outfile_test))
+    end if
+!for slope erosion
+    outfile_slope = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_slope", outswitch_slope, ier)
+    if (outswitch_slope == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_slope", outfile_slope, ier)
+        write(*,'("outfile_slope : ", a)') trim(adjustl(outfile_slope))
+    end if
+
+!---tentatively turn off the channel width expansion and over deposition cutting 20250122
+    riv_wid_expan_switch = 0 
+    cut_overdepo_switch = 0
 !--------------------------------------------------
 !iRICの基本機能で対応
 !--------------------------------------------------
