@@ -1,67 +1,43 @@
-# iRIC ソルバテンプレート
+# RRI on iRIC
 
-これは、 iRIC version 4 のソルバを開発するためのテンプレートです。
-含まれるフォルダ、ファイルについて以下に説明します。
+# Japanese
 
-## install
+## RRI on iRICについて
 
-iRIC のインストーラに同梱したいファイルを置きます。ここに置くファイルの例を以下に示します。
+RRI on iRICは、土木研究所ICHARMが開発したRRIモデルをiRICで使えるよう、RIverlinkの旭氏が中心となって、RRIモデルを改変したプログラムです。その後、土木研究所ICHARMが開発している降雨-土砂流出モデル等を統合したものです。
+iRICのポストプロセッサを使って計算結果の表示を行うなど、便利に利用できるようになりました。
 
-* definition.xml
-* ソルバの実行プログラム (例: solver.exe. solver.py)
-* 辞書ファイル (translation_ja_JP.ts など)
-* README
-* LICENSE
+## 動作環境
 
-## src
+iRICに同封されているものは，Intel Open APIを使ってコンパイルをしています．
 
-プログラムのソースコードを置きます。
-FORTRAN のプログラムを開発する場合のサンプルとして、 main.f90, iric.f90 が最初から置いてあります。
+同環境で使用したい場合は例えば下記のページなどで環境構築をお願いします．
 
-## lib
+https://qiita.com/Kazutake/items/a069f86d21ca43b6c153
 
-iriclib.lib が最初から置いてあります。
+## 改良版をiRICで動かす
 
-ソルバ開発者がこのフォルダの内容を変更する必要はありません。
+make.batでコンパイルできます．もちろん，そのほかの方法でコンパイルいただいても大丈夫だと思います．
 
-## .github
+コンパイルするとrri.exeが生成されるので，iRICのインストールフォルダにある，solvers/RRIにコピーすると更新ソルバーが使えます．
 
-Github actions の機能を使い、ソルバの自動ビルド、インストーラへの自動登録処理を実行する
-ためのファイルが置いてあります。
+条件設定ファイルdefinition.xmlを変更した際も同様です．
 
-ソルバ開発者がこのフォルダの内容を変更する必要はありません。
+# English
 
-## config.json
+## About RRI on iRIC
 
-ソルバのビルド・公開に関する設定ファイルです。設定項目の説明を以下に示します。
+RRI on iRIC is a modified version of the RRI model, originally developed by ICHARM (International Centre for Water Hazard and Risk Management) at PWRI (Public Works Research Institute). This adaptation was primarily led by Mr. Asahi of RIverlink to make the RRI model compatible with iRIC. Subsequently, it has been integrated with rainfall-sediment runoff models and other functionalities developed by ICHARM. It now offers enhanced usability, including the display of calculation results using iRIC's post-processor.
 
-### status
+## Operating Environment
 
-以下のいずれかを指定します。
+The version packaged with iRIC is compiled using the Intel Open API.
+If you wish to use it in the same environment, please follow the instructions on a resource like the following page for environment setup:
+https://qiita.com/Kazutake/items/a069f86d21ca43b6c153
 
-* private: developer版にも公開版にも登録されません。もし過去に登録していた場合、削除されます。
-* develop: developer版にのみ登録されます。
-* public: developer版と公開版両方に登録されます。
+## Running the Improved Version with iRIC
 
-### build
+You can compile it using make.bat. Of course, you may also compile it using other methods.
+Compiling generates rri.exe. Copying this to the solvers/RRI directory within your iRIC installation folder will update the solver.
+The same procedure applies when you modify the definition file definition.xml.
 
-* true を指定すると、最新のソースコードから自動的にプログラムのビルドが実行されます。ビルドには make.bat が使用されます。
-
-* false を指定すると、ビルドは実行されません。以下の場合は、false を指定してください。
-
-  * 自分でプログラムをビルドして install フォルダに置き、それをそのまま公開したい場合
-  * ソルバを Python で開発した場合
-
-## LICENSE
-
-ソルバのライセンスを記述します。テンプレートでは MITライセンスになっています。
-必要に応じて、ソルバに適用したいライセンスの内容に書き換えてください。
-
-## make.bat
-
-ソルバを FORTRAN で開発している場合、src 内のソースコードからソルバをビルドし、
-install フォルダにコピーする処理を記述してください。
-
-## README.md
-
-このファイルです。内容について、ソルバに関する説明などに自由に書き換えてください
