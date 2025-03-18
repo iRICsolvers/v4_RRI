@@ -241,7 +241,7 @@
             <translation></translation>
         </message>
         <message>
-            <source>Initial Condition for Hotstart</source>
+            <source>Initial Condition setting for hotstart</source>
             <translation>ホットスタート初期条件</translation>
         </message>
         <message>
@@ -315,6 +315,26 @@
         <message>
             <source>outfile_storage</source>
             <translation></translation>
+        </message>
+        <message>
+            <source>Settings for Advanced Users</source>
+            <translation>詳細設定（Advanced）</translation>
+        </message>
+        <message>
+            <source>Variables used for Adaptive Stepsize to Control Runge-Kutta</source>
+            <translation>Adaptive Runge-Kutta法の変数</translation>
+        </message>
+        <message>
+            <source>Initial conditions</source>
+            <translation>初期条件</translation>
+        </message>
+        <message>
+            <source>initial water content of surface soil</source>
+            <translation>土壌水分の初期条件</translation>
+        </message>
+        <message>
+            <source>Downstream boundary condition setting</source>
+            <translation>下流端の境界条件</translation>
         </message>
         <message>
             <source>+ RSR model</source>
@@ -457,8 +477,12 @@
             <translation>初期の斜面水深(m)</translation>
         </message>
         <message>
+            <source>Enforcing overflow of sediment when river channel is filled up with sediment </source>
+            <translation>河道が満砂の時に土砂を溢れさせる</translation>
+        </message>
+        <message>
             <source>+ Non-uniform GSDs for river and slope</source>
-            <translation>+　混合粒径土砂の粒度分布</translation>
+            <translation>+ 混合粒径土砂の粒度分布</translation>
         </message>
         <message>
             <source>GSD for river channels</source>
@@ -615,6 +639,22 @@
         <message>
             <source>+ Advanced output results</source>
             <translation>+ 計算結果出力の詳細設定</translation>
+        </message>
+        <message>
+            <source>Division of long unit channel (Minimizing the uniform spatial variation of sediment transport process)</source>
+            <translation>長い単位河道の分割</translation>
+        </message>
+        <message>
+            <source>Dividing unit channels</source>
+            <translation>単位河道の分割</translation>
+        </message>
+        <message>
+            <source>The number of intervel cells for division</source>
+            <translation>分割数</translation>
+        </message>
+        <message>
+            <source>Setting the boudaries' (i,j) of division sections</source>
+            <translation>分割区間境界の座標(i,j)</translation>
         </message>
         <message>
             <source>Elevation [m]</source>

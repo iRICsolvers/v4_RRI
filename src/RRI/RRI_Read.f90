@@ -10,10 +10,10 @@ subroutine RRI_Read
 
     implicit none
 
-    integer i, num_of_bound_point
+    integer i, j,num_of_bound_point
     character*256 format_version
 
-    integer :: ier
+    integer :: ier, tmp,mm,k,n
 !--------------------------------------------------
 !CGNSファイルを開く
 !--------------------------------------------------
@@ -59,6 +59,7 @@ subroutine RRI_Read
     write (*, '("demfile : ", a)') trim(adjustl(demfile))
     write (*, '("accfile : ", a)') trim(adjustl(accfile))
     write (*, '("dirfile : ", a)') trim(adjustl(dirfile))
+
 !
 !read(1,*)
     write (*, *)
@@ -135,7 +136,7 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
     call cg_iric_read_integer(cgns_f, "dif_2", dif(2), ier)
     call cg_iric_read_integer(cgns_f, "dif_3", dif(3), ier)
     call cg_iric_read_integer(cgns_f, "dif_4", dif(4), ier)
-    call cg_iric_read_integer(cgns_f, "dif_4", dif(5), ier)
+    call cg_iric_read_integer(cgns_f, "dif_5", dif(5), ier)
 
 !ns_slope
     call cg_iric_read_real(cgns_f, "ns_slope_1", ns_slope(1), ier)
@@ -193,7 +194,8 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
 !read(1,*)
     write (*, *)
 !
-    allocate (ka(num_of_landuse), gammam(num_of_landuse), beta(num_of_landuse))
+    allocate (ka(num_of_landuse), gammam(num_of_landuse), beta(num_of_landuse),min_wc4latflow(num_of_landuse))
+    min_wc4latflow(:)=0.d0
 !
 !ka
     call cg_iric_read_real(cgns_f, "ka_1", ka(1), ier)
@@ -215,10 +217,17 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
     call cg_iric_read_real(cgns_f, "beta_3", beta(3), ier)
     call cg_iric_read_real(cgns_f, "beta_4", beta(4), ier)
     call cg_iric_read_real(cgns_f, "beta_5", beta(5), ier)
+!min_wc
+    !call cg_iric_read_real(cgns_f, "min_wc_1", min_wc4latflow(1), ier)
+    !call cg_iric_read_real(cgns_f, "min_wc_2", min_wc4latflow(2), ier)
+    !call cg_iric_read_real(cgns_f, "min_wc_3", min_wc4latflow(3), ier)
+    !call cg_iric_read_real(cgns_f, "min_wc_4", min_wc4latflow(4), ier)
+    !call cg_iric_read_real(cgns_f, "min_wc_5", min_wc4latflow(5), ier)    
 
     write (*, '("ka : ", 100e12.3)') (ka(i), i=1, num_of_landuse)
     write (*, '("gammam : ", 100f12.3)') (gammam(i), i=1, num_of_landuse)
     write (*, '("beta : ", 100f12.3)') (beta(i), i=1, num_of_landuse)
+   ! write (*, '("Minimum water content for forming lateral flow : ", 100f12.3)') (min_wc4latflow(i), i=1, num_of_landuse)
 
     do i = 1, num_of_landuse
         if (gammam(i) .gt. gammaa(i)) stop "gammag must be smaller than gammaa"
@@ -278,12 +287,6 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
 !read(1,'(a)') widthfile
 !read(1,'(a)') depthfile
 !read(1,'(a)') heightfile
-    widthfile = ''; depthfile = ''; heightfile = ''
-    if (rivfile_switch == 1) then
-        call cg_iric_read_string(cgns_f, "widthfile", widthfile, ier)
-        call cg_iric_read_string(cgns_f, "depthfile", depthfile, ier)
-        call cg_iric_read_string(cgns_f, "heightfile", heightfile, ier)
-    end if
 
     if (rivfile_switch .eq. 0) then
         write (*, '("width_param_c : ", f12.2)') width_param_c
@@ -302,6 +305,7 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
     write (*, *)
 
 !--------------------------------------------------
+!-------------------
 !hotstart用　初期条件
 !--------------------------------------------------
 !read(1,*) init_slo_switch, init_riv_switch, init_gw_switch, init_gampt_ff_switch
@@ -521,6 +525,31 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
 !read(1,*)
     write (*, *)
 
+!----read advanced settings--modified 20250317
+ !------Advanced setting eps 20240724
+        call cg_iric_read_real(cgns_f, "eps", eps, ier)
+        write (*, '("eps: ", f12.5)') eps
+        call cg_iric_read_real(cgns_f, "ddt_min_riv", ddt_min_riv, ier)
+        write (*, '("ddt_min_riv: ", f12.5)') ddt_min_riv
+        call cg_iric_read_real(cgns_f, "ddt_min_slo", ddt_min_slo, ier)
+        write (*, '("ddt_min_slo: ", f12.5)') ddt_min_slo     
+
+!------------Initial conditions of water contents of surface soil and river flow depth
+!moved to RRI setting 20250312
+    call cg_iric_read_real(cgns_f, "hr0", hr0, ier)
+    call cg_iric_read_real(cgns_f, "wc0", wc0, ier)        
+        write (*, '("Initial water content of surface soil: ", f12.5)') wc0
+        write (*, '("Initial flow depth : ", f12.5)') hr0    
+
+!----setting of downstream boundary condition    
+    call cg_iric_read_integer(cgns_f, "DBC_switch", DBC_switch, ier)
+    if (DBC_switch==0)then 
+    write(*,*) "Downstream boundary condition is same with the original RRI"
+    elseif(DBC_switch==1)then
+        write(*,*) "Downstream boundary condition is setted as free flow"
+    endif    
+!------------------------------------
+
  !------added for RSR model 20240724
     allocate( kgv(num_of_landuse), tg(num_of_landuse))
 
@@ -575,12 +604,13 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
         write (*, '("alpha_ss2 : ", f12.5)') alpha_ss2
         call cg_iric_read_real(cgns_f, "thresh_ss", thresh_ss, ier)
         write (*, '("thresh_ss : ", f12.5)') thresh_ss
-        call cg_iric_read_real(cgns_f, "hr0", hr0, ier)
-        write (*, '("Initial flow depth : ", f12.5)') hr0
-        call cg_iric_read_real(cgns_f, "hs0", hs0, ier)
-        write (*, '("Initial water depth of slope cells: ", f12.5)') hs0
-        !call cg_iric_read_integer(cgns_f, "cut_overdepo_switch", cut_overdepo_switch, ier) !tentatively turned of 20250122
-         !write (*, '("Enforcing sediment overflow: ", i7)') cut_overdepo_switch
+       !moved to rri setting 20250312 
+      !  call cg_iric_read_real(cgns_f, "hr0", hr0, ier)
+      !  write (*, '("Initial flow depth : ", f12.5)') hr0
+       ! call cg_iric_read_real(cgns_f, "wc0", wc0, ier)
+      !  write (*, '("Initial water depth of slope cells: ", f12.5)') wc0
+        call cg_iric_read_integer(cgns_f, "cut_overdepo_switch", cut_overdepo_switch, ier) 
+         write (*, '("Enforcing sediment overflow: ", i7)') cut_overdepo_switch
         !Non-uniform
         if(sed_type_switch ==2)then
             call cg_iric_read_real(cgns_f, "Em", Em, ier)
@@ -659,12 +689,49 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
     write (*, '("Wood_density : ", f12.5)') Wood_density
 
  !------Advanced setting eps 20240724
-        call cg_iric_read_real(cgns_f, "eps", eps, ier)
-        write (*, '("eps: ", f12.5)') eps
-        call cg_iric_read_real(cgns_f, "ddt_min_riv", ddt_min_riv, ier)
-        write (*, '("ddt_min_riv: ", f12.5)') ddt_min_riv
-        call cg_iric_read_real(cgns_f, "ddt_min_slo", ddt_min_slo, ier)
-        write (*, '("ddt_min_slo: ", f12.5)') ddt_min_slo
+        !call cg_iric_read_real(cgns_f, "eps", eps, ier)
+       ! write (*, '("eps: ", f12.5)') eps
+       ! call cg_iric_read_real(cgns_f, "ddt_min_riv", ddt_min_riv, ier)
+       ! write (*, '("ddt_min_riv: ", f12.5)') ddt_min_riv
+       ! call cg_iric_read_real(cgns_f, "ddt_min_slo", ddt_min_slo, ier)
+       ! write (*, '("ddt_min_slo: ", f12.5)') ddt_min_slo
+!--Settings for division of unit channels;added 20250304
+        call cg_iric_read_integer(cgns_f, "link_divi_switch", link_divi_switch, ier)
+        if(link_divi_switch==1) then
+        write (*, *) 'Enabled the division of unit channels' 
+        call cg_iric_read_integer(cgns_f, "merg_cell_num", merg_cell_num, ier)
+        write (*, *) 'The number of intervel cells for division is', merg_cell_num 
+        call CG_IRIC_READ_FUNCTIONALSIZE(cgns_f,"division_sec", tmp, ier)
+            if(ier==0)then
+                sele_l_num = tmp
+                mm = sele_l_num
+            endif
+            if(sele_l_num.le.0) then
+                write(*,*) 'No division section has been specified '
+                stop
+            endif    
+            write(*,*) 'Number of division sections:', sele_l_num
+             allocate(xtmp(tmp),ytmp(tmp))
+            allocate(sele_loc(4, sele_l_num),divi_sec_No(sele_l_num)) 
+            call cg_iric_read_functionalwithname(cgns_f, 'division_sec', 'sec_ij', xtmp, ier)
+            do k=1, sele_l_num
+               divi_sec_No(k) = xtmp(k)
+            enddo
+
+            do n=1,4
+             write(cm,'(i1)') n
+             cordi_label = 'Cordi_'//trim(cm)          
+             call cg_iric_read_functionalwithname(cgns_f, 'division_sec', cordi_label, ytmp, ier)          
+             do k=1,sele_l_num
+                sele_loc(n,k) = ytmp(k)
+             end do                    
+            end do
+            do k=1,sele_l_num
+             write(*,*)"ij coordinate of the upstream cell of No.",divi_sec_No(k) ,"is", sele_loc(1,k), sele_loc(2,k)
+             write(*,*)"ij coordinate of the downstream cell of No.",divi_sec_No(k) ,"is", sele_loc(3,k), sele_loc(4,k)
+            enddo
+        endif
+
 
  !------Advanced output setting 20240724
     outfile_test = ''
@@ -683,7 +750,7 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
 
 !---tentatively turn off the channel width expansion and over deposition cutting 20250122
     riv_wid_expan_switch = 0 
-    cut_overdepo_switch = 0
+    !cut_overdepo_switch = 0
 !--------------------------------------------------
 !iRICの基本機能で対応
 !--------------------------------------------------
@@ -713,7 +780,8 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
     infilt_limit(:) = 0.d0
     do i = 1, num_of_landuse
         if (soildepth(i) .gt. 0.d0 .and. ksv(i) .gt. 0.d0) infilt_limit(i) = soildepth(i)*gammaa(i)
-        if (soildepth(i) .gt. 0.d0 .and. ka(i) .gt. 0.d0) da(i) = soildepth(i)*gammaa(i)
+        !if (soildepth(i) .gt. 0.d0 .and. ka(i) .gt. 0.d0) da(i) = soildepth(i)*gammaa(i) !modified 20250312
+         da(i) = soildepth(i)*gammaa(i)
         if (soildepth(i) .gt. 0.d0 .and. ka(i) .gt. 0.d0 .and. gammam(i) .gt. 0.d0) &
             dm(i) = soildepth(i)*gammam(i)
     end do

@@ -60,7 +60,7 @@
             call qr_calc(hr_idx, qr_idx) !modified 20240407
          endif
          
-         if( div_switch .eq. 1 ) call RRI_Div(qr_idx, qr_div_idx)
+         if( div_switch .eq. 1 ) call RRI_Div(qr_idx, hr_idx,qr_div_idx)
 
 ! boundary condition for river (discharge boundary)
          if( bound_riv_disc_switch .ge. 1 ) then
@@ -95,6 +95,7 @@
              do l = 1, div_id_max
  ! outflow from (k)
                  k = div_org_idx(l)
+        
                  qr_sum_idx(k) = qr_sum_idx(k) + qr_div_idx(k)
                  kk = div_dest_idx(l)
                  if(domain_riv_idx(kk).eq.0) cycle
@@ -157,7 +158,14 @@
 ! the destination cell is outlet (domain = 2)
              !if( domain_riv_idx(kk) .eq. 2 ) dh = 0.0   !check tentative 20210418
 !             if( domain_riv_idx(kk) .eq. 2 ) dh = (zb_p + hr_p - zb_n - hr_n) / distance ! yorozuya added
-             if( domain_riv_idx(kk) .eq. 2 ) dh = (zb_p + hr_p - zb_n) / distance ! kinematic wave (+hr_p)
+
+             if( domain_riv_idx(kk) .eq. 2 )then
+                if(DBC_switch==0) then
+                dh = (zb_p + hr_p - zb_n) / distance ! kinematic wave (+hr_p)
+                elseif(DBC_switch==1)then
+                dh = (zb_p - zb_n) / distance ! free flow, modified 20250312
+                endif 
+             endif
 !             if( domain_riv_idx(kk) .eq. 2 ) then
 !               dh = max( (zb_p - zb_n) / distance, 0.0001) ! same as kinematic wave
 !               hr_n = hr_p + zb_p - zb_n

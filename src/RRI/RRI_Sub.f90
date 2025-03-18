@@ -210,7 +210,7 @@ subroutine slo_idx_setting
     allocate (soildepth_idx(slo_count))
     allocate (gammaa_idx(slo_count))
 
-    allocate (ksv_idx(slo_count), faif_idx(slo_count), infilt_limit_idx(slo_count))
+    allocate (ksv_idx(slo_count), faif_idx(slo_count), infilt_limit_idx(slo_count),min_wc4latflow_idx(slo_count)) !added 20250314
     allocate (ka_idx(slo_count), gammam_idx(slo_count), beta_idx(slo_count), da_idx(slo_count), dm_idx(slo_count))
     allocate (ksg_idx(slo_count), kgv_idx(slo_count), gammag_idx(slo_count), tg_idx(slo_count), fpg_idx(slo_count), init_cond_gw_idx(slo_count) )!this line is modified for RSR 20240724
     allocate ( slo_riv_idx(slo_count), up_slo_idx(slo_count,8) )  !this line is modified for RSR 20240724
@@ -236,8 +236,9 @@ subroutine slo_idx_setting
  
             ksv_idx(slo_count) = ksv(land(i, j))
             faif_idx(slo_count) = faif(land(i, j))
-            infilt_limit_idx(slo_count) = infilt_limit(land(i, j))
+            infilt_limit_idx(slo_count) = infilt_limit(land(i, j))!added 20250314
             ka_idx(slo_count) = ka(land(i, j))
+            min_wc4latflow_idx(slo_count) = min_wc4latflow(land(i,j))
             gammam_idx(slo_count) = gammam(land(i, j))
             beta_idx(slo_count) = beta(land(i, j))
             da_idx(slo_count) = da(land(i, j))

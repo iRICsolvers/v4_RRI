@@ -13,15 +13,15 @@ subroutine RRI_Div(qr_idx, hr_idx, qr_div_idx)
         k = div_org_idx(l)
         kk = down_riv_idx(k)
         kk_div = div_dest_idx(l)
-
-        if (div_rate(l) .gt. 0.d0) then
-            if (qr_idx(k) .gt. 0.d0) then
+     
+        if(div_rate(l) .gt. 0.d0) then
+            if (qr_idx(k) .gt. 0.1d0) then
                 qr_div_idx(k) = qr_idx(k)*div_rate(l)
                 qr_idx(k) = qr_idx(k) - qr_div_idx(k)
             end if
 
         else ! div_rate(l) = 0.d0
-
+        if(domain_riv_idx(kk_div)==0.or. kk_div == riv_count) cycle
             zb_p = zb_riv_idx(k)
             hr_p = hr_idx(k)
             dif_p = dif_riv_idx(k)

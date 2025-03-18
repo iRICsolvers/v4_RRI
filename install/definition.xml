@@ -172,7 +172,6 @@
       </Definition>
     </Item>
   </Tab>
-
   <!--
   ***** Slope Simulation Parameters *****
   -->
@@ -328,6 +327,7 @@
         <Label row="1" col="0" caption="ka[m/s]" />
         <Label row="2" col="0" caption="Unsat. porosity [-]        " />
         <Label row="3" col="0" caption="beta" />
+        <!--Label row= "4" col="0" caption="min_wc_formation_later_flow"/-->
 
         <!--type1-->
         <Item row="1" col="1" name="ka_1">
@@ -339,6 +339,9 @@
         <Item row="3" col="1" name="beta_1">
           <Definition valueType="real" default="4.0" />
         </Item>
+        <!--Item row="4" col="1" name="min_wc_1">
+          <Definition valueType="real" default="0.0" />
+        </Item-->
 
         <!--type2--> 
         <Item row="1" col="2" name="ka_2" caption="ka[m/s]">
@@ -350,6 +353,9 @@
         <Item row="3" col="2" name="beta_2" caption="beta">
           <Definition valueType="real" default="4.0" />
         </Item>
+        <!--Item row="4" col="2" name="min_wc_2">
+          <Definition valueType="real" default="0.0" />
+        </Item-->
 
         <!--type3-->
         <Item row="1" col="3" name="ka_3" caption="ka[m/s]">
@@ -361,6 +367,9 @@
         <Item row="3" col="3" name="beta_3" caption="beta">
           <Definition valueType="real" default="4.0" />
         </Item>
+        <!--Item row="4" col="3" name="min_wc_3">
+          <Definition valueType="real" default="0.0" />
+        </Item-->
 
         <!--type4-->
         <Item row="1" col="4" name="ka_4" caption="ka[m/s]">
@@ -372,6 +381,9 @@
         <Item row="3" col="4" name="beta_4" caption="beta">
           <Definition valueType="real" default="4.0" />
         </Item>
+        <!--Item row="4" col="4" name="min_wc_4">
+          <Definition valueType="real" default="0.0" />
+        </Item-->
 
         <!--type5-->
         <Item row="1" col="5" name="ka_5" caption="ka[m/s]">
@@ -383,7 +395,10 @@
         <Item row="3" col="5" name="beta_5" caption="beta">
           <Definition valueType="real" default="4.0" />
         </Item>
-        
+        <!--Item row="4" col="5" name="min_wc_5">
+          <Definition valueType="real" default="0.0" />
+        </Item-->     
+
       </GridLayout>
     </GroupBox>
   </Tab>
@@ -391,8 +406,8 @@
   <!--
   ***** initial condition for hotstart *****
   -->
-  <Tab name="initial_files" caption="Initial Condition for Hotstart">
-    <GroupBox caption="Settings">
+  <Tab name="initial_files" caption="Initial Condition setting for hotstart">
+    <GroupBox caption="Intitial Condtion Settings for Hotstart">
       <GridLayout>
         <Label row="0" col="0" caption="initfile_slo" />
         <Item  row="0" col="1" name="initfile_slo" >
@@ -449,7 +464,7 @@
 
       </GridLayout>
     </GroupBox>
-  </Tab>
+  </Tab>  
     
   <!--
   ***** outputfiles *****
@@ -591,6 +606,49 @@
     </GroupBox>
   </Tab>
 
+  <!--Advanced settings-->
+  <Tab name="Advanced settings" caption="Settings for Advanced Users">
+    <GroupBox caption="Variables used for Adaptive Stepsize to Control Runge-Kutta">
+      <Item name="eps" caption="eps (small value for fine mesh computation)" >
+        <Definition valueType="real" default="0.01"  max ="10">
+        </Definition>
+      </Item>
+      
+      <Item name="ddt_min_riv" caption="ddt_min_riv (small value for fine mesh computation)" >
+        <Definition valueType="real" default="0.1"  max ="10">
+        </Definition>
+      </Item>
+
+      <Item name="ddt_min_slo" caption="ddt_min_slo (small value for fine mesh computation)" >
+        <Definition valueType="real" default="1"  max ="100">
+        </Definition>
+      </Item>  
+    </GroupBox>  
+    <GroupBox caption = "Initial conditions">
+      <GridLayout>
+        <Label row="0" col= "0" caption = "initial water content of surface soil"/>
+          <Item row= "0" col = "1" name="wc0">
+            <Definition valueType="real" default = "0." max="1"/>
+          </Item>
+        <Label row = "1" col = "0" caption="Iinitial flow depth(m)"/>  
+          <Item row = "1" col ="1" name="hr0">
+            <Definition valueType="real" default="0." max ="100"/>
+          </Item>
+      </GridLayout>    
+    </GroupBox>
+    
+    <GroupBox>
+      <Item name = "DBC_switch" caption="Downstream boundary condition setting">
+        <Definition valueType = "integer" default = "0">
+          <Enumerations>
+            <Enumeration value = "0" caption = "Keep with default setting of RRI"/>
+            <Enumeration value = "1" caption = "Free flow"/>
+          </Enumerations>
+        </Definition>
+      </Item> 
+    </GroupBox>  
+  </Tab>
+
      <!--
   ***** Sediment conditions (RSR model) added for RSR model 20240724*****
   --> 
@@ -713,22 +771,22 @@
       <Definition valueType="real" default="0.3"  max ="100">
       </Definition>
     </Item>
-    <Item name="hr0" caption="Iinitial flow depth(m)" >
+    <!--Item name="hr0" caption="Iinitial flow depth(m)" >
       <Definition valueType="real" default="0."  max ="100">
       </Definition>
     </Item>
     <Item name="hs0" caption="Iinitial water depth of slope cells(m):hs">
       <Definition valueType="real" default="0."  max ="100">
       </Definition>
-    </Item>
-    <!--Item name="cut_overdepo_switch" caption="Enforcing overflow of sediment when river channel is filled up with sediment ">
+    </Item-->
+    <Item name="cut_overdepo_switch" caption="Enforcing overflow of sediment when river channel is filled up with sediment ">
       <Definition conditionType="constant" valueType="integer" option="true" default="0">
         <Enumerations>
           <Enumeration value="0" caption="Disable"/>
           <Enumeration value="1" caption="Enable"/>
         </Enumerations>
       </Definition>
-    </Item-->
+    </Item>
     </GroupBox>
 
   </Tab>
@@ -1204,22 +1262,6 @@
   ***** Advanced setting for RSR *** added for RSR model 20240724*****
   --> 
   <Tab name="Advanced setting" caption="+ Advanced setting for RSR">
-
-    <Item name="eps" caption="eps (small value for fine mesh computation)" >
-      <Definition valueType="real" default="0.01"  max ="10">
-      </Definition>
-    </Item>
-    
-    <Item name="ddt_min_riv" caption="ddt_min_riv (small value for fine mesh computation)" >
-      <Definition valueType="real" default="0.1"  max ="10">
-      </Definition>
-    </Item>
-
-    <Item name="ddt_min_slo" caption="ddt_min_slo (small value for fine mesh computation)" >
-      <Definition valueType="real" default="1"  max ="100">
-      </Definition>
-    </Item>
-
     <Item name="detail_console" caption="Display detailed RSR results in the console" >
 			<Definition conditionType="constant" valueType="integer" option="true" default="0">
 				<Enumerations>
@@ -1227,7 +1269,46 @@
 					<Enumeration value="1" caption="Enabled"/>
 				</Enumerations>
       </Definition>
-    </Item>
+    </Item>  
+    <GroupBox caption="Division of long unit channel (Minimizing the uniform spatial variation of sediment transport process)">
+      
+      <Item name="link_divi_switch" caption = "Dividing unit channels">
+        <Definition conditionType="constant" valueType="integer" option="true" default="0">
+          <Enumerations>
+            <Enumeration value="0" caption="Disabled"/>
+            <Enumeration value="1" caption="Enabled"/>
+          </Enumerations>
+        </Definition>
+      </Item>
+
+      <Item name ="merg_cell_num" caption="The number of intervel cells for division">
+        <Definition conditionType="constant" valueType="integer" default="0">
+          <Dependency>
+            <Condition type="and">
+              <Condition type="isEqual" target="link_divi_switch" value="1"/>
+            </Condition>
+            <Action type="enable"/>
+          </Dependency>
+        </Definition>  
+      </Item>
+
+      <Item name="division_sec" caption="Setting the boudaries' (i,j) of division sections">
+        <Definition conditionType="functional">
+          <Parameter name="sec_ij" valueType="integer" caption="Division Section No.(Set from 1)"/>							
+            <Value name="Cordi_1" valueType="integer" caption="i of upstream boundary cell"/>
+            <Value name="Cordi_2" valueType="integer" caption="j of upstream boundary cell"/>
+            <Value name="Cordi_3"  valueType="integer" caption="i of downstream boundary cell"/>
+            <Value name="Cordi_4" valueType="integer" caption="j of downstream boundary cell"/>
+            <Dependency>
+              <Condition type="and">
+                <Condition type="isEqual" target="link_divi_switch" value="1"/>
+              </Condition>
+              <Action type="enable"/>
+            </Dependency>
+        </Definition>
+      </Item>
+
+    </GroupBox>
 
   </Tab>
 
@@ -1270,7 +1351,7 @@
 
   </Tab>
 
-</CalculationCondition>
+</CalculationCondition>  
 
   <GridRelatedCondition  keepOrder="true">
     <Item name="elevation_c" caption="Elevation [m]">

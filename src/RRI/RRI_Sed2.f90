@@ -32,11 +32,16 @@
 	node_ups(:) = 0 !20240603
 
     if(link_divi_switch==1)then
-    do l = 1,sele_l_num
-    i = sele_up_loci(l)
-    j = sele_up_locj(l)
-    ii=sele_down_loci(l)
-    jj= sele_down_locj(l)
+	do l = 1,sele_l_num
+   ! i = sele_up_loci(l)
+   ! j = sele_up_locj(l)
+   ! ii=sele_down_loci(l)
+   ! jj= sele_down_locj(l)
+   ! modified for IRIC GUI
+	i = sele_loc(1,l)
+	j = sele_loc(2,l)
+	ii = sele_loc(3,l)
+	jj = sele_loc(4,l)
     k = riv_ij2idx(i,j)
     divi_cell(k) = 1
     divi_cell(riv_ij2idx(ii,jj)) = 1
@@ -49,7 +54,7 @@
         divi_cell(k) = 1
     enddo
     1111 continue
-    enddo
+	enddo
     endif
 
     !-----------------------------------------------------------

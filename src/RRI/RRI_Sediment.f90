@@ -1484,7 +1484,7 @@ endif
 	 enddo
    elseif(cut_overdepo_switch > 0 .and. riv_wid_expan_switch> 0)then
    ! width expansion
-	!$omp parallel do private(k,l,kk, h, wid, expa_rate,thetr) 
+	!!$omp parallel do private(k,l,kk, h, wid, expa_rate,thetr) 
 	 do k = 1, riv_count
 	 	l = link_to_riv(k)
 		!if(dzb_temp_lin(l).ge.0.d0)then
@@ -1517,12 +1517,12 @@ endif
 		area_lin(l) = width_lin(l) * link_len(l)
 	 enddo
 	! cutting over-deposition	
-	!$omp parallel do private(l,k,m,chan_capa)
+	!!$omp parallel do private(l,k,m,chan_capa)
 		do l = 1, link_count
 				k = link_idx_k(l)
 		!do k = 1, riv_count
 	 		!l = link_to_riv(k)				
-			if((depth_idx(k)+height_idx(k)).le.0.d0)then
+			if((depth_idx(k)+height_idx(k)).le. 0.)then
 				dzb_temp_lin(l)=0.d0 
 				do m = 1,Np 
 				if(sed_lin(l)%dzbpr(m).ge.0.d0)then
@@ -1560,7 +1560,7 @@ endif
 				k = link_idx_k(l)
 		!do k = 1, riv_count
 	 		!l = link_to_riv(k)				
-			if((depth_idx(k)+height_idx(k)).le.0.d0)then
+			if((depth_idx(k)+height_idx(k)) .le. 0.)then
 				dzb_temp_lin(l)=0.d0 
 				do m = 1,Np 
 				if(sed_lin(l)%dzbpr(m).ge.0.d0)then
@@ -1574,7 +1574,7 @@ endif
 				enddo	
 			else
 				chan_capa=depth_idx(k)+height_idx(k)-dzb_temp_lin(l)
-				if(chan_capa .lt. 0.d0)then		
+				if(chan_capa .le. 0.)then		
 					chan_capa = chan_capa/dzb_temp_lin(l)
 					if(dzb_temp_lin(l)==0.d0) chan_capa=0.d0
 					dzb_temp_lin(l)=0.d0 

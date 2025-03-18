@@ -210,15 +210,15 @@ end subroutine funcs
                      hw = hs_p
    !if(emb .gt. 0.d0) hw = max(hs_p - emb, 0.d0)
                      if( zb_p .lt. zb_n ) hw = max(0.d0, zb_p + hs_p - zb_n)
-                     call hq(ns_p, ka_p, da_p, dm_p, b_p, hw, dh, len, q) 
+                     call hq(ns_p, ka_p, da_p, dm_p, b_p, hw, dh, len, q,k) !modified 20250314 
                      qs_idx(l,k) = q
                  else
    ! coming in
                      hw = hs_n
    !if(emb .gt. 0.d0) hw = max(hs_n - emb, 0.d0)
-                     dh = abs(dh)
+                    ! dh = abs(dh) !modified 20250317
                      if( zb_n .lt. zb_p ) hw = max(0.d0, zb_n + hs_n - zb_p)
-                     call hq(ns_n, ka_n, da_n, dm_n, b_n, hw, dh, len, q) 
+                     call hq(ns_n, ka_n, da_n, dm_n, b_n, hw, dh, len, q,k) !modified 20250314 
                      qs_idx(l,k) = -q
                  endif
 
@@ -229,37 +229,46 @@ end subroutine funcs
       end subroutine qs_calc
 
 ! water depth and discharge relationship
-subroutine hq(ns_p, ka_p, da_p, dm_p, b_p, h, dh, len, q)
+subroutine hq(ns_p, ka_p, da_p, dm_p, b_p, h, dh, len, q,k) !modified 20250314
     use globals
     implicit none
 
     real(8) ns_p, da_p, dm_p, ka_p, b_p, h, dh, len, q
-    real(8) km, vm, va, al, m
+    real(8) km, vm, va, al, m, min_hs
+    integer k
+    !real(8) min_hs_idx(slo_count)
+    min_hs =0.d0
+    if(ka_p>0.d0) min_hs = soildepth_idx(k)*gammaa_idx(k)*min_wc4latflow_idx(k) !modified 20250314
+    !modified 20250317
+    if (dh>0.d0 .and. h.le.min_hs)then 
+        q=0.d0
+    else   
+        dh = dabs(dh)
+        if (b_p .gt. 0.d0) then
+            km = ka_p/b_p
+        else
+            km = 0.d0
+        end if
+        vm = km*dh
 
-    if (b_p .gt. 0.d0) then
-        km = ka_p/b_p
-    else
-        km = 0.d0
-    end if
-    vm = km*dh
+        if (da_p .gt. 0.d0) then
+            va = ka_p*dh
+        else
+            va = 0.d0
+        end if
 
-    if (da_p .gt. 0.d0) then
-        va = ka_p*dh
-    else
-        va = 0.d0
-    end if
+        !if (dh .lt. 0) dh = 0.d0
+        al = sqrt(dh)/ns_p
+        m = 5.d0/3.d0
 
-    if (dh .lt. 0) dh = 0.d0
-    al = sqrt(dh)/ns_p
-    m = 5.d0/3.d0
-
-    if (h .lt. dm_p) then
-        q = vm*dm_p*(h/dm_p)**b_p
-    elseif (h .lt. da_p) then
-        q = vm*dm_p + va*(h - dm_p)
-    else
-        q = vm*dm_p + va*(h - dm_p) + al*(h - da_p)**m
-    end if
+        if (h .lt. dm_p) then
+            q = vm*dm_p*(h/dm_p)**b_p
+        elseif (h .lt. da_p) then
+            q = vm*dm_p + va*(h - dm_p)
+        else
+            q = vm*dm_p + va*(h - dm_p) + al*(h - da_p)**m
+        end if
+    endif
 
 ! discharge per unit area
 ! (q multiply by width and divide by area)

@@ -98,6 +98,7 @@ module globals
     real(8), allocatable, save :: gammam(:)
     real(8), allocatable, save :: beta(:)
     real(8), allocatable, save :: da(:), dm(:)
+    real(8), allocatable, save :: min_wc4latflow(:) !added 20250314
 
     real(8), allocatable, save :: ksg(:)
     real(8), allocatable, save :: gammag(:)
@@ -107,6 +108,7 @@ module globals
     integer gw_switch
 
     integer riv_thresh
+    integer DBC_switch !Downstream boundary condition: 0 original RRI; 1: free flow;added 20250316
     real(8) width_param_c
     real(8) width_param_s
     real(8) depth_param_c
@@ -154,11 +156,12 @@ module globals
     integer, allocatable, save :: down_slo_1d_idx(:)
     real(8), allocatable, save :: ns_slo_idx(:), soildepth_idx(:), gammaa_idx(:)
     real(8), allocatable, save :: ksv_idx(:), faif_idx(:), infilt_limit_idx(:)
-    real(8), allocatable, save :: ka_idx(:), gammam_idx(:), beta_idx(:), da_idx(:), dm_idx(:)
+    real(8), allocatable, save :: ka_idx(:), gammam_idx(:), beta_idx(:), da_idx(:), dm_idx(:), min_wc4latflow_idx(:)! added the threshold of water content of soil to form the lateral subsurface flow; 20250314
     real(8), allocatable, save :: ksg_idx(:), gammag_idx(:), kg0_idx(:), fpg_idx(:), rgl_idx(:)
     real(8), allocatable, save :: zb_slo_idx(:), dis_slo_idx(:, :), len_slo_idx(:, :)
     real(8), allocatable, save :: dis_slo_1d_idx(:), len_slo_1d_idx(:)
     integer, allocatable, save :: dif_slo_idx(:), acc_slo_idx(:)
+    real(8), save:: hr0, wc0 !added 20250314
 
     character*256 ofile_hs, ofile_hr, ofile_hg, ofile_qr, ofile_qu, ofile_qv, ofile_gu, ofile_gv, ofile_gampt_ff
 

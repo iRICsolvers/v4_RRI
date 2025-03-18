@@ -258,7 +258,9 @@
 !---------------added for division of unit channel
         character*256 infile_divi
         integer link_divi_switch, sele_l_num, merg_cell_num
-        integer, allocatable,save :: sele_up_loci(:),sele_up_locj(:), sele_down_loci(:),sele_down_locj(:), divi_cell(:)
+        !integer, allocatable,save :: sele_up_loci(:),sele_up_locj(:), sele_down_loci(:),sele_down_locj(:), divi_cell(:)
+        integer, allocatable,save :: sele_loc(:,:),divi_sec_No(:), divi_cell(:) !modified for IRIC GUI
+        character(50):: cordi_label
 !-------added for setting some threshhold value for sediment transportation computation
         real(8)  min_slope, max_slope, min_hr,alpha_ss1, alpha_ss2, thresh_ss    
 !-------added for river width adjustment; 20240419
@@ -267,7 +269,7 @@
          real(8), allocatable, save:: wl4wid_expan(:),wid_expa_rate(:)
          !real(8), allocatable, save:: chan_capa4wid_expan(:), depth_uni_chan(:)
 !-----added for initial hs hr setting; 20240521
-         real(8) hr0, hs0
+         !real(8) hr0, wc0 !moved 20250314
 !-----modified for slope erosion
         integer nm_cell
       	character(50) :: mix_label, gullyB_label,gullyD_label,cm     
