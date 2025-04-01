@@ -38,13 +38,23 @@
    ! ii=sele_down_loci(l)
    ! jj= sele_down_locj(l)
    ! modified for IRIC GUI
-	i = sele_loc(1,l)
-	j = sele_loc(2,l)
-	ii = sele_loc(3,l)
-	jj = sele_loc(4,l)
+	i = ny-sele_loc(2,l)+1!modified 20250329
+	j = sele_loc(1,l) 
+	ii =ny-sele_loc(4,l)+1!modified 20250329)
+	jj =sele_loc(3,l)
     k = riv_ij2idx(i,j)
+	kk = riv_ij2idx(ii,jj)
+	if(k.lt.1) then
+        write (*, *) "check the i,j of section", l,"I", sele_loc(1,l),"J",sele_loc(2,l)
+        stop
+	endif	
+	if(kk.lt.1) then
+        write (*, *) "check the i,j of section", l,"I", sele_loc(3,l),"J",sele_loc(4,l)
+        stop
+	endif
     divi_cell(k) = 1
-    divi_cell(riv_ij2idx(ii,jj)) = 1
+    divi_cell(kk) = 1
+	write(*,*)l, i,j,ii,jj, k,kk
     do
         do n = 1, merg_cell_num
         kk = down_riv_idx(k)
@@ -240,12 +250,26 @@
         !n_count = n_count+1
         !up_riv_idx(riv_count, 1) = riv_ij2idx(ii, jj)
         	link_count = link_count + 1
-        	node_ups(riv_count) = 1
+        	node_ups(riv_count) = 1			
     	endif
     !write(*,*) damflg(riv_count),riv_count, n_count, link_count
     endif
     enddo
     endif
+
+	!for santanmria river old yamy dam; diversion channel added 20250329
+	if(div_switch==2)then
+	 do f = 1, div_id_max
+		if(div_org_idx(f)==riv_count .and. n_count==1)then
+		link_count = link_count + 1
+		node_ups(riv_count) = 1
+        write(*,*) div_switch, div_org_idx(f),riv_count, n_count, link_count
+		elseif(down_riv_idx(div_org_idx(f))==riv_count .and. n_count==1)then
+			link_count = link_count+1
+			node_ups(riv_count) =1
+		endif
+	 enddo	
+	endif
 
     !20230924 20231016
     if(link_divi_switch>0)then

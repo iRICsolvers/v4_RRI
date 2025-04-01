@@ -332,6 +332,8 @@ program RRI
           enddo
           write(*,'(a,i)') "End time of dam outflow discharge(hour) : ",max_dam_discharge_t
     endif 
+
+
     do i = 1, ny
         do j = 1, nx
             if (riv(i, j) .eq. 1) zb_riv0(i,j) = zb_riv(i,j)
@@ -345,10 +347,57 @@ do
 ! river index setting (modified for RSR)
     call riv_idx_setting
 
+!moved to here activate the diversion in RSR     
+ ! div file
+!div_id_max = 0
+    if (div_switch .eq. 1) then
+        !open( 20, file = divfile, status = "old" )
+        !do
+        ! read(20, *, iostat = ios) div_org_i, div_org_j, div_dest_i, div_dest_j
+        ! if(ios .ne. 0) exit
+        ! div_id_max = div_id_max + 1
+        !enddo
+        !write(*,*) "div_id_max : ", div_id_max
+        allocate (div_org_idx(div_id_max), div_dest_idx(div_id_max), div_rate(div_id_max))
+        !rewind(20)
+
+        do k = 1, div_id_max
+            !read(20, *) div_org_i, div_org_j, div_dest_i, div_dest_j, div_rate(k)
+            call cg_iric_read_bc_indicessize(cgns_f, "div", k, size, ier)
+            if (size /= 1) then
+                write (*, *) "Error:Number of indicessize setting div must be one."
+                stop
+            end if
+
+            call cg_iric_read_bc_indices(cgns_f, "div", k, tmp_idx, ier)
+            div_org_i = ny - tmp_idx(2) + 1
+            div_org_j = tmp_idx(1)
+            call cg_iric_read_bc_integer(cgns_f, "div", k, "div_dest_i", tmp_ii, ier)
+            call cg_iric_read_bc_integer(cgns_f, "div", k, "div_dest_j", tmp_jj, ier)
+            call cg_iric_read_bc_real(cgns_f, "div", k, "div_rate", div_rate(k), ier)
+
+            div_org_idx(k) = riv_ij2idx(div_org_i, div_org_j)
+            !modified 20250313
+            if(tmp_jj>0 .and. tmp_ii>0 ) then
+            div_dest_i = ny - tmp_jj + 1
+            div_dest_j = tmp_ii
+            div_dest_idx(k) = riv_ij2idx(div_dest_i, div_dest_j)
+            if(div_dest_idx(k)<1) div_dest_idx(k) = 0
+            else
+            div_dest_idx(k) = 0
+            div_switch=2
+            endif
+            write (*, *) "done: reading div dest idx", div_dest_idx(k)
+        end do
+        write (*, *) "done: reading div file"
+        !close(20)
+    end if
+
 !-------added for RSR model 20240724
     if(sed_switch.ge.1)call riv_set4sedi
     if(kill_n .le. 0) exit
 end do
+
     if(sed_switch.ge.1)then
         open( 22222, file = 'kij_file.txt', status = 'unknown' )
         write(22222,'(a)') '    k rivi rivj'
@@ -358,7 +407,6 @@ end do
         close(22222)
     end if
 !-------RSR model until here     
-
 ! slope index setting
     call slo_idx_setting
 
@@ -473,49 +521,7 @@ end do
 ! boundary conditions
     call read_bound
 
-! div file
-!div_id_max = 0
-    if (div_switch .eq. 1) then
-        !open( 20, file = divfile, status = "old" )
-        !do
-        ! read(20, *, iostat = ios) div_org_i, div_org_j, div_dest_i, div_dest_j
-        ! if(ios .ne. 0) exit
-        ! div_id_max = div_id_max + 1
-        !enddo
-        !write(*,*) "div_id_max : ", div_id_max
-        allocate (div_org_idx(div_id_max), div_dest_idx(div_id_max), div_rate(div_id_max))
-        !rewind(20)
 
-        do k = 1, div_id_max
-            !read(20, *) div_org_i, div_org_j, div_dest_i, div_dest_j, div_rate(k)
-            call cg_iric_read_bc_indicessize(cgns_f, "div", k, size, ier)
-            if (size /= 1) then
-                write (*, *) "Error:Number of indicessize setting div must be one."
-                stop
-            end if
-
-            call cg_iric_read_bc_indices(cgns_f, "div", k, tmp_idx, ier)
-            div_org_i = ny - tmp_idx(2) + 1
-            div_org_j = tmp_idx(1)
-            call cg_iric_read_bc_integer(cgns_f, "div", k, "div_dest_i", tmp_ii, ier)
-            call cg_iric_read_bc_integer(cgns_f, "div", k, "div_dest_j", tmp_jj, ier)
-            call cg_iric_read_bc_real(cgns_f, "div", k, "div_rate", div_rate(k), ier)
-
-            div_org_idx(k) = riv_ij2idx(div_org_i, div_org_j)
-            !modified 20250313
-            if(tmp_jj>0 .and. tmp_ii>0 ) then
-            div_dest_i = ny - tmp_jj + 1
-            div_dest_j = tmp_ii
-            div_dest_idx(k) = riv_ij2idx(div_dest_i, div_dest_j)
-            if(div_dest_idx(k)<1) div_dest_idx(k) = 0
-            else
-            div_dest_idx(k) = 0
-            endif
-            write (*, *) "done: reading div dest idx", div_dest_idx(k)
-        end do
-        write (*, *) "done: reading div file"
-        !close(20)
-    end if
 
 ! emb file
 !if( emb_switch.eq.1 ) then

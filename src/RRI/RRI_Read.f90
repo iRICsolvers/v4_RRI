@@ -723,13 +723,16 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
              cordi_label = 'Cordi_'//trim(cm)          
              call cg_iric_read_functionalwithname(cgns_f, 'division_sec', cordi_label, ytmp, ier)          
              do k=1,sele_l_num
-                sele_loc(n,k) = ytmp(k)
+                sele_loc(n,k) = ytmp(k)  
              end do                    
             end do
             do k=1,sele_l_num
              write(*,*)"ij coordinate of the upstream cell of No.",divi_sec_No(k) ,"is", sele_loc(1,k), sele_loc(2,k)
              write(*,*)"ij coordinate of the downstream cell of No.",divi_sec_No(k) ,"is", sele_loc(3,k), sele_loc(4,k)
             enddo
+            DEALLOCATE(xtmp, STAT = ier)
+             DEALLOCATE(ytmp, STAT = ier)
+
         endif
 
 

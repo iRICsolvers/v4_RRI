@@ -60,7 +60,7 @@
             call qr_calc(hr_idx, qr_idx) !modified 20240407
          endif
          
-         if( div_switch .eq. 1 ) call RRI_Div(qr_idx, hr_idx,qr_div_idx)
+         if( div_switch > 0 ) call RRI_Div(qr_idx, hr_idx,qr_div_idx)
 
 ! boundary condition for river (discharge boundary)
          if( bound_riv_disc_switch .ge. 1 ) then
@@ -91,7 +91,7 @@
          enddo
 
 ! diversion
-         if( div_switch .eq. 1 ) then
+         if( div_switch > 0 ) then
              do l = 1, div_id_max
  ! outflow from (k)
                  k = div_org_idx(l)

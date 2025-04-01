@@ -305,7 +305,7 @@ contains
 
     subroutine iric_cgns_output_result( &
         sum_qp_t, qp_t, hs, hr, hg, qr_ave, qs_ave, qg_ave, &
-        qsb, qss, sumdzb, sumqsb, sumqss)
+        qsb, qss, sumdzb, sumqsb, sumqss) !added unitchannel display 20250328
         use globals
         use sediment_mod
 
@@ -320,7 +320,9 @@ contains
         double precision, dimension(:, :), allocatable :: tmpv
         integer :: i, j
         integer:: ierr
-
+    !added unitchannel display 20250328    
+        integer, dimension(:, :), allocatable :: tmpv_i
+    !!!!!!!!!!!!!!!!!!    
         call cg_iric_write_sol_start(cgns_f, ierr)
         call cg_iric_write_sol_time(cgns_f, time, ierr)
 
@@ -329,7 +331,14 @@ contains
         tmpv = 0.0d0
         call cg_iRIC_Write_Sol_Node_Real(cgns_f, "dummy", tmpv, ierr)
         deallocate (tmpv)
-
+ !added unitchannel display 20250328 
+        if(sed_switch==2)then
+            allocate (tmpv_i(1:ny + 1, 1:nx + 1))
+            tmpv_i = 0  
+            call cg_iric_write_sol_node_integer (cgns_f,"dummy2", tmpv_i,ierr)
+         deallocate (tmpv_i)
+        endif 
+ !!!!!!!!!!!!!        
         allocate (rain_rate(1:ny, 1:nx), rain_vol(1:ny, 1:nx))
         do i = 1, ny
             do j = 1, nx
@@ -350,6 +359,7 @@ contains
         call iric_write_gu(qg_ave)
         call iric_write_gv(qg_ave)
         call iric_write_result_real('gampt_ff', gampt_ff)
+
 !-----For RSR model 20240724
 
         if(sed_switch .ne. 0)then
@@ -372,6 +382,7 @@ contains
             if(debris_switch==1) call iric_write_result_real('Total sediment supply from debris flow [m3]', debri_sup_sum_ij)            
             if(j_drf==1) call iric_write_result_real('Wood_deposition [m3_m2]', vw2d)
             if(j_drf==1) call iric_write_result_real('Wood_concentration', cw2d)
+            if(sed_switch==2) call iric_write_result_integer('Unit channel ID', link_ij) !added 20250328
         end if
 
 !-----RSR until here

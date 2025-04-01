@@ -1203,11 +1203,12 @@ endif
 		!Driftwood
 		real(8), parameter :: C_Dw = 0.4d0
 		real(8), parameter :: C_Dr = 0.8d0
-		real(8) :: C_rt, D_depo, D_ero,chan_capa ,wid, expa_rate
+		real(8) :: C_rt, D_depo, D_ero,chan_capa ,wid, expa_rate, divloss
 		
 		qd_sum_idx(:) = 0.d0
 		Emb_min = Emc
 		chan_capa=1.d0
+		divloss=1.d0
 !write(*,*) 'sediment computation   t=', t
 !$omp parallel do private(m)
 	do l = 1, link_count
@@ -1295,50 +1296,59 @@ endif
 
 	do l = 1,link_count
 		k = link_idx_k(l)
+		if(n_link_depth(l)==1) then   !20240229
 		!if(zb_riv_idx(k)-zb_riv0_idx(k) + depth_idx(k)*0.1 >  depth_idx(k) ) then !check the condition 'depth_idx(k)*0.2'
 		!if(depth_idx(k) < min_hr*2. )then !check this condition
-		if(n_link_depth(l)==1) then   !20240229
-			do m = 1, Np
-				do n = 1, 8
-					if(up_riv_lin(l,n) == 0) exit 	
-					lll = up_riv_lin(l, n)			
-					sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) - sed_lin(lll)%qbi(m)    !qdsum and ffd; erosion positive
-				end do    									!calculate input sediment from two unit channels at first 
-				sed_lin(l)%qbi(m) = -sed_lin(l)%qdsum(m)   !modify the output sediment so that in = out
-				sed_lin(l)%qdsum(m) = 0.                  !initialization for the next loop
-			end do
-		end if
+				do m = 1, Np
+					do n = 1, 8
+						if(up_riv_lin(l,n) == 0) exit 	
+						lll = up_riv_lin(l, n)			
+						sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) - sed_lin(lll)%qbi(m)    !qdsum and ffd; erosion positive
+					end do    									!calculate input sediment from two unit channels at first 
+					sed_lin(l)%qbi(m) = -sed_lin(l)%qdsum(m)   !modify the output sediment so that in = out
+					sed_lin(l)%qdsum(m) = 0.                  !initialization for the next loop
+				end do
 
-		if(depth_idx(k) < 0.)then
-			!write(*,*) 'depth(k)<0,  k ,l, up_iln ', k, l, up_riv_lin(l, 1), up_riv_lin(l, 2)
-		end if
+			if(depth_idx(k) < 0.)then
+				!write(*,*) 'depth(k)<0,  k ,l, up_iln ', k, l, up_riv_lin(l, 1), up_riv_lin(l, 2)
+			end if
+		endif	
 	end do
 !end if
-!!$omp parallel do private(m,n,lll,thet)
+!!$omp parallel do private(m,n,lll,thet,k)
 	do l =1, link_count
 		thet = zb_riv_slope0_lin(l)
-	if(link_0th_order(l)== 0 .and. thet.gt.max_slope)then !modified by Qin 2022/12/06	
-		do m = 1, Np
-			sed_lin(l)%qdsum(m) = 0.d0
-		enddo
-	else
-	  if(link_0th_order(l) == 0)then
-	 	do m = 1, Np
-			sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) + sed_lin(l)%qbi(m) !m3/s	 !check this condition  !?????????!  
-!			sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m)  !m3/s                         !0th order channel: unlimit supply (no beddeform at upstream end)
-		end do
-	  else
-		do m = 1, Np
-			do n = 1, 8
-!				if(up_riv_lin(l,n)==0) cycle !revised by Qin 2021/5/27
-				if(up_riv_lin(l,n) == 0) exit 	
-				lll = up_riv_lin(l, n)
-				sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) - sed_lin(lll)%qbi(m) !m3/s   !?????????!!!  ffd ??-??????��A+?????N?H
-			end do
-			sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) + sed_lin(l)%qbi(m)
-		end do
-	  end if
-	endif 
+	!added for diversion 20250329	
+		divloss =1.
+		if(div_switch==2)then
+			k = link_idx_k(l)
+			do f = 1, div_id_max
+			if(div_org_idx(f)==k) divloss=1.-div_rate(f)
+			enddo
+		endif
+			if(link_0th_order(l)== 0 .and. thet.gt.max_slope)then !modified by Qin 2022/12/06	
+				do m = 1, Np
+					sed_lin(l)%qdsum(m) = 0.d0
+				enddo
+			else
+			if(link_0th_order(l) == 0)then
+				do m = 1, Np
+					sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) + sed_lin(l)%qbi(m) !m3/s	 !check this condition  !?????????!  
+		!			sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m)  !m3/s                         !0th order channel: unlimit supply (no beddeform at upstream end)
+				end do
+			else
+				do m = 1, Np
+					do n = 1, 8
+		!				if(up_riv_lin(l,n)==0) cycle !revised by Qin 2021/5/27
+						if(up_riv_lin(l,n) == 0) exit 	
+						lll = up_riv_lin(l, n)
+						sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) - sed_lin(lll)%qbi(m)*divloss !m3/s   !?????????!!!  ffd ??-??????��A+?????N?H modified for diversion 20250329
+					end do
+					sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) + sed_lin(l)%qbi(m)
+				end do
+			end if
+			endif 
+	
 	end do
 !!$omp end parallel do
 
@@ -1894,7 +1904,7 @@ end subroutine washload2
 	real(8) water_v_lin (link_count), hr_lin(link_count)
 	real(8) qss_b(link_count) !added by Qin 2021/5/27
 !	 real(8) width_idx(riv_count), len_riv_idx(riv_count)
-	integer k, kk, kkk, n, m, l, lll
+	integer k, kk, kkk, n, m, l, lll,f
 	real(8) :: ss1, ss11, ss2, ss3, ss22
 !    real(8) :: ss4, ss5, DDD
 !	 real(8) :: qsss1
@@ -1909,7 +1919,7 @@ end subroutine washload2
 	real(8) :: alfa2 , sum_sus_dzb !for bedlock
 	real(8) :: ristar, Emb_min
 	real(8) :: thet !2021/7/18
-	real(8) :: ss_c, ss_q
+	real(8) :: ss_c, ss_q, divloss
 
 	
 	real(8), parameter :: pai = 3.141592
@@ -1921,6 +1931,7 @@ end subroutine washload2
 
 !	 DDD = 0.01
 Emb_min = Emc
+divloss =1.d0
 
 
 !$omp parallel do private(m)
@@ -2135,16 +2146,23 @@ Emb_min = Emc
 !--------------------trasportation of suspended sediment
   	do l = 1, link_count
 		k = link_idx_k(l)
+		divloss =1.
 		if(damflg(k)>0)cycle	
-			do m = 1, Np
-				do n = 1, 8
+		!added for diversion 20250329	
+		if(div_switch==2)then
+			do f = 1, div_id_max
+			if(div_org_idx(f)==k) divloss=1.-div_rate(f)
+			enddo
+		endif
+		do m = 1, Np
+			do n = 1, 8
 	!				if(up_riv_lin(l,n) == 0) cycle !revised by Qin 2021/5/27
 					if(up_riv_lin(l,n) == 0) exit 
 					lll = up_riv_lin(l, n)
-					sed_lin(l)%qsisum(m) = sed_lin(l)%qsisum(m) - sed_lin(lll)%qsi(m) !m3/s   !符号に注意!!!  ffd が-のとき堆積、+のとき侵食
+					sed_lin(l)%qsisum(m) = sed_lin(l)%qsisum(m) - sed_lin(lll)%qsi(m)*divloss !m3/s   !符号に注意!!!  ffd が-のとき堆積、+のとき侵食 modified for diversion 20250329
 				end do
 					sed_lin(l)%qsisum(m) = sed_lin(l)%qsisum(m) + sed_lin(l)%qsi(m)
-			end do
+		end do
 		!-----Driftwood Transport
 		if(j_drf == 1)then
 			qwsum(l) = 0.d0
@@ -2155,7 +2173,7 @@ Emb_min = Emc
 !					if(up_riv_lin(l,n) == 0) cycle !revised by Qin 2021/5/27
 					if(up_riv_lin(l,n) == 0) exit 
 					lll = up_riv_lin(l, n)
-					qwsum(l) = qwsum(l) - qw(lll) !m3/s   !符号に注意!!!  ffd が-のとき堆積、+のとき侵食
+					qwsum(l) = qwsum(l) - qw(lll)*divloss !m3/s   !符号に注意!!!  ffd が-のとき堆積、+のとき侵食 modified for diversion 20250329
 				end do
 				qwsum(l) = qwsum(l) + qw(l)
 			end if
