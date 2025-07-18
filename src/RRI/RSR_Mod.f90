@@ -61,6 +61,7 @@
         integer outswitch_erosupply
         integer outswitch_qrs, outswitch_overflowsed !added 202309024
         integer outswitch_slope !for slope erosion
+        integer outswitch_h_surf
       
 
          character*256 outfile_qsb
@@ -82,6 +83,7 @@
          character*256 outfile_qrs
          character*256 outfile_slope
          character*256 outfile_overflow_sed_vol
+         character*256 outfile_h_surf !added 20250405
       
 
          character*256 outfile_qsb1
@@ -137,7 +139,7 @@
          character*256 ofile_qss1, ofile_qss2, ofile_qss3, ofile_qss4, ofile_qss5, ofile_qss6, ofile_qss7, ofile_qss8, ofile_qss9, ofile_qss10
          character*256 ofile_qss11, ofile_qss12, ofile_qss13, ofile_qss14, ofile_qss15, ofile_qss16, ofile_qss17, ofile_qss18
          character*256 ofile_test
-         character*256 ofile_sumqsb, ofile_sumqss, ofile_slope!--added by Qin 2021/07/28
+         character*256 ofile_sumqsb, ofile_sumqss, ofile_slope, ofile_h_surf!--added by Qin 2021/07/28
 		 
        integer sdt_switch
        integer isedeq, isuseq                     !***** added by Harada	2021/04/20
@@ -213,8 +215,9 @@
          real(8),allocatable,save:: slo_sur_zb(:),slo_sur_zb_before(:)
          real(8),allocatable,save:: fmslo(:,:),fgully(:,:)!, dsi_slo(:,:),Dmslo(:) 20231226
          real(8),allocatable,save:: Ero_mslo(:,:,:), Ero_kslo(:,:),dzslo_idx(:), dzslo(:,:),Ero_slo_vol(:), eroslovol(:,:),dzslo_fp_idx(:,:),inum_sed_dm(:)
-         real(8),allocatable,save:: slo_to_lin_sed(:,:),slo_s_dsum(:,:),slo_s_sum(:),slo_to_lin_sed_sum(:),slo_vol_remain(:,:),slo_to_lin_sum_di(:,:),slo_to_lin_sed_sum_idx(:), slo_supply(:,:),lin_to_slo_sed_sum(:),lin_to_slo_sum_di(:,:),lin_to_slo_sed_sum_idx(:),overflow_sed_sum(:,:)
+         real(8),allocatable,save:: slo_to_lin_sed(:,:),slo_s_dsum(:,:),slo_s_sum(:),slo_to_lin_sed_sum(:),slo_vol_remain(:,:),slo_to_lin_sum_di(:,:),slo_to_lin_sed_sum_idx(:), slo_supply(:,:),lin_to_slo_sed_sum(:),lin_to_slo_sum_di(:,:),lin_to_slo_sed_sum_idx(:),overflow_sed_sum(:,:),slo_to_lin_idx_di(:,:),lin_to_slo_idx_di(:,:)!added 20250503
          real(8),allocatable,save:: B_chan(:),D_chan(:),h_chan(:),  q_chan(:),I_chan(:),l_chan(:),area_chan(:), gully_sedi_dep(:,:) !modified for rill and gully erosion on slope 2022/07/21 20231226
+         real(8), allocatable, save:: infil_s_depth(:), infil_w_depth(:) !maximum the infitration depth of the rainfall; addedd 2025/06/18
          real(8),allocatable,save:: qss_slope(:),ss_slope(:)
          real(8),allocatable,save:: dsi(:),w0(:),ns_MS(:)
          real(8),allocatable,save:: slo_qsisum(:,:),slo_qsi(:,:),slo_ssi(:,:),slo_Dsi(:,:),slo_Esi(:,:)
@@ -222,6 +225,7 @@
          real(8),allocatable,save:: inflow_sedi(:), overflow_sedi(:),overflow_sedi_di(:,:), overdepo_sedi_di(:,:) !modified 20230924
          integer slo_sedi_cal_switch,slope_ero_switch, Ouput_TSAS_switch! modified 20230924
          real(8) dt_slo_sed,surflowdepth,modirate_to_slo_dt  !added 20230427/20230430
+ !        real(8) infil_s_depth, infil_w_depth !maximum the infitration depth of the rainfall; addedd 2025/06/18
          !integer,allocatable,save:: landslide(:,:)
           real(8),allocatable,save:: h_surf(:,:),ss_slope_ij(:,:)    !surface flow depth;  added 20231101
           real(8),allocatable,save:: inflow_sedi_ij(:,:), overflow_sedi_ij(:,:)!for slope erosion
@@ -272,6 +276,6 @@
          !real(8) hr0, wc0 !moved 20250314
 !-----modified for slope erosion
         integer nm_cell
-      	character(50) :: mix_label, gullyB_label,gullyD_label,cm     
+      	character(50) :: mix_label, gullyB_label,gullyD_label,cm,infil_s_d_label     
         real(8),allocatable,save:: B_gully_r(:), D_gully(:) 
       end module sediment_mod

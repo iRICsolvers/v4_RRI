@@ -163,7 +163,8 @@ subroutine funcrs(hr, hs)
                     hr(i, j) = hs(i, j) + depth(i, j) ! 最終手段
                 end if
             elseif(isnan(hr(i,j))) then!---added by Qin
-                write(*,'(a,3i)') 'k/i/j=', k, i, j
+               ! write(*,'(a,3i)') 'k/i/j=', k, i, j
+                write(*,'(a,3i)') 'k/i/j=', k, j, ny+1-i ! convert to i,j in IRIC GUI 20250505
                 write(*,'(a,4f12.5)') 'hs/hr/depth/height=', hs(i,j), hr(i,j),depth(i,j),height(i,j)
                 stop "Error : RivSlo_hr=Nan"
             else
