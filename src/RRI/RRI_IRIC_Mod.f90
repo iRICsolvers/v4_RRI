@@ -368,20 +368,22 @@ contains
             call iric_write_result_real('Elevation change[m]', sumdzb)
             call iric_write_result_real('Total bedload transport[m3]', sumqsb)
             call iric_write_result_real('Total S.S. transport[m3]', sumqss)
+           ! if(sed_switch==2) call iric_write_result_real('Suspended sediment concentration[m3/m3]', ssc_ij)
             call iric_write_result_real('Mean diameter [mm]', dmean_out)
-            if(slo_sedi_cal_switch>0) then !for slope erosion
-             call iric_write_result_real('dzslo', dzslo)
-            ! call iric_write_result_real('Sediment concentration of slope cell[m3/m3]',ss_slope_ij)
-            ! call iric_write_result_real ('Sediment inflow discharge from slope to unit channel [m3/s]',inflow_sedi_ij)
-             !call iric_write_result_real ('Sediment overflow discharge from unit channel [m3/s]', overflow_sedi_ij)            
-             call iric_write_result_real ('Total sediment supply volume from slope to unit channel[m3]', slo_supply)
-             call iric_write_result_real ('Total sediment overflow volume from unit channel[m3]', overflow_sed_sum) 
-            endif
+            !for slope erosion
+            if(slo_sedi_cal_switch>0)  call iric_write_result_real('Elevation change by slope erosion[m]', dzslo)
+            if(slo_sedi_cal_switch>0)  call iric_write_result_real('Slope erosion volume[m3]', eroslovol)
+            ! if(slo_sedi_cal_switch>0) call iric_write_result_real('Sediment concentration of slope cell[m3/m3]',ss_slope_ij)
+            !  if(slo_sedi_cal_switch>0) call iric_write_result_real ('Sediment inflow discharge from slope to unit channel [m3/s]',inflow_sedi_ij)
+             ! if(slo_sedi_cal_switch>0) call iric_write_result_real ('Sediment overflow discharge from unit channel [m3/s]', overflow_sedi_ij)            
+            if(slo_sedi_cal_switch>0) call iric_write_result_real ('Total sediment supply volume from slope to unit channel[m3]', slo_supply)
+            if(slo_sedi_cal_switch>0) call iric_write_result_real ('Total sediment overflow volume from unit channel[m3]', overflow_sed_sum) 
             if(debris_switch==1) call iric_write_result_real('Land slide occurence', LS)
             if(debris_switch==1) call iric_write_result_real('Elevation change (debris flow) [m]', dzslo_mspnt)
             if(debris_switch==1) call iric_write_result_real('Total sediment supply from debris flow [m3]', debri_sup_sum_ij)            
             if(j_drf==1) call iric_write_result_real('Wood_deposition [m3_m2]', vw2d)
-            if(j_drf==1) call iric_write_result_real('Wood_concentration', cw2d)
+            !if(sed_switch==2)
+           ! call iric_write_result_real('Suspended sediment concentration[m3/m3]', ssc_ij)
             if(sed_switch==2) call iric_write_result_integer('Unit channel ID', link_ij) !added 20250328
         end if
 

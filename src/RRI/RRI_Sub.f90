@@ -36,6 +36,11 @@ subroutine riv_idx_setting
             riv_idx2i(riv_count) = i
             riv_idx2j(riv_count) = j
             domain_riv_idx(riv_count) = domain(i, j)
+            ! added to avoid extreme small river channel 20250716
+            if(chan_capa_switch==1)then
+            if(width(i,j).le.min_wid) width(i,j) = min_wid   
+            if(depth(i,j).le.min_dep) depth(i,j) = min_dep 
+            endif
             width_idx(riv_count) = width(i, j)
             depth_idx(riv_count) = depth(i, j)
             height_idx(riv_count) = height(i, j)
@@ -115,7 +120,8 @@ subroutine riv_idx_setting
                 ii = i
                 jj = j
             else
-                write (*, *) "dir(i, j) is error (", i, j, ")", dir(i, j)
+             !   write (*, *) "dir(i, j) is error (", i, j, ")", dir(i, j)
+             write (*, *) "dir(i, j) is error (", j, ny+1-i, ")", dir(i, j) !convert i,j in IRIC GUI 20250505
                 stop
             end if
 
@@ -134,7 +140,8 @@ subroutine riv_idx_setting
             end if
 
             if (riv(ii, jj) .eq. 0) then
-                write (*, *) "riv(ii, jj) should be 1 (", i, j, ")", "(", ii, jj, ")"
+ !               write (*, *) "riv(ii, jj) should be 1 (", i, j, ")", "(", ii, jj, ")"
+                write (*, *) "riv(ii, jj) should be 1 (", j, ny+1-i, ")", "(", jj, ny+1-ii, ")" !convert i,j in IRIC GUI 20250505
                 stop
             end if
 
@@ -398,7 +405,8 @@ subroutine slo_idx_setting
                 distance = dx
                 len = l1_kin
             else
-                write (*, *) "dir(i, j) is error (", i, j, ")", dir(i, j)
+              !  write (*, *) "dir(i, j) is error (", i, j, ")", dir(i, j)
+             write (*, *) "dir(i, j) is error (", j, ny+1-i, ")", dir(i, j) !convert i,j in IRIC GUI 20250505                
                 stop
             end if
 
@@ -564,9 +572,9 @@ if(domain(ii,jj).eq.0 .or. riv(ii,jj).ne.1) goto 80
 enddo
 enddo
 
-write(*,*) "Finished slope idx setting"
-end if
 
+end if
+write(*,*) "Finished slope idx setting"
 end subroutine slo_idx_setting
 
 ! 2D -> 1D (ij2idx)

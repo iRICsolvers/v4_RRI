@@ -54,7 +54,7 @@
 	endif
     divi_cell(k) = 1
     divi_cell(kk) = 1
-	write(*,*)l, i,j,ii,jj, k,kk
+	!write(*,*)l, i,j,ii,jj, k,kk
     do
         do n = 1, merg_cell_num
         kk = down_riv_idx(k)
@@ -487,7 +487,8 @@
 		write(1234,'(a)') '     n    2i,    2j,    up,   cur,  down,  link'
 		do k = 1, riv_count
 		do n = 1, 8
-		write(1234,'(8i6)') n, riv_idx2i(k), riv_idx2j(k),  up_riv_idx(k,n), k, down_riv_idx(k), link_to_riv(k)
+		!write(1234,'(8i6)') n, riv_idx2i(k), riv_idx2j(k),  up_riv_idx(k,n), k, down_riv_idx(k), link_to_riv(k)
+		write(1234,'(8i6)') n, riv_idx2j(k), ny+1-riv_idx2i(k), up_riv_idx(k,n), k, down_riv_idx(k), link_to_riv(k) !convert to i,j in IRIC GUI 20250505
 		enddo
 		enddo
 		close(1234)
@@ -917,7 +918,8 @@ subroutine sed_distr2 (sed)
 					   sed(i,j)%fm1(m) = sed(i,j)%fm1(m)/fm1_all
 					   sed(i,j)%fms(m) = sed(i,j)%fms(m)/fms_all
 					    if(sed(i,j)%fms(m)>1.d0) then
-	                    write(*,*) 'input fmslo >1 ', i,j, m, sed(i,j)%dsed(m), fms_all,sed(i,j)%fms(m), sed(i,j)%fms(1),sed(i,j)%fms(2),sed(i,j)%fms(10)!modified 20240509
+!	                    write(*,*) 'input fmslo >1 ', i,j, m, sed(i,j)%dsed(m), fms_all,sed(i,j)%fms(m), sed(i,j)%fms(1),sed(i,j)%fms(2),sed(i,j)%fms(10)!modified 20240509
+	                    write(*,*) 'input fmslo >1 ', j, ny+1-i, m, sed(i,j)%dsed(m), fms_all,sed(i,j)%fms(m), sed(i,j)%fms(1),sed(i,j)%fms(2),sed(i,j)%fms(10)!convert i,j in IRIC GUI 20250505
 		                stop
 	                    endif
 						sed(i,j)%fsur(m)=sed(i,j)%fm(m)  !20240509
@@ -1105,8 +1107,9 @@ end subroutine sed_distr2
 					   sed(i,j)%fm1(m) = sed(i,j)%fm1(m)/fm1_all
 					   sed(i,j)%fms(m) = sed(i,j)%fms(m)/fms_all
 					    if(sed(i,j)%fms(m)>1.d0) then
-	                    write(*,*) 'input fmslo >1 ', i,j, m, sed(i,j)%dsed(m), fms_all,sed(i,j)%fms(m), sed(i,j)%fms(1),sed(i,j)%fms(2),sed(i,j)%fms(10)!modified 20240509
-		                stop
+	                    !write(*,*) 'input fmslo >1 ', i,j, m, sed(i,j)%dsed(m), fms_all,sed(i,j)%fms(m), sed(i,j)%fms(1),sed(i,j)%fms(2),sed(i,j)%fms(10)!modified 20240509
+	                    write(*,*) 'input fmslo >1 ', j, ny+1-i, m, sed(i,j)%dsed(m), fms_all,sed(i,j)%fms(m), sed(i,j)%fms(1),sed(i,j)%fms(2),sed(i,j)%fms(10)!convert i,j in IRIC GUI 20250505		                
+						stop
 	                    endif
 						sed(i,j)%fsur(m)=sed(i,j)%fm(m)  !20240509
 					   sed(i,j)%dmean = sed(i,j)%dsed(m) * sed(i,j)%fm(m) + sed(i,j)%dmean
@@ -2241,14 +2244,14 @@ endif
 			do i = 1, maxloc
 				k = riv_ij2idx(target_i(i), target_j(i))
 				l = link_to_riv(k)
-				write(301,'(a,2i4,100f15.8)')name(i), target_i(i), target_j(i), qr_ave_idx(k), (sed(target_i(i),target_j(i))%ssi(m),m=1,Np)
+				write(301,'(a,2i4,100f15.8)')name(i), target_j(i), ny+1-target_i(i),qr_ave_idx(k), (sed(target_i(i),target_j(i))%ssi(m),m=1,Np)
 			enddo		
 		else
 			write(301,'(a)') 'Target_site    i      j        qr        cw       ssi(m=1,Np)(Suspended Sediment concentration)'
 			do i = 1, maxloc
 				k = riv_ij2idx(target_i(i), target_j(i))
 				l = link_to_riv(k)
-				write(301,'(a,2i4,100f15.8)')name(i), target_i(i), target_j(i), qr_ave_idx(k), cw(l), (sed(target_i(i),target_j(i))%ssi(m),m=1,Np)
+				write(301,'(a,2i4,100f15.8)')name(i), target_j(i), ny+1-target_i(i), qr_ave_idx(k), cw(l), (sed(target_i(i),target_j(i))%ssi(m),m=1,Np)
 	
 			!write(301,*)
 			!write(301,'(a,2i,2f12.3,f10.5,3f12.3,f10.5,f15.8,f10.2,f10.5,4f12.3,f20.2, 20f15.8)') name(i), l,k,qr_ave_idx(k),hr_idxa(k), tan(zb_riv_slope_lin(l)*3.14159/180.),width_lin(l),Link_len(l),zb_riv_idx(k),ust_idx(k), dzb_temp(k) &

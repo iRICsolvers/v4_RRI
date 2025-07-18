@@ -663,15 +663,17 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
         write (*, '("slope_ero_switch : ", i7)') slope_ero_switch
         if(slope_ero_switch>0)then
         nm_cell =9 !tentative
-        allocate (B_gully_r(nm_cell+1), D_gully(nm_cell+1))
+        allocate (B_gully_r(nm_cell+1), D_gully(nm_cell+1),infil_s_depth(nm_cell+1))
         do i = 0, nm_cell
         write(cm,'(i1)') i
         gullyB_label = 'B_gully_r_'//trim(cm)  
         gullyD_label = 'D_gully_'//trim(cm)  
+        infil_s_d_label='infil_s_d_'//trim(cm)
         call cg_iric_read_real(cgns_f, gullyB_label, B_gully_r(i+1), ier)      
         call cg_iric_read_real(cgns_f, gullyD_label, D_gully(i+1), ier)     
+        call cg_iric_read_real(cgns_f, infil_s_d_label, infil_s_depth(i+1), ier)  
         enddo
-        endif
+    endif
 
         call cg_iric_read_real(cgns_f, "modirate_to_slo_dt", modirate_to_slo_dt, ier)
         write (*, '("modirate_to_slo_dt: ", f12.2)') modirate_to_slo_dt
@@ -743,6 +745,14 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
         call cg_iric_read_string(cgns_f, "outfile_test", outfile_test, ier)
         write(*,'("outfile_test : ", a)') trim(adjustl(outfile_test))
     end if
+!added 20250405    
+    outfile_dzb = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_dzb", outswitch_dzb, ier)
+    if (outswitch_dzb == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_dzb", outfile_dzb, ier)
+        write(*,'("outfile_dzb : ", a)') trim(adjustl(outfile_dzb))
+    end if    
+
 !for slope erosion
     outfile_slope = ''
     call cg_iric_read_integer(cgns_f, "outswitch_slope", outswitch_slope, ier)
@@ -750,7 +760,48 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
         call cg_iric_read_string(cgns_f, "outfile_slope", outfile_slope, ier)
         write(*,'("outfile_slope : ", a)') trim(adjustl(outfile_slope))
     end if
+!added 20250405    
+    outfile_dzslo = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_dzslo", outswitch_dzslo, ier)
+    if (outswitch_dzslo == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_dzslo", outfile_dzslo, ier)
+        write(*,'("outfile_dzslo : ", a)') trim(adjustl(outfile_dzslo))
+    end if  
 
+    outfile_eroslovol = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_eroslovol", outswitch_eroslovol, ier)
+    if (outswitch_eroslovol == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_eroslovol", outfile_eroslovol, ier)
+        write(*,'("outfile_eroslovol: ", a)') trim(adjustl(outfile_eroslovol))
+    end if    
+
+    outfile_erosupply = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_erosupply", outswitch_erosupply, ier)
+    if (outswitch_erosupply == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_erosupply", outfile_erosupply, ier)
+        write(*,'("outfile_erosupply: ", a)') trim(adjustl(outfile_erosupply))
+    end if
+! for landslide and debris flows
+    outfile_mspnt = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_mspnt", outswitch_mspnt, ier)
+    if (outswitch_mspnt == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_mspnt", outfile_mspnt, ier)
+        write(*,'("outfile_mspnt: ", a)') trim(adjustl(outfile_mspnt))
+    end if
+
+    outfile_LS = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_LS", outswitch_LS, ier)
+    if (outswitch_LS == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_LS", outfile_LS, ier)
+        write(*,'("outfile_LS: ", a)') trim(adjustl(outfile_LS))
+    end if
+       
+    outfile_h_surf = ''
+    call cg_iric_read_integer(cgns_f, "outswitch_h_surf", outswitch_h_surf, ier)
+    if (outswitch_h_surf == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_h_surf", outfile_h_surf, ier)
+        write(*,'("outfile_h_surf: ", a)') trim(adjustl(outfile_h_surf))
+    end if
 !---tentatively turn off the channel width expansion and over deposition cutting 20250122
     riv_wid_expan_switch = 0 
     !cut_overdepo_switch = 0

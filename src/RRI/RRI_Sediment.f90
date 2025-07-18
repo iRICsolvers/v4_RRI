@@ -82,7 +82,7 @@
 	  endif
 
 	if(Frn.ge.100.0) then
-!	 if(Frn.ge.1.0) then !Fr����ȏ�̏ꍇ
+!	 if(Frn.ge.1.0) then !Fr?��?��?��?��ȏ�̏ꍇ
 
 !	 pause'Frn>1.0'
 
@@ -93,7 +93,7 @@
             sed_idx(k)%qdsum(m) = sed_idx(k)%qdsum(m) + sed_idx(kk)%qbi(m) !m3/s
 	  enddo
 
-	 else !Frn����ȉ��̏ꍇ
+	 else !Frn?��?��?��?��ȉ�?��̏ꍇ
 
 !	 pause'Frn<1.0'
  	 if (riv_0th_idx(k)== 1)then ! set the sediment supply condition from the 0th order channel;modified by Qin 2021/6/23		
@@ -121,16 +121,16 @@
     enddo !do k = 1, riv_count
 
 !pause'after sediment equation'
-!----�|���������̌v�Z
+!----?��|?��?��?��?��?��?��?��?��?��̌v?��Z
     do k = 1, riv_count
 	  do m = 1, Np
-!	   sed_idx(k)%ffd(m) = sed_idx(k)%qdsum(m)/width_idx(k)/dis_riv_idx(k) !�P�ʂ�[m/s]
-	   sed_idx(k)%ffd(m) = sed_idx(k)%qdsum(m)/area_idx(k) !�P�ʂ�[m/s]
+!	   sed_idx(k)%ffd(m) = sed_idx(k)%qdsum(m)/width_idx(k)/dis_riv_idx(k) !?��P?��ʂ�[m/s]
+	   sed_idx(k)%ffd(m) = sed_idx(k)%qdsum(m)/area_idx(k) !?��P?��ʂ�[m/s]
 	  enddo
 	enddo
 
     do k = 1, riv_count
-!----���V���̑����Z
+!----?��?��?��V?��?��?��̑�?��?��?��Z
 		kk = down_riv_idx(k)
 !	if(domain_riv_idx(k)==2.and.domain_riv_idx(kk).ne.0)then ! modified by Qin 2021/6/18
 	if (riv_0th_idx(k)==1)then ! no bed deformation at 0th order channel +modified by Qin 2021/6/23	
@@ -140,12 +140,12 @@
 		enddo
 	else
 		do m = 1, Np
-			sed_idx(k)%ffd(m) = sed_idx(k)%ffd(m) + (sed_idx(k)%Esi(m) - sed_idx(k)%Dsi(m)) !�P�ʂ�[m/s]
+			sed_idx(k)%ffd(m) = sed_idx(k)%ffd(m) + (sed_idx(k)%Esi(m) - sed_idx(k)%Dsi(m)) !?��P?��ʂ�[m/s]
 		enddo	
 	endif	
 
 	  do m = 1, Np
-	   sed_idx(k)%dzbpr(m) = - ddt * sed_idx(k)%ffd(m) * dlambda !�P�ʂ�[m]
+	   sed_idx(k)%dzbpr(m) = - ddt * sed_idx(k)%ffd(m) * dlambda !?��P?��ʂ�[m]
 	   dzb_temp(k) = dzb_temp(k) + sed_idx(k)%dzbpr(m) ![m]
 	  enddo
 
@@ -158,7 +158,7 @@
 !dzb_temp(k) = dzb_cap * 0.01
 !endif
 
-!�͏��ϓ����傫������ꍇ�C�����}����D(���ꂼ��̗��a�ɂ�����͏��ϓ������l�ɉ�������K�v������D)
+!?��͏�?��ϓ�?��?��?��傫?��?��?��?��?��?���??��C?��?��?��?��?��}?��?��?��?��D(?��?��?��ꂼ?��?��̗�?��a?��ɂ�?��?��?��?��͏�?��ϓ�?��?��?��?��?��l?��ɉ�?��?��?��?��?��?��K?��v?��?��?��?��?��?��D)
 
 !	if(dzb_temp(k).gt.mzbt) then
 !	  dzb_temp(k) = mzbt
@@ -309,7 +309,7 @@
 		   Frn = u_flax/sqrt(9.81*hr_idxa(k))
 
 		 if(Frn.ge.100.0) then 
-!		 if(Frn.lt.1.0) then !!Fr����ȏ�̏ꍇ
+!		 if(Frn.lt.1.0) then !!Fr?��?��?��?��ȏ�̏ꍇ
 
 		 do m = 1, Np
 		   sed_idx(k)%qswisum(m) = sed_idx(k)%qswisum(m) - sed_idx(k)%qswi(m)
@@ -720,15 +720,15 @@ enddo !end of do k = 1, riv_count
 		else !-----revised by Harada 2021/5/21	
 			sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) + (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k)
 			if(sed_idx(k)%ssi(m).le.0.0) then
-			sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) - (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k) !��񌳂ɖ߂���
-			sed_idx(k)%Dsi(m) = -1.* sed_idx(k)%qsisum(m)/area_idx(k) + sed_idx(k)%Esi(m)      !D���C������
-			if(sed_idx(k)%Dsi(m) < 0.) sed_idx(k)%Dsi(m) = 0.d0 !�܂�D�����̎��͏㉺���̃A���o�����X�ɂ��̂�D��0�ƂȂ�
-			sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) + (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k) !�V����D���g���Ă�����xssi���v�Z
+			sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) - (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k) !?��?��?��ɖ߂�?��?��
+			sed_idx(k)%Dsi(m) = -1.* sed_idx(k)%qsisum(m)/area_idx(k) + sed_idx(k)%Esi(m)      !D?��?��?��C?��?��?��?��?��?��
+			if(sed_idx(k)%Dsi(m) < 0.) sed_idx(k)%Dsi(m) = 0.d0 !?��܂�D?��?��?��?��?��̎�?��͏㉺?��?��?��̃A?��?��?��o?��?��?��?��?��X?��ɂ�?��̂�D?��?��0?��ƂȂ�
+			sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) + (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k) !?��V?��?��?��?��D?��?��?��g?��?��?��Ă�?��?��?��?��xssi?��?��?��v?��Z
 		 !----modified by Qin 2021/5/30
 			 if(sed_idx(k)%ssi(m).lt.0.d0) then
-				sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) - (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k) !������񌳂ɖ߂���
-				sed_idx(k)%Esi(m) = sed_idx(k)%qsisum(m)/area_idx(k)!E���C������
-!				sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) + (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k) !�V����E���g���Ă�����xssi���v�Z	 
+				sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) - (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k) !?��?��?��?��?��?��?��ɖ߂�?��?��
+				sed_idx(k)%Esi(m) = sed_idx(k)%qsisum(m)/area_idx(k)!E?��?��?��C?��?��?��?��?��?��
+!				sed_idx(k)%ssi(m) = sed_idx(k)%ssi(m) + (-1.* sed_idx(k)%qsisum(m) + sed_idx(k)%Esi(m)*area_idx(k) - sed_idx(k)%Dsi(m)*area_idx(k)) * ddt/water_v_idx(k) !?��V?��?��?��?��E?��?��?��g?��?��?��Ă�?��?��?��?��xssi?��?��?��v?��Z	 
 				sed_idx(k)%ssi(m) = 0.d0
 			endif	
 			  if (sed_idx(k)%ssi(m)<0.d0) then
@@ -839,7 +839,7 @@ end subroutine susload
 !enddo
 !pause'in bedload'
 
-!-----------���ʂ̍Čv�Z�n��----------------
+!-----------?��?��?��ʂ̍Čv?��Z?��n?��?��----------------
 
 !write(*,*) 'tan(45.)=', tan(45.*3.14159/180.)
 
@@ -882,7 +882,7 @@ enddo
 
 
 !pause'in bedload'
-!-----------���ʂ̍Čv�Z�I��----------------
+!-----------?��?��?��ʂ̍Čv?��Z?��I?��?��----------------
 !pause'1'
 
 do k = 1, riv_count
@@ -912,7 +912,7 @@ do k = 1, riv_count
       !           else
 				 u_flax = qr_ave_idx(k)/width_idx(k)/hr_idxa(k)
       !           endif    
-	!�}�j���O�̑e�x�W����p�������C���x�̎Z��
+	!?��}?��j?��?��?��O?��̑e?��x?��W?��?��?��?��p?��?��?��?��?��?��?��C?��?��?��x?��̎Z?��?��
 	!			if(hr_idxa(k).lt.0.001) then
 	!		         ust_idx1 = 0.0
 	!			else
@@ -928,7 +928,7 @@ do k = 1, riv_count
                     Frn = u_flax/sqrt(9.81*hr_idxa(k))
                     endif
 	
-	!���ʌ��z��p�������C���x�̎Z��
+	!?��?��?��ʌ�?��z?��?��p?��?��?��?��?��?��?��C?��?��?��x?��̎Z?��?��
 	
 	!if(Frn.ge.100.0) then !Fr >= 1.0
 	!if(Frn.ge.1.0) then !Fr < 1.0
@@ -1004,9 +1004,9 @@ endif
 
 !                if (hr_idxa(k).lt.1.0) then
 !                if (hr_idxa(k).lt.100.0) then
-!                  ust_idx33 = ust_idx22 !�������l���̗p����ꍇ
+!                  ust_idx33 = ust_idx22 !?��?��?��?��?��?��?��l?��?��?��̗p?��?��?��?���?
 !			     else
-!                 ust_idx33 = ust_idx1 !�������l���̗p����ꍇ
+!                 ust_idx33 = ust_idx1 !?��?��?��?��?��?��?��l?��?��?��̗p?��?��?��?���?
 !			     endif
 
 !                if (hr_idxa(k).gt.0.1) then
@@ -1049,7 +1049,7 @@ endif
 
 
 			do m = 1, Np
-!	if(dsi.ge.0.0001) then ! di=> 0.1mm��bedload ���v�Z
+!	if(dsi.ge.0.0001) then ! di=> 0.1mm?��?��bedload ?��?��?��v?��Z
 			  fp = sed_idx(k)%fm(m)
 			  if (dsi(m)/dsm .le. 0.4) then
 !			     R_tcts = 0.85
@@ -1088,7 +1088,7 @@ endif
 		!MPM equation
 		           if (ust_idx(k).gt.usci) then
 		             qbe = 8.0 * (t_star - t_Crit)**1.5
-		             sed_idx(k)%qbi(m) = qbe*sqrt((s-1)*grav*dsi(m)**3.)*width_idx(k)*fp*alfa !�P�ʂ�m3/s
+		             sed_idx(k)%qbi(m) = qbe*sqrt((s-1)*grav*dsi(m)**3.)*width_idx(k)*fp*alfa !?��P?��ʂ�m3/s
                    else
 		             sed_idx(k)%qbi(m) = 0.0
 	               end if 
@@ -1342,7 +1342,7 @@ endif
 		!				if(up_riv_lin(l,n)==0) cycle !revised by Qin 2021/5/27
 						if(up_riv_lin(l,n) == 0) exit 	
 						lll = up_riv_lin(l, n)
-						sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) - sed_lin(lll)%qbi(m)*divloss !m3/s   !?????????!!!  ffd ??-??????��A+?????N?H modified for diversion 20250329
+						sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) - sed_lin(lll)%qbi(m)*divloss !m3/s   !?????????!!!  ffd ??-???????��?��A+?????N?H modified for diversion 20250329
 					end do
 					sed_lin(l)%qdsum(m) = sed_lin(l)%qdsum(m) + sed_lin(l)%qbi(m)
 				end do
@@ -1667,7 +1667,7 @@ end if
 !			else	
 !			do m = 1, Np
 !			sed_lin(l)%ffd(m) = sed_lin(l)%ffd(m) + (sed_lin(l)%Ewi(m) - sed_lin(l)%Dwi(m)) !?P???[m/s]
-!			if(link_0th_order(l) == 0) sed_lin(l)%ffd(m) = 0.         !0????????�p??????????B???V???Awashload????????s????????????????u??ffd??0??
+!			if(link_0th_order(l) == 0) sed_lin(l)%ffd(m) = 0.         !0?????????��p??????????B???V???Awashload????????s????????????????u??ffd??0??
 !			sed_lin(l)%dzbpr(m) = - ddt * sed_lin(l)%ffd(m) * dlambda !?P???[m]
 !			dzb_temp_lin(l) = dzb_temp_lin(l) + sed_lin(l)%dzbpr(m) ![m]
 !			enddo	
@@ -1675,7 +1675,7 @@ end if
 !		else	
 !		do m = 1, Np
 !			sed_lin(l)%ffd(m) = sed_lin(l)%ffd(m) + (sed_lin(l)%Ewi(m) - sed_lin(l)%Dwi(m)) !?P???[m/s]
-!			if(link_0th_order(l) == 0) sed_lin(l)%ffd(m) = 0.         !0????????�p??????????B???V???Awashload????????s????????????????u??ffd??0??
+!			if(link_0th_order(l) == 0) sed_lin(l)%ffd(m) = 0.         !0?????????��p??????????B???V???Awashload????????s????????????????u??ffd??0??
 !			sed_lin(l)%dzbpr(m) = - ddt * sed_lin(l)%ffd(m) * dlambda !?P???[m]
 !			dzb_temp_lin(l) = dzb_temp_lin(l) + sed_lin(l)%dzbpr(m) ![m]
 !		enddo
@@ -1776,7 +1776,7 @@ end if
 	if(link_0th_order(l) == 0)then
 		do m = 1, Np
 			!sed_lin(l)%qswisum(m) = sed_lin(l)%qswisum(m) + sed_lin(l)%qsi(m)    !?????????
-			sed_lin(l)%qswisum(m) = sed_lin(l)%qswisum(m)    !???????�??
+			sed_lin(l)%qswisum(m) = sed_lin(l)%qswisum(m)    !????????��??
 		end do
 	else
 			
@@ -1785,7 +1785,7 @@ end if
 !				if(up_riv_lin(l,n) == 0) cycle !revised by Qin 2021/5/27
 			if(up_riv_lin(l,n) == 0) exit 
 				lll = up_riv_lin(l, n)
-				sed_lin(l)%qswisum(m) = sed_lin(l)%qswisum(m) - sed_lin(lll)%qswi(m) !m3/s   !?????????!!!  ffd ??-??????��A+?????N?H
+				sed_lin(l)%qswisum(m) = sed_lin(l)%qswisum(m) - sed_lin(lll)%qswi(m) !m3/s   !?????????!!!  ffd ??-???????��?��A+?????N?H
 			end do
 			sed_lin(l)%qswisum(m) = sed_lin(l)%qswisum(m) + sed_lin(l)%qswi(m)
 		end do
@@ -2159,7 +2159,7 @@ divloss =1.d0
 	!				if(up_riv_lin(l,n) == 0) cycle !revised by Qin 2021/5/27
 					if(up_riv_lin(l,n) == 0) exit 
 					lll = up_riv_lin(l, n)
-					sed_lin(l)%qsisum(m) = sed_lin(l)%qsisum(m) - sed_lin(lll)%qsi(m)*divloss !m3/s   !符号に注意!!!  ffd が-のとき堆積、+のとき侵食 modified for diversion 20250329
+					sed_lin(l)%qsisum(m) = sed_lin(l)%qsisum(m) - sed_lin(lll)%qsi(m)*divloss !m3/s   !符号に注�?!!!  ffd �?-のとき�??積�?+のとき侵�? modified for diversion 20250329
 				end do
 					sed_lin(l)%qsisum(m) = sed_lin(l)%qsisum(m) + sed_lin(l)%qsi(m)
 		end do
@@ -2173,7 +2173,7 @@ divloss =1.d0
 !					if(up_riv_lin(l,n) == 0) cycle !revised by Qin 2021/5/27
 					if(up_riv_lin(l,n) == 0) exit 
 					lll = up_riv_lin(l, n)
-					qwsum(l) = qwsum(l) - qw(lll)*divloss !m3/s   !符号に注意!!!  ffd が-のとき堆積、+のとき侵食 modified for diversion 20250329
+					qwsum(l) = qwsum(l) - qw(lll)*divloss !m3/s   !符号に注�?!!!  ffd �?-のとき�??積�?+のとき侵�? modified for diversion 20250329
 				end do
 				qwsum(l) = qwsum(l) + qw(l)
 			end if
@@ -2210,10 +2210,10 @@ divloss =1.d0
 				do m =1,Np
 					sed_lin(l)%ssi(m) = sed_lin(l)%ssi(m) + (-1.* sed_lin(l)%qsisum(m) + sed_lin(l)%Esi(m)*area_lin(l) - sed_lin(l)%Dsi(m)*area_lin(l)) * ddt/water_v_lin(l)
 					if(sed_lin(l)%ssi(m).lt.0.d0) then
-						sed_lin(l)%ssi(m) = sed_lin(l)%ssi(m) - (-1.* sed_lin(l)%qsisum(m) + sed_lin(l)%Esi(m)*area_lin(l) - sed_lin(l)%Dsi(m)*area_lin(l)) * ddt/water_v_lin(l) !一回元に戻して
+						sed_lin(l)%ssi(m) = sed_lin(l)%ssi(m) - (-1.* sed_lin(l)%qsisum(m) + sed_lin(l)%Esi(m)*area_lin(l) - sed_lin(l)%Dsi(m)*area_lin(l)) * ddt/water_v_lin(l) !一回�??に戻して
 						sed_lin(l)%Dsi(m) = -1.* sed_lin(l)%qsisum(m)/area_lin(l) + sed_lin(l)%Esi(m)      !Dを修正して
-						if(sed_lin(l)%Dsi(m) < 0.) sed_lin(l)%Dsi(m) = 0.d0 !まだDが負の時は上下流のアンバランスによるのでDは0となる
-						sed_lin(l)%ssi(m) = sed_lin(l)%ssi(m) + (-1.* sed_lin(l)%qsisum(m) + sed_lin(l)%Esi(m)*area_lin(l) - sed_lin(l)%Dsi(m)*area_lin(l)) * ddt/water_v_lin(l) !新しいDを使ってもう一度ssiを計算
+						if(sed_lin(l)%Dsi(m) < 0.) sed_lin(l)%Dsi(m) = 0.d0 !ま�?Dが�?の時�?�上下流�?�アンバランスによるのでDは0とな�?
+						sed_lin(l)%ssi(m) = sed_lin(l)%ssi(m) + (-1.* sed_lin(l)%qsisum(m) + sed_lin(l)%Esi(m)*area_lin(l) - sed_lin(l)%Dsi(m)*area_lin(l)) * ddt/water_v_lin(l) !新しいDを使ってもう一度ssiを計�?
 						if(sed_lin(l)%ssi(m).lt.0.d0) sed_lin(l)%ssi(m) = 0.d0 !modified 20240101	
 						if (isnan(sed_lin(l)%ssi(m))) then
 							write(*,*) k, m, sed_lin(l)%ssi(m),water_v_lin(l),sed_lin(l)%Dsi(m),sed_lin(l)%Esi(m),sed_lin(l)%qsisum(m)
@@ -2469,12 +2469,12 @@ end subroutine susload2
 
 
 !-----Sediment transportation calculation in slope area
-	subroutine slo_sedi_cal ( sed_lin, hs_idx,qsur_ave_temp_idx,slo_sedi_cal_duration) 
+	subroutine slo_sedi_cal ( sed_lin, hs_idx,qs_ave_idx,qsur_ave_temp_idx,slo_sedi_cal_duration) 
 		use globals
         use sediment_mod
         implicit none
         type(sed_struct) sed_lin(link_count)
-		real(8) hs_idx(slo_count),qsur_ave_temp_idx(lmax,slo_count)
+		real(8) hs_idx(slo_count),qs_ave_idx(i4,slo_count),qsur_ave_temp_idx(i4,slo_count) !revised
 		!real(8) qss_slope(slo_count),slo_Dsi(slo_count,Np),slo_qsi(slo_count,Np),slo_ssi(slo_count,Np),slo_sur_zb(slo_count),fmslo(slo_count,Np),ns_MS(slo_count)
 		real(8) :: V, Frn, V_ave
 		real(8) :: bbeta, ss,cc
@@ -2487,7 +2487,7 @@ end subroutine susload2
 		real(8):: wl !flood propagate velocity under kinematic wave approximate
 		real(8) :: RC,DR,Ke_DT,Ke_LD,dsm, d50,TC, uscm,omega,omega_c2,param_c, param_eta,param_beta,param_b,gammaa_k,dgammaa
 		real(8) :: AA,BB,h_c
-		real(8) :: ddt_slo,	cal_time, slo_sedi_cal_duration,grad_H,over_ss
+		real(8) :: ddt_slo,	cal_time, slo_sedi_cal_duration,grad_H,over_ss,D_inf
 		integer:: lt !delay time = t : time step
 		integer :: depo_t ! depostion time
 		real(8), parameter :: pai = 3.141592
@@ -2507,8 +2507,7 @@ end subroutine susload2
 		!if(slope_ero_switch==1)then ! gully/rill erosion on slope area (sediment path); added by Qin 20220730
 		!ddt = 0.05d0
 		n_count = 0
-		inflow_sedi(:) = 0.d0
-		overflow_sedi(:) =0.d0
+		cal_time=0.d0
 do 
 	n_count=n_count+1
 	!write(*,*) 'n_count=', n_count
@@ -2522,7 +2521,7 @@ do
 		if(ddt_slo.gt.dt_slo_sed) ddt_slo = dt_slo_sed
 	endif 
 !pause '1'	
-!$omp parallel do private(i,j,m,soildepth_fp_idx,gammaa_k,dgammaa,dh,ns,V,h_dash,usta,thetr,emb_gully,alfa,fp,bbeta,Csb,z_star,Cae1,Cae,ristar,Ce,soildepth_fp_before,grad_H)
+!$omp parallel do private(i,j,m,soildepth_fp_idx,gammaa_k,dgammaa,D_inf,dh,ns,V,h_dash,usta,thetr,emb_gully,alfa,fp,bbeta,Csb,z_star,Cae1,Cae,ristar,Ce,soildepth_fp_before,grad_H)
         do k = 1, slo_count
             i = slo_idx2i(k)
             j = slo_idx2j(k)
@@ -2530,10 +2529,9 @@ do
 !modified 20240115			
 			if(debris_switch.ne.0)then		
 			!if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1)cycle !modified for gofukuya river 20231101;20240121	
-			if(slo_grad(k).ge.0.25) cycle !20240126
+			!if(slo_grad(k).ge.0.25) cycle !20240126
 			if(hki_g(k)>0) cycle 	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
 			endif
-
 !	write(*,*) "check1205 01"				
             !if(riv(i,j) == 1) cycle !modified 20230711 for inundation				
 	    	ns = ns_slo_idx(k)
@@ -2545,149 +2543,160 @@ do
 !	write(*,*) "check1205 02"				
 			 gammaa_k=gammaa_idx(k)
 			 dgammaa=1./(1.-gammaa_k)
-			 h_surf(i,j) = hs_idx(k) - da_idx(k) ! modified 20231204
-			 if(h_surf(i,j).le.0.) h_surf(i,j) = 0.d0
-			 dh = h_surf(i,j)!(h-dapが表流水の水深)
+			! h_surf(i,j) = hs_idx(k) - da_idx(k) ! modified 20231204
+			! if(h_surf(i,j).le.0.) h_surf(i,j) = 0.d0
+			! dh = h_surf(i,j)!(h-dapが表流水の水深)
+			!modified 20250618
+			if(infil_w_depth(k)>da_idx(k))then
+				D_inf=da_idx(k)
+			else
+				D_inf=infil_w_depth(k)
+			endif	
+			dh = hs_idx(k)-D_inf	
+			if(dh.le.0.d0) dh=0.d0
 
-			 water_v_cell(k) = dh*area !added 20231226
-!modified 20231226				
+            !modified20250503
+			!if(riv(i,j)==1)then
+			!water_v_cell(k) = hs_idx(k) *area
+			!if(water_v_cell(k)<0.d0) water_v_cell(k)=0.d0
+			!Qg(k) = sqrt(qs_ave_idx(1,k) ** 2.d0 + qs_ave_idx(2,k) ** 2.d0) * area
+			!if(Qg(k).le. 0.d0) Qg(k) =0.d0
+			!do m = 1, Np
+			!slo_qsi(k,m)=Qg(k)*slo_ssi(k,m) 
+			!enddo
+			! all sediment in river cell supply into unit channel (without sediment inundation) 20250513
+			if(riv(i,j)==1) then
+			 water_v_cell(k) =0.d0
+			 Qg(k)=0.d0
+			 do m=1,Np
+				slo_ssi(k,m) =0.d0
+				slo_qsi(k,m) =0.d0
+			 enddo
+			else			
+			!water_v_cell(k) = dh*area
+			water_v_cell(k) = hs_idx(k)*area !20250514
+			if(water_v_cell(k)<0.d0) water_v_cell(k)=0.d0
+			Qg(k) = sqrt(qs_ave_idx(1,k) ** 2.d0 + qs_ave_idx(2,k) ** 2.d0) * area !20250514
+			if(Qg(k).le. 0.d0) Qg(k) =0.d0
 			if(dh.le.surflowdepth )then 
-				Qg(k) = 0.d0
+				!Qg(k)=0.d0
 				do m = 1, Np  
 				slo_Esi(k,m) = 0.
-	!modified 20231226							
-				!slo_Dsi(k,m) = slo_ssi(k,m)*w0(m)
-				slo_Dsi(k,m) = water_v_cell(k)*slo_ssi(k,m) / slo_sedi_cal_duration
-				!if(slo_Dsi(k,m).le.1e-7) slo_Dsi(k,m) = 0.d0 !added 20240101
+				slo_Dsi(k,m)=slo_ssi(k,m)*w0(m) !20250505
+				slo_qsi(k,m) = slo_ssi(k,m)*Qg(k)
 				if(slo_Dsi(k,m).le.0.d0) slo_Dsi(k,m) = 0.d0
 					if (isnan(slo_ssi(k,m)).or.isnan(slo_Dsi(k,m))) then 
 						write(*,*) k,m,slo_Dsi(k,m),slo_qsi(k,m) ,Qg(k),usta, dh,slo_grad(k),v
 						stop "slope ssi or dsi is Nan"
 					endif	
-				slo_qsi(k,m)  = 0.d0 
-				slo_ssi(k,m) = 0.d0 
 				enddo
-			else !for dh>surflowdepth
-				Qg(k) = sqrt(qsur_ave_temp_idx(1,k) ** 2.d0 + qsur_ave_temp_idx(2,k) ** 2.d0) * area
-!			 if(Qg(k).lt.0.001) Qg(k) = 0.d0	
-			 !if(Qg(k).le.0.) Qg(k) = 0.d0 !modified 20231226
-				if(Qg(k).lt.0.) then
-				write(*,*) Qg(k),k,dh,ns, slo_grad(k),len_slo_1d_idx(k),qsur_ave_temp_idx(1,k),qsur_ave_temp_idx(2,k),qsur_ave_temp_idx(3,k),qsur_ave_temp_idx(4,k)
-				stop "surface flow discharge <0 "
-				endif		
+			else !for dh>surflowdepth	
 	!write(*,*) "check1205 05"
-				if(slope_ero_switch==1)then !20230924
- !modified 20240126
-					if(len_slo_idx(1, k) > 0.d0 .and. len_slo_idx(2, k) > 0.d0 )then ! right-end side and down-end side boundaries of the basin do not have the width for x-flux and y-flux, respectively 
-						q_chan(k) =  abs((qsur_ave_temp_idx(1,k) * area / len_slo_idx(1, k) * abs(slo_ang_cos(k)) + qsur_ave_temp_idx(2,k) * area / len_slo_idx(2, k) * abs(slo_ang_sin(k)))) / B_chan(k)
-						V = sqrt((qsur_ave_temp_idx(1,k) * area / (len_slo_idx(1, k) * dh)) ** 2.d0 + (qsur_ave_temp_idx(2,k) * area / (len_slo_idx(2, k) *dh)) ** 2.d0)
-					elseif(len_slo_idx(1, k) == 0.d0 .and. len_slo_idx(2, k) > 0.d0 )then
-						q_chan(k) =  abs(qsur_ave_temp_idx(2,k) * area / len_slo_idx(2, k) * slo_ang_sin(k)) / B_chan(k) 
-						V = abs((qsur_ave_temp_idx(2,k) * area / (len_slo_idx(2, k) *dh)))
-					elseif(len_slo_idx(1, k) > 0.d0 .and. len_slo_idx(2, k) == 0.d0 )then
-						q_chan(k) =  abs(qsur_ave_temp_idx(1,k) * area / len_slo_idx(1, k) * slo_ang_cos(k)) / B_chan(k)  
-						V = abs((qsur_ave_temp_idx(1,k) * area / (len_slo_idx(1, k) *dh)))
-					else
-						q_chan(k) = 0.d0 
-						V = 0.d0
-					endif
-					!V = 1/ns*dh**(2./3.)*slo_grad(k)**0.5 !modified 20231112 20240131
-					 !usta = sqrt(grav*dh*slo_grad(k)) !bed slope of gully/rill for estimating erosion rate 20240131
-					 if(V == 0.d0 .or. q_chan(k)== 0.d0)then
-					  grad_H = 0.d0
-					  h_chan(k) = dh
-					  if(h_chan(k) .gt. D_chan(k)) h_chan(k) = D_chan(k)
-					  usta = 0.d0
-					 else
-					  grad_H = (ns * V / dh ** (2. / 3.)) ** 2.d0
-					  h_chan(k) = (ns_MS(k) * q_chan(k) / sqrt(grad_H )) ** 0.6 
-					 if(h_chan(k).gt.D_chan(k)) then 
-					  h_chan(k) = D_chan(k)
-					  grad_H = (ns_MS(k) * q_chan(k) / h_chan(k) ** (5./3.) ) ** 2.d0
-					 endif
-					  V = q_chan(k) / h_chan(k)
-					  usta = sqrt(grav * h_chan(k) * grad_H) 
-					 endif
-
-					if(h_chan(k).lt.0.d0 .or. isnan(h_chan(k)))then
-						write(*,*) k,ns_MS(k),q_chan(k),h_chan(k),B_chan(k),len_slo_1d_idx(K),V,dh, qsur_ave_temp_idx(1,k),qsur_ave_temp_idx(2,k),len_slo_idx(2, k) , slo_ang_sin(k),len_slo_idx(1, k), slo_ang_cos(k)
-						stop "water depth in sediment path is not correct "
-					endif
-					h_dash= 0.d0
-					!usta=0.d0
-					if(h_chan(k).gt.0.d0 .and. grad_H.gt.0.d0)then
-						
-						if(grad_H .ge. slope_20)then
-							Usta = 0.d0 !no sediment erosion from the river bed when the slope is larger than 20 degree
+				!Qg(k) = sqrt(qsur_ave_temp_idx(1,k) ** 2.d0 + qsur_ave_temp_idx(2,k) ** 2.d0) * area
+				if(slope_ero_switch==1)then !20230924 
+					if(D_chan(k).le.0.d0 .or. B_chan(k).le.0.d0 .or. slo_grad(k).ge.slope_20) then !to prevent the erosion in urban area and the slope> 20 deg (deposition only) 20250402
+						h_chan(k) = 0.d0
+						q_chan(k)=0.d0
+						do m = 1, Np 
+							slo_qsi(k,m) = slo_ssi(k,m)*Qg(k)  
+							slo_Dsi(k,m)  = slo_ssi(k,m) * w0(m) 		
+							if(slo_Dsi(k,m).le.0.d0) slo_Dsi(k,m) = 0.d0
+							slo_Esi(k,m) =0.d0	
+						enddo								
+					else	
+	!modified 20240126
+						if(len_slo_idx(1, k) > 0.d0 .and. len_slo_idx(2, k) > 0.d0 )then ! right-end side and down-end side boundaries of the basin do not have the width for x-flux and y-flux, respectively 
+							q_chan(k) =  abs((qsur_ave_temp_idx(1,k) * area / len_slo_idx(1, k) * abs(slo_ang_cos(k)) + qsur_ave_temp_idx(2,k) * area / len_slo_idx(2, k) * abs(slo_ang_sin(k)))) / B_chan(k)
+							!V = sqrt((qsur_ave_temp_idx(1,k) * area / (len_slo_idx(1, k) * dh)) ** 2.d0 + (qsur_ave_temp_idx(2,k) * area / (len_slo_idx(2, k) *dh)) ** 2.d0)
+						elseif(len_slo_idx(1, k) == 0.d0 .and. len_slo_idx(2, k) > 0.d0 )then
+							q_chan(k) =  abs(qsur_ave_temp_idx(2,k) * area / len_slo_idx(2, k) * slo_ang_sin(k)) / B_chan(k) 
+							!V = abs((qsur_ave_temp_idx(2,k) * area / (len_slo_idx(2, k) *dh)))
+						elseif(len_slo_idx(1, k) > 0.d0 .and. len_slo_idx(2, k) == 0.d0 )then
+							q_chan(k) =  abs(qsur_ave_temp_idx(1,k) * area / len_slo_idx(1, k) * slo_ang_cos(k)) / B_chan(k)  
+							!V = abs((qsur_ave_temp_idx(1,k) * area / (len_slo_idx(1, k) *dh)))
 						else
-							thetr = atan( grad_H )
-							emb_gully = usta ** 2.d0 /((rs-1.) * csta / 2. * grav * cos(thetr) * (tan(S_angle)-tan(thetr)))!Exchange layer thickness
-							h_dash = emb_gully/h_chan(k)
+							q_chan(k) = 0.d0 
+							!V = 0.d0
 						endif
-					endif
-			!------modified 20230420
-	!					if (h_chan(k).gt.0.01.and.h_dash.ge.0.9d0) then
-					if (h_chan(k).gt.0.d0.and.h_dash.ge.0.9d0) then !modifieid 20231226
-						h_dash = 0.9d0
-						emb_gully= h_dash*h_chan(k)
-						Usta = sqrt(emb_gully*((rs-1.)*csta/2.*grav*cos(thetr)*(tan(S_angle)-tan(thetr))))
-	!modified 20231205
-						if(emb_gully.le.Emc) Usta=0.d0
-					endif
-			!pause'2'
+						!modified 20250406
+						h_chan(k) = (ns_MS(k) * q_chan(k) / sqrt(slo_grad(k) )) ** 0.6
+						if(h_chan(k)>D_chan(k)) then
+						h_chan(k) = D_chan(k)
+						!elseif(h_chan(k)<dh)then
+						! h_chan(k) = dh
+						endif
+						V = 1./ns_MS(k)*sqrt(slo_grad(k))*h_chan(k)**(2./3.)
+						q_chan(k)=V*h_chan(k)
+						usta = sqrt(grav * h_chan(k) *slo_grad(k))
 
-					if(h_chan(k).gt.0.d0.and.h_dash.gt.0.d0.and.h_dash.le.0.9d0)then ! modified 20231226
+						if(h_chan(k).lt.0.d0 .or. isnan(h_chan(k)))then
+							write(*,*) k,ns_MS(k),q_chan(k),h_chan(k),B_chan(k),D_chan(k), len_slo_1d_idx(K),V,dh, qsur_ave_temp_idx(1,k),qsur_ave_temp_idx(2,k),len_slo_idx(2, k) , slo_ang_sin(k),len_slo_idx(1, k), slo_ang_cos(k)
+							stop "water depth in sediment path is not correct "
+						endif
+						h_dash= 0.d0
+						if(h_chan(k).gt.0.d0 .and. slo_grad(k).gt.0.d0)then
+								thetr = atan(slo_grad(k))
+								emb_gully = usta ** 2.d0 /((rs-1.) * csta / 2. * grav * cos(thetr) * (tan(S_angle)-tan(thetr)))!Exchange layer thickness
+								h_dash = emb_gully/h_chan(k)
+							if(h_dash.ge.0.9)then
+								h_dash = 0.9d0
+								emb_gully= h_dash*h_chan(k)
+								Usta = sqrt(emb_gully*((rs-1.)*csta/2.*grav*cos(thetr)*(tan(S_angle)-tan(thetr))))
+								grad_H= usta**2./grav/h_chan(k)
+								V=1./ns_MS(k)*sqrt(grad_H)*h_chan(k)**(2./3.)
+							endif
+						!if(emb_gully.le.Emc) Usta=0.d0
+						endif
+				!------modified 20230420
+				    endif !endif for urban or not
+				!pause'2'
+
+					if(h_chan(k).gt.0.d0.and.h_dash.gt.0.d0)then ! modified 20231226
 						!added 20240101	  
-						alfa=0.
+						alfa=1.
 						alfa = (slo_sur_zb(k)-zb_slo_idx(k))/emb_gully
 						if(alfa.ge.1.) alfa=1.
-						if(alfa <= 0.d0 .or.emb_gully.le.Emc) alfa=0.
+						if(alfa <= 0.d0 .or.emb_gully.le.Emc) alfa=0. !turned off 20250407
+						!if(alfa <= 0.d0) alfa=0.
 						do m = 1, Np
-							!slo_ssi(k,m) = slo_qsi(k,m)/Qg(k)  
 							slo_qsi(k,m) = slo_ssi(k,m)*Qg(k)  
-							slo_Dsi(k,m)  = slo_ssi(k,m) * w0(m) 
-							!if(slo_Dsi(k,m).le.1e-7) slo_Dsi(k,m) = 0.d0 !added 20240101		
+							slo_Dsi(k,m)  = slo_ssi(k,m) * w0(m) 		
 							if(slo_Dsi(k,m).le.0.d0) slo_Dsi(k,m) = 0.d0
-							slo_Esi(k,m) =0.d0
-							if(alfa==0.) cycle					
-							!if(slo_grad(k).ge.slope_20) cycle!the no erosion on slope >20 degree modified 20221128
-							!if(fmslo(k,m)==0.) cycle
-							if(fgully(k,m)==0.) cycle !20231126
-							!if(land(i,j)== 4.or.land(i,j)==5) cycle  !modidified 20231226
-			!				if(dzslo_idx(k).ge.soildepth_idx(k)) cycle
-							!fp = fmslo(k,m)
-							fp = fgully(k,m) !20231226
-							if (fp.lt.0.d0)then
-							write(*,*) fp,k,m, gully_sedi_dep(k,m)
-							stop 'GSD of gully is negative'
-							endif
-							if (w0(m) .ge. usta) cycle
-							if(isuseq == 1)then  !Lane-Kalinske formula
-								bbeta = 6.0*w0(m)/karmans/usta
-								slo_Dsi(k,m)  = Csb * w0(m)
-								!if(slo_Dsi(k,m).le.1e-7) slo_Dsi(k,m) = 0.d0 !added 20240101	
-				                if(slo_Dsi(k,m).le.0.d0) slo_Dsi(k,m) = 0.d0								
-								z_star = usta/w0(m)
-								Cae1 = 5.55*(0.5*z_star*exp(-(1./z_star)**2.))** 1.61 * 1.0E-4 
-								if(Cae1.ge.0.2d0) Cae1 = 0.2d0
-								Cae = Cae1 *fp
-								slo_Esi(k,m)  = Cae * w0(m)*alfa !modified 20240101 
-							!	slo_Esi(k,m) = slo_Esi(k,m)*area_chan(k)/area !revise to the erosion rate for the entire cell modified 20231106	 20231226									
-							elseif(isuseq == 2)then  !Density stratified flow formula
-							ristar = (rs/rw - 1.) * csbar * grav * h_chan(k) / (V ** 2.) 
-								Ce = kappa/ristar * V * csbar/w0(m)
-								if(Ce.ge.0.3d0)then !modified 20231225
-									Ce = 0.3d0
-									ristar = kappa/Ce*V*csbar/w0(m)        !Once ristar is modified by this regulation for smallest size, the regulated ristar is applied to all classes.
+							slo_Esi(k,m) =0.d0	
+							if(dsi(m).ge.h_chan(k)) cycle !added 20240131									
+							if(fmslo(k,m)>0.d0 .and. alfa>0.d0)then 
+								fp = fmslo(k,m)
+								if (fp.lt.0.d0)then
+									write(*,*) fp,k,m !, gully_sedi_dep(k,m)
+									stop 'GSD of slope soil is negative'
 								endif
-								slo_Esi(k,m)  = fp * kappa / ristar * V * csbar * alfa !modified 20240101 
-								!slo_Esi(k,m) = slo_Esi(k,m)*area_chan(k)/area !revise to the erosion rate for the entire cell modified 20231106 20231226										
+								if (w0(m) < usta)then
+									if(isuseq == 1)then  !Lane-Kalinske formula
+										bbeta = 6.0*w0(m)/karmans/usta
+										Csb = slo_ssi(k,m)*bbeta/(1.-exp(-1. * bbeta))
+										slo_Dsi(k,m)  = Csb * w0(m)
+										!if(slo_Dsi(k,m).le.1e-7) slo_Dsi(k,m) = 0.d0 !added 20240101	
+										if(slo_Dsi(k,m).le.0.d0) slo_Dsi(k,m) = 0.d0								
+										z_star = usta/w0(m)
+										Cae1 = 5.55*(0.5*z_star*exp(-(1./z_star)**2.))** 1.61 * 1.0E-4 
+										if(Cae1.ge.0.2d0) Cae1 = 0.2d0
+										Cae = Cae1 *fp
+										slo_Esi(k,m)  = Cae * w0(m)*alfa !modified 20240101 									
+									elseif(isuseq == 2)then  !Density stratified flow formula
+										ristar = (rs/rw - 1.) * csbar * grav * h_chan(k) / (V ** 2.) 
+										Ce = kappa/ristar * V * csbar/w0(m)
+										if(Ce.ge.0.3d0)then !modified 20231225
+											Ce = 0.3d0
+											ristar = kappa/Ce*V*csbar/w0(m)        !Once ristar is modified by this regulation for smallest size, the regulated ristar is applied to all classes.
+										endif
+											slo_Esi(k,m)  = fp * kappa / ristar * V * csbar * alfa !modified 20240101 										
+									endif
+								endif	
 							endif
-!modified 20231226
-							!soildepth_fp_idx=(slo_sur_zb(k)-zb_slo_idx(k))*fmslo(k,m)
-							!soildepth_fp_before = soildepth_fp_idx
-							!soildepth_fp_idx = soildepth_fp_idx + (slo_Dsi(k,m) -slo_Esi(k,m) )*ddt_slo*dgammaa						
-							soildepth_fp_idx=gully_sedi_dep(k,m)
+
+							slo_Esi(k,m) = slo_Esi(k,m)*area_chan(k)/area !modified 20250407
+	!modified 20231226
+							soildepth_fp_idx=(slo_sur_zb(k)-zb_slo_idx(k))*fmslo(k,m)
 							!modified 20240101
 							if(soildepth_fp_idx.le.0.) then
 								slo_Esi(k,m)=0.d0
@@ -2698,8 +2707,8 @@ do
 								slo_Esi(k,m)  = (soildepth_fp_before + slo_Dsi(k,m) *ddt_slo*dgammaa)/ddt_slo/dgammaa
 								endif			
 								if(isnan(slo_Esi(k,m)))then
-								write(*,*) slo_Esi(k,m) ,slo_Dsi(k,m), k, V, ristar, dh, B_chan(k),usta,slo_grad(k),fgully(k,m),slo_sur_zb(k),zb_slo_idx(k)
-								stop "E is nan" 
+									write(*,*) slo_Esi(k,m) ,slo_Dsi(k,m), k, V, ristar, dh, B_chan(k),usta,slo_grad(k),fgully(k,m),slo_sur_zb(k),zb_slo_idx(k)
+									stop "E is nan" 
 								endif
 								if(slo_Esi(k,m) .gt.1.0E+2) then
 									!if(ust_idx(k).gt.0.01) then
@@ -2708,17 +2717,17 @@ do
 									!pause'check erosion rate'
 								endif
 								if(slo_Esi(k,m)<0.d0)then
-									write(*,*) slo_Esi(k,m),gully_sedi_dep(k,m),k,m,fgully(k,m),v, grad_H ,alfa,slo_Dsi(k,m)
+									write(*,*) slo_Esi(k,m),soildepth_fp_before,k,m,fgully(k,m),v, grad_H ,alfa,slo_Dsi(k,m)
 									stop 'E in gully is negative'
 								endif
-								slo_Esi(k,m) = slo_Esi(k,m)*area_chan(k)/area !revise  20231226	
+									!slo_Esi(k,m) = slo_Esi(k,m)*area_chan(k)/area !revise  20231226	turned off 20250407
 							endif						
-						enddo !end of do m = 1, Np
+						enddo !end of do m = 1, Np	
 					endif	
 	!write(*,*) "check1205 07"						
 				else ! without slope erosion 20230924
 					 !V= Qg(k)/(width_idx(k)*dh)
-					if(slo_grad(k).ge.slope_20)then !added 20240131
+					if(slo_grad(k).ge.slope_20 )then !added 20240131
 					 V = 0.d0
 					 usta = 0.d0
 					 grad_H = 0.d0
@@ -2727,7 +2736,6 @@ do
 					 !modified 20240126
 					 if(len_slo_idx(1, k) > 0.d0 .and. len_slo_idx(2, k) > 0.d0 )then ! right-end side and down-end side boundaries of the basin do not have the width for x-flux and y-flux, respectively 
 					  V = sqrt((qsur_ave_temp_idx(1,k) * area / len_slo_idx(1, k) ) ** 2.d0 + (qsur_ave_temp_idx(2,k) * area / len_slo_idx(2, k) ) ** 2.d0) / dh
-					 !V = sqrt((qsur_ave_temp_idx(1,k) * area / (len_slo_idx(1, k) * dh)) ** 2.d0 + (qsur_ave_temp_idx(2,k) * area / (len_slo_idx(2, k) *dh)) ** 2.d0)
 					 elseif(len_slo_idx(1, k) == 0.d0 .and. len_slo_idx(2, k) > 0.d0 )then
 					 V = abs(qsur_ave_temp_idx(2,k)) * area / (len_slo_idx(2, k) * dh)
 					 elseif(len_slo_idx(1, k) > 0.d0 .and. len_slo_idx(2, k) == 0.d0 )then
@@ -2735,43 +2743,32 @@ do
 					 else
 					 V = 0.d0
 					 endif
-					!V = 1/ns*dh**(2./3.)*slo_grad(k)**0.5 !modified 20231112 20240131
-					 !usta = sqrt(grav*dh*slo_grad(k)) !bed slope of gully/rill for estimating erosion rate 20240131
 					 grad_H = (ns * v / dh ** (2./3.) ) ** 2.
 					 usta = sqrt(grav * dh * grad_H) !modified 20231226 
 					 h_dash = 0.d0
 					!20240311
 					!write(*,*) k,V,grad_H, dh,usta,qsur_ave_temp_idx(1,k),qsur_ave_temp_idx(2,k),len_slo_idx(1, k),len_slo_idx(2, k),ns
-					endif 
-					!alfa= 1.d0		
+					!endif 		
 	!write(*,*) "check1205 08"				 
-					 !if(slo_grad(k).ge.slope_20)then
-					 !if(grad_H.ge.slope_20)then
-					!	 Usta = 0.d0 !no sediment erosion from the river bed when the slope is larger than 20 degree
-					! else
 						thetr=atan(grad_H) !added 20231226
 						emb_gully = usta**2./((rs-1.)*csta/2.*grav*cos(thetr)*(tan(S_angle)-tan(thetr)))!Exchange layer thickness
 						h_dash = emb_gully/dh
 !modified 20231205						
-						if (h_dash.ge.0.9d0) then
+						if (h_dash.ge.0.9d0) then !modified 20250407
 						h_dash = 0.9d0
 						emb_gully= h_dash*dh
-						endif
 						Usta = sqrt(emb_gully*((rs-1.)*csta/2.*grav*cos(thetr)*(tan(S_angle)-tan(thetr))))
-						if(emb_gully.le.Emc) then 
-							h_dash=0.d0
-							Usta=0.d0
+						grad_H= usta**2./grav/dh
+						V=1./ns*sqrt(grad_H)*dh**(2./3.)
 						endif
 	!write(*,*) "check1205 09"	
-					
-					 !endif
+						!if(emb_gully.le.Emc) Usta=0.d0
+					 endif !endif slope>20 degree
 !added 20240101
-						alfa=0.
-						if (emb_gully>Emc) then
+						alfa=1.
 						alfa = (slo_sur_zb(k)-zb_slo_idx(k))/emb_gully
 						if(alfa.ge.1.) alfa=1.
-						if(alfa <= 0.d0) alfa=0.
-						endif
+						if(alfa <= 0.d0 .or.emb_gully.le.Emc) alfa=0. !turned off 20250407
 						do m = 1, Np
 							!slo_ssi(k,m) = slo_qsi(k,m)/Qg(k)  
 							slo_qsi(k,m) = slo_ssi(k,m)*Qg(k)  
@@ -2779,10 +2776,8 @@ do
 							!if(slo_Dsi(k,m).le.1e-7) slo_Dsi(k,m) = 0.d0 !added 20240101		
 							if(slo_Dsi(k,m).le.0.d0) slo_Dsi(k,m) = 0.d0					
 							slo_Esi(k,m) =0.d0
-							!if(slo_grad(k).ge.slope_20) cycle!the no erosion on slope >20 degree modified 20221128
 							if(alfa==0.) cycle	
 							if(fmslo(k,m)==0.) cycle
-							!if(land(i,j)== 4.or.land(i,j)==5) cycle !modified 20231226
 			!				if(dzslo_idx(k).ge.soildepth_idx(k)) cycle
 							fp = fmslo(k,m)
 							if(dsi(m).ge.dh) cycle !added 20240131
@@ -2797,11 +2792,11 @@ do
 								Cae1 = 5.55*(0.5*z_star*exp(-(1./z_star)**2.))**1.61 * 1.0E-4 
 								if(Cae1.ge.0.2d0) Cae1 = 0.2d0
 								Cae = Cae1 *fp
-								if (riv(i,j)==1)then
+								!if (riv(i,j)==1)then
 								slo_Esi(k,m) = Cae * w0(m)*alfa !modified 20240101  	
-								else
-								slo_Esi(k,m) = Cae * w0(m)*0.5**alfa !modified 20240101 !modified erosion rate on slope area 20231111
-								endif						
+								!else
+								!slo_Esi(k,m) = Cae * w0(m)*0.5*alfa !modified 20240101 !modified erosion rate on slope area 20231111
+								!endif						
 							elseif(isuseq == 2)then  !Density stratified flow formula
 								ristar = (rs/rw-1.)*csbar*grav*dh/(V**2.) 
 								Ce = kappa/ristar*V*csbar/w0(m)
@@ -2809,15 +2804,8 @@ do
 									Ce = 0.3d0
 									ristar = kappa/Ce*V*csbar/w0(m)        !Once ristar is modified by this regulation for smallest size, the regulated ristar is applied to all classes.
 								endif
-								if (riv(i,j)==1)then
-								slo_Esi(k,m) = fp*kappa/ristar*V*csbar*alfa !modified 20240101 	
-								else
-								slo_Esi(k,m) = fp*kappa/ristar*V*csbar*0.5*alfa !modified 20240101  !modified erosion rate on slope area 20231111		
-								endif							
+								slo_Esi(k,m) = fp*kappa/ristar*V*csbar*alfa !modified 20240101 								
 							endif
-							!for tese 20240311
-							!write(*,*) slo_Esi(k,m) ,slo_Dsi(k,m), k,V, ristar, dh,ns,len_slo_idx(1, k),len_slo_idx(2, k),qsur_ave_temp_idx(1,k),qsur_ave_temp_idx(2,k),usta,slo_grad(k),grad_H,fmslo(k,m),slo_sur_zb(k),zb_slo_idx(k)
-							!write(*,*) slo_Esi(k,m) ,slo_Dsi(k,m), k,V, ristar, dh,ns,usta,grad_H
 							soildepth_fp_idx=(slo_sur_zb(k)-zb_slo_idx(k))*fmslo(k,m)
 							!modified 20240101
 							if(soildepth_fp_idx.le.0.) then
@@ -2847,11 +2835,12 @@ do
 	!write(*,*) "check1205 11"						
 				endif ! for slope_ero_switch
 			endif !endif for dh>surflow
+		endif !endif for riv ==1	added 20250503
 		enddo !end of do k = 1, slope_count	
 	!write(*,*) "check1205 11"	
 !pause'after deposition'
 !pause '2'
-!$omp parallel do private(m,n,riv_k,kk,kkk,down_xk,down_yk,i,j,ii,jj,iii,jjj,ll,x_outflow,y_outflow,x_up_inflow ,y_up_inflow,sedi)
+!$omp parallel do private(m,n,riv_k,kk,kkk,down_xk,down_yk,i,j,ii,jj,ll,x_outflow,y_outflow,x_up_inflow ,y_up_inflow)
 !--------------------trasportation of suspended sediment
 		do k = 1, slo_count		
 		    i=slo_idx2i(k)
@@ -2861,56 +2850,50 @@ do
 		if(isnan(water_v_cell(k)))then
 		write(*,*) water_v_cell(k), hs_idx(k),da_idx(k)
 		stop 'water volume in cell is nan'
-		endif
-		if(water_v_cell(k).le. 0.) goto 100 !no sediment transportation caused by surface flow on the dry cell
-!!!!!!!!!previous version before 2023/4/26---this is only appliable for Kinematic wave!!!  
+		endif  
 		if(dif_slo_idx(k)== 0)then
-!!		if(riv(slo_idx2i(k),slo_idx2j(k)) == 1)then
-!		else
-		! kk = down_slo_1d_idx(k)
 			do m = 1, Np
 !modified 20240115			
 			if(debris_switch.ne.0)then		
 			!if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1) exit !modified for gofukuya river 20231101;20240121	
-			if(slo_grad(k).ge.0.25) exit !20240126
 			if(hki_g(k)>0) exit	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
 			endif		
 				do n = 1, 8
-!					if(up_slo_idx(k,n) == 0) cycle 
 				if(up_slo_idx(k,n) == 0) exit 
-						kkk = up_slo_idx(k, n)
-		!		if(h_chan(kkk).gt.0.01d0 .and. q_chan(kkk).gt.0.d0)	slo_qsisum(k,m) = slo_qsisum(k,m) - slo_qsi(kkk,m)  !m3/s   !符号に注意!!!  ffd が-のとき堆積、+のとき侵食
-				slo_qsisum(k,m) = slo_qsisum(k,m) - slo_qsi(kkk,m)  !m3/s   !符号に注意!!!  ffd が-のとき堆積、+のとき侵食 !modified 20230924
-				end do
-
-!				if(h_chan(k).gt.0.01d0 .and. q_chan(k).gt.0.d0)	slo_qsisum(k,m) = slo_qsisum(k,m) + slo_qsi(k,m)		
+					kkk = up_slo_idx(k, n)
+					if(domain_riv_idx(kkk)==0)then !20250513
+					slo_qsisum(k,m) = slo_qsisum(k,m) - slo_qsi(kkk,m)  !m3/s   !符号に注�?!!!  ffd �?-のとき�??積�?+のとき侵�? !modified 20230924
+					endif
+				end do		
+				!if(riv(i,j)==1.and. qrs(i,j).ge.0.d0)then !modified 20250503
+				if(riv(i,j)==1)then !all sediment in river cell should be delivered to unit channel 20250513
+				slo_qsisum(k,m)=slo_qsisum(k,m)
+				else
 				slo_qsisum(k,m) = slo_qsisum(k,m) + slo_qsi(k,m)	 !modified 20230924
+				endif
 				if (isnan(slo_qsisum(k,m))) then
 				write(*,*) k, m, riv(i,j), land(i,j), domain(i,j),slo_qsisum(k,m),slo_ssi(k,m),slo_qsi(k,m),qsur_ave_temp_idx(1,k),qsur_ave_temp_idx(2,k),water_v_cell(k)
 				stop "check Nan of suspended sediment buguet in kinematic wave area"
 			endif
 			end do
-		!endif ! endif for river or not
 	!write(*,*) "check1205 12"	
 
 !!!!!modified for diffusion wave; by Qin 2023/4/26		
 		elseif(dif_slo_idx(k)== 1)then
-		!if(h_chan(k).gt.0.01d0 .and. q_chan(k).gt.0.d0) then
+		kk=0
+		kkk=0
 			ii=slo_idx2i(k)-1
 			jj=slo_idx2j(k)-1
+			if(ii>0) kkk = slo_ij2idx(ii,j) !up:l=2 y direction inflow flux
+			if(jj>0) kk = slo_ij2idx(i,jj) ! left: l=1 x direction inflow flux
 !added 20240101			
-			iii=slo_idx2i(k)+1
-			jjj= slo_idx2j(k)+1
 			down_xk = down_slo_idx(1,k)
 			down_yk = down_slo_idx(2,k)
-		  !	kk = slo_ij2idx(i,jj) ! left: l=1 x direction inflow flux
-			!kkk = slo_ij2idx(ii,j) !up:l=2 y direction inflow flux
 !modified 20231206			
-!			if(domain(i,jj)==0)then
 			do m =1,Np
 			if(debris_switch.ne.0)then		
 			!if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1) exit !modified for gofukuya river 20231101;20240121	
-			if(slo_grad(k).ge.0.25) exit !20240126
+			!if(slo_grad(k).ge.0.25) exit !20240126
 			if(hki_g(k)>0) exit	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
 			endif	
 			x_up_inflow=0.d0
@@ -2918,47 +2901,28 @@ do
 			x_outflow =0.d0
 			y_outflow=0.d0
 			!backward 20240126
-			if(domain(i,jj)>0)then
-			kk = slo_ij2idx(i,jj) ! left: l=1 x direction inflow flux
-			!if(qsur_ave_temp_idx(1,kk)<0.d0)then !modified 20240101
-			!x_up_inflow = slo_ssi(k,m)*qsur_ave_temp_idx(1,kk)
-			!else
-			x_up_inflow = slo_ssi(kk,m) * qsur_ave_temp_idx(1,kk)
-			!endif
+			if(kk>0)then
+			x_up_inflow = slo_ssi(kk,m) * qs_ave_idx(1,kk) !20250505
 			endif
-			if(domain(ii,j)> 0)then
-			kkk = slo_ij2idx(ii,j) !up:l=2 y direction inflow flux
-			!if(qsur_ave_temp_idx(2,kkk)<0.d0)then !modified 20240101
-			!y_up_inflow = slo_ssi(k,m)*qsur_ave_temp_idx(2,kkk)
-			!else
-			y_up_inflow = slo_ssi(kkk,m) * qsur_ave_temp_idx(2,kkk)
-			!endif
+			if(kkk> 0)then
+			y_up_inflow = slo_ssi(kkk,m) * qs_ave_idx(2,kkk) !20250505
 			endif	
 !added 20240101	
 !upwind		
-			if(qsur_ave_temp_idx(1,k) < 0.d0)then
-			!if(domain(i,jjj)>0)then
+			if(qs_ave_idx(1,k) < 0.d0)then!20250505
 			if(down_xk > 0)then
-			!down_xk=slo_ij2idx(i,jjj)  
-			x_outflow= slo_ssi(down_xk,m)*qsur_ave_temp_idx(1,down_xk)
+			x_outflow= slo_ssi(down_xk,m)*qs_ave_idx(1,down_xk) !20250505
 			endif
-			else
-			x_outflow= slo_ssi(k,m)*qsur_ave_temp_idx(1,k)			
+			else		
+			x_outflow= slo_ssi(k,m)*qs_ave_idx(1,k)		!20250505
 			endif
-
-			if(qsur_ave_temp_idx(2,k)<0.d0)then
-			!if(domain(iii,j)>0)then
+			if(qs_ave_idx(2,k) < 0.d0)then!20250505
 			if(down_yk > 0)then
-			!down_yk=slo_ij2idx(iii,j)  
-			y_outflow= slo_ssi(down_yk,m)*qsur_ave_temp_idx(2, down_yk)
+			y_outflow= slo_ssi(down_yk,m)*qs_ave_idx(2, down_yk) !20250505
 			endif
 			else
-			y_outflow= slo_ssi(k,m) * qsur_ave_temp_idx(2,k) 
+			y_outflow= slo_ssi(k,m) * qs_ave_idx(2,k) !20250505
 			endif			
-
-			!do m = 1,Np
-			! slo_qsisum(k,m) = slo_qsisum(k,m)+(slo_ssi(k,m)*(qsur_ave_temp_idx(1,k)+qsur_ave_temp_idx(2,k))-slo_ssi(kk,m)*qsur_ave_temp_idx(1,kk)-slo_ssi(kkk,m)*qsur_ave_temp_idx(2,kkk))*area
-			 !slo_qsisum(k,m) = slo_qsisum(k,m)+(slo_ssi(k,m)*(qsur_ave_temp_idx(1,k)+qsur_ave_temp_idx(2,k))-x_up_inflow -y_up_inflow )*area
 			 slo_qsisum(k,m) = slo_qsisum(k,m)+ (x_outflow + y_outflow -x_up_inflow -y_up_inflow) *area !modified 20240101
 			if (isnan(slo_qsisum(k,m))) then
 				write(*,*) k, m, riv(i,j), land(i,j), x_outflow ,y_outflow ,x_up_inflow ,y_up_inflow,water_v_cell(k),domain(i,j),domain(i,jj),domain(ii,j),slo_qsisum(k,m),slo_ssi(k,m),qsur_ave_temp_idx(1,k),qsur_ave_temp_idx(2,k),slo_ssi(kk,m) ,qsur_ave_temp_idx(1,kk),slo_ssi(kkk,m) ,qsur_ave_temp_idx(1,kkk),qsur_ave_temp_idx(1,down_xk),slo_ssi(down_xk,m),slo_ssi(down_yk,m),qsur_ave_temp_idx(2,down_yk)
@@ -2969,37 +2933,29 @@ do
 		else
 		stop "Please change the setting for kinematic approximation or diffusion approximation "
 		endif
-
-100 continue
-		if (riv(i,j)==1)then
-			riv_k=riv_ij2idx(i,j) 
-			ll= link_to_riv(riv_k)			
-			if(ll == 0) cycle     !in case ll is not defined 
-			do m  =1, Np
-				!slo_qsisum(k,m) =slo_qsisum(k,m)+ qrs(i,j)*area*sed_lin(ll)%ssi(m)		
-				if (isnan(qrs(i,j))) then
-				write(*,*) k, m, riv(i,j), land(i,j), water_v_cell(k),domain(i,j),slo_qsisum(k,m),slo_ssi(k,m),qrs(slo_idx2i(k),slo_idx2j(k)),Qg(k),q_chan(k),slo_qsisum(k,m),slo_Dsi(k,m),slo_Esi(k,m), area_chan(k),area,B_chan(k),l_chan(k),h_chan(k),ns_MS(k),I_chan(k) 
-				stop "river and cell flow exchange value is Nan"
-				endif				  
-			  	sedi= overflow_sedi_di(ll,m)/dt
-				slo_qsisum(k,m) =slo_qsisum(k,m)- sedi	
-			enddo
-		endif 	
+		! turnded off sediment inundation 20250513
+		!if (riv(i,j)==1.and. qrs(i,j)<0.d0)then
+		!	riv_k=riv_ij2idx(i,j) 
+			!ll= link_to_riv(riv_k)			
+		!	if(ll == 0) cycle     !in case ll is not defined 
+		!	do m  =1, Np				  
+		!		slo_qsisum(k,m) =slo_qsisum(k,m)+lin_to_slo_idx_di(riv_k,m)
+		!	enddo
+		!endif 	
 
 		enddo		
 !pause '3'
 !write(*,*) "check1205 14"	
-!!note: the erosion&sediment GSD change are taking place in the virtual channel of each slope cell, are not the values represent the entire slope cell; whereas the deposition is taking place on the entire slope cell(including the virtual channel area) & suspended sediment concentration is considering the total surface water volume of the each slope cell 
-!$omp parallel do private(i,j,m,soildepth_fp_before,gammaa_k,dgammaa,soildepth_fp_idx,over_ss,sum_fmslo,sum_fmgully,nn,d80)	  
+!$omp parallel do private(i,j,riv_k,m,soildepth_fp_before,gammaa_k,dgammaa,soildepth_fp_idx,over_ss,sum_fmslo,nn,d80)	  
   	do k = 1, slo_count
-		!if(riv(slo_idx2i(k),slo_idx2j(k)) == 1) cycle
 			i=slo_idx2i(k)
 			j=slo_idx2j(k)
-		if( domain(slo_idx2i(k),slo_idx2j(k)) == 0 ) cycle
+		if( domain(i,j) == 0 ) cycle
+		riv_k=riv_ij2idx(i,j)
 !modified 20240115			
 			if(debris_switch.ne.0)then		
 			!if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1) cycle !modified for gofukuya river 20231101;20240121	
-			if(slo_grad(k).ge.0.25) cycle !20240126
+			!if(slo_grad(k).ge.0.25) cycle !20240126
 			!if(hki_g(k)>0) cycle	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
 			endif		
 		ss_slope(k) = 0.d0
@@ -3007,53 +2963,31 @@ do
 		gammaa_k=gammaa_idx(k)
 		dgammaa=1./(1.-gammaa_k)
 			do m = 1, Np
-				if(slope_ero_switch>0) then !added 20231226 
-					soildepth_fp_before = gully_sedi_dep(k,m)
-				else
-					soildepth_fp_before = (slo_sur_zb(k)-zb_slo_idx(k))*fmslo(k,m) 
-				endif
-					!slo_Esi(k,m) = 0.d0
-					soildepth_fp_idx = soildepth_fp_before
-				if(water_v_cell(k).le.0.d0.or.hki_g(k)>0)then !modified for gofukuya 20240109
-					!added 20240123
-					!if(riv(i,j)==1 .and. qrs(i,j)<0.)then
-					if(riv(i,j)==1)then !modified 20240305
-						!slo_ssi(k,m) = slo_qsisum(k,m)/qrs(i,j)/area 
-						slo_Dsi(k,m) = -slo_qsisum(k,m) / area
-						if(slo_Dsi(k,m) .lt. 0.d0) slo_Dsi(k,m) = 0.d0
-						slo_ssi(k,m) = 0.d0
-						!if(slo_ssi(k,m).le.0.d0)then
-						!slo_ssi(k,m) = 0.d0
-						!slo_Dsi(k,m)=0.d0
-						!else
-						!slo_Dsi(k,m) = slo_Dsi(k,m)+sed_lin(ll)%ssi(m)*w0(m) !modified 20240125
-						!slo_ssi(k,m)= (qrs(i,j)*sed_lin(ll)%ssi(m)-slo_Dsi(k,m))/qrs(i,j) !20240201
-						!if(slo_ssi(k,m).le.0.d0) slo_ssi(k,m) =0.d0
+				soildepth_fp_before = (slo_sur_zb(k)-zb_slo_idx(k))*fmslo(k,m) 
+				soildepth_fp_idx = soildepth_fp_before
+			!	if(water_v_cell(k).le.0.d0.or.hki_g(k)>0)then !modified for gofukuya 20240109
+				if(riv(i,j)==1 .or. water_v_cell(k).le.0.d0)then
 						if(slo_Dsi(k,m)>1.)then
 						write(*,*) k, m, slo_Dsi(k,m),dsi(m), w0(m), slo_ssi(k,m), qrs(i,j), slo_qsisum(k,m)
 					    stop 'slope deposition rate is too large check1'
 						endif
-					else
-					!slo_Dsi(k,m) = slo_Dsi(k,m)+(-1.*slo_qsisum(k,m))/area !added 20231226	
-						slo_Dsi(k,m) = 0.d0 !modified 20240125
+					!slo_Dsi(k,m) =slo_Dsi(k,m)+ (-1.*slo_qsisum(k,m))/area !added 20231226	
+					slo_Dsi(k,m) = (-1.*slo_qsisum(k,m))/area !20250511	
 						slo_ssi(k,m) = 0.d0
-					endif
-
-					!if(slo_Dsi(k,m).le.1e-7) slo_Dsi(k,m) = 0.d0 !adde 20240101
 					if(slo_Dsi(k,m).le.0.d0) slo_Dsi(k,m) = 0.d0
 					slo_Esi(k,m) = 0.d0 !modified 20231226											
 					slo_qsisum(k,m) = 0.d0
 					slo_qsi(k,m) =0.d0
 				else
 					if(slo_Esi(k,m)<0.d0)then
-					write(*,*) slo_Esi(k,m),gully_sedi_dep(k,m),k,m,fgully(k,m)
+					write(*,*) slo_Esi(k,m),soildepth_fp_before,k,m,fmslo(k,m)
 					stop 'erosion rate is negative'
 					endif
 					slo_ssi(k,m) = slo_ssi(k,m) + (-1.* slo_qsisum(k,m) + (slo_Esi(k,m)- slo_Dsi(k,m))*area)*ddt_slo/water_v_cell(k)!modified for inundation 20230711
 					if(slo_ssi(k,m).lt.0.d0) then
 						slo_ssi(k,m) = slo_ssi(k,m) - (-1.* slo_qsisum(k,m) + (slo_Esi(k,m)- slo_Dsi(k,m))*area)*ddt_slo/water_v_cell(k)!modified for inundation 20230711
 						slo_Dsi(k,m)  = -1.* slo_qsisum(k,m)/area + slo_Esi(k,m)      !Dを修正して  !modified for inundation 20230711
-						if(slo_Dsi(k,m)  < 0.) slo_Dsi(k,m)  = 0.d0 !まだDが負の時は上下流のアンバランスによるのでDは0となる
+						if(slo_Dsi(k,m)  < 0.) slo_Dsi(k,m)  = 0.d0 !ま�?Dが�?の時�?�上下流�?�アンバランスによるのでDは0とな�?
 						!if(slo_Dsi(k,m).le.1e-7) slo_Dsi(k,m) = 0.d0 !added 20240101						
 						slo_ssi(k,m) = slo_ssi(k,m) + (-1.* slo_qsisum(k,m) + (slo_Esi(k,m)- slo_Dsi(k,m))*area)*ddt_slo/water_v_cell(k) !modified for inundation 20230711
 						if(slo_ssi(k,m).lt.0.d0) slo_ssi(k,m) = 0.d0 !modified 20240101	
@@ -3065,24 +2999,21 @@ do
 					endif
 				endif
 
-!modified 20231226
-				if (slope_ero_switch>0) then
-				 gully_sedi_dep(k,m) = gully_sedi_dep(k,m) + (slo_Dsi(k,m) -slo_Esi(k,m)*area/area_chan(k))*ddt_slo*dgammaa ! added 20231226	
-				 if(gully_sedi_dep(k,m).lt.0.d0) then
-				 slo_Esi(k,m)  = gully_sedi_dep(k,m)*area_chan(k)/area/ddt_slo/dgammaa + slo_Esi(k,m) 
-				 if(slo_Esi(k,m) .le.0.d0) slo_Esi(k,m) = 0.d0
-				 slo_ssi(k,m) = slo_ssi(k,m)+ gully_sedi_dep(k,m)*area_chan(k)/dgammaa/water_v_cell(k)
-				 if(slo_ssi(k,m).le.0.d0) slo_ssi(k,m) =0.d0
-				 gully_sedi_dep(k,m) = 0.d0
-				 endif
-				endif
+				!if(riv(i,j)==1.and. qrs(i,j).ge.0.d0) then !added 20250503 all the sediment should supply into river if no overflow
+				!slo_to_lin_idx_di(riv_k,m)=slo_to_lin_idx_di(riv_k,m)+slo_ssi(k,m)*water_v_cell(k)+slo_Dsi(k,m)*area*ddt_slo
+				if(riv(i,j)==1) then !all sediment in river cell should be delivered to unit channel 20250513
+				slo_to_lin_idx_di(riv_k,m)=slo_to_lin_idx_di(riv_k,m)+slo_Dsi(k,m)*area*ddt_slo
+				slo_Dsi(k,m) =0.d0
+				slo_ssi(k,m)=0.d0
+				slo_qsi(k,m)=0.d0
+				qss_slope(k)=0.d0
+				else
+
 				soildepth_fp_idx = soildepth_fp_idx + (slo_Dsi(k,m) -slo_Esi(k,m) )*ddt_slo*dgammaa
 				!added 20231226
 				if(soildepth_fp_idx .lt. 0.d0) then	
 				slo_ssi(k,m) = slo_ssi(k,m) +(slo_Dsi(k,m) -slo_Esi(k,m) )*ddt_slo*area/water_v_cell(k) 	
-				!slo_Esi(k,m) = dzslo_fp_idx(k,m)/ddt_slo/dgammaa+slo_Esi(k,m)
-				slo_Esi(k,m) = soildepth_fp_before / ddt_slo / dgammaa + slo_Dsi(k,m)
-				!if(slo_Esi(k,m) .le.0.d0) slo_Esi(k,m) = 0.d0 !added 20240101	
+				slo_Esi(k,m) = soildepth_fp_before / ddt_slo / dgammaa + slo_Dsi(k,m)	
 				slo_ssi(k,m) = slo_ssi(k,m) +(slo_Esi(k,m) - slo_Dsi(k,m) )*ddt_slo*area/water_v_cell(k) 
 				if(slo_ssi(k,m).le.0.d0) slo_ssi(k,m) = 0.d0	
 				soildepth_fp_idx = 0.d0
@@ -3107,21 +3038,15 @@ do
 						write(*,*) k, m, slo_Dsi(k,m),dsi(m), w0(m), slo_ssi(k,m), slo_qsisum(k,m), over_ss, slo_Esi(k,m)
 					   ! stop 'slope deposition rate is too large check3'
 						endif
-					!if(slo_Dsi(k,m).le.1e-7)then
 					if(slo_Dsi(k,m).le.0.d0) then
 					 slo_Dsi(k,m) = 0.d0 !added 20240101
 					 over_ss = 0.d0
-					endif	
-					!if(over_ss>0.d0) slo_Dsi(k,m) = slo_Dsi(k,m)+over_ss* Qg(k)/area !modified 20231226		
+					endif			
 					slo_ssi(k,m)=thresh_ss-ss_slope(k)
 					ss_slope(k) = thresh_ss
 					if (slo_ssi(k,m).le.0.d0) slo_ssi(k,m)= 0.d0
 !modified 20240101					
-					dzslo_fp_idx(k,m) = dzslo_fp_idx(k,m)+over_ss* water_v_cell(k)/area*dgammaa
-					if (slope_ero_switch>0) gully_sedi_dep(k,m) = gully_sedi_dep(k,m) +over_ss* water_v_cell(k)/area*dgammaa 
-! added 20231226						
-					!dzslo_fp_idx(k,m) = dzslo_fp_idx(k,m)+over_ss* Qg(k)/area*ddt_slo*dgammaa
-					!if (slope_ero_switch>0) gully_sedi_dep(k,m) = gully_sedi_dep(k,m) + over_ss* Qg(k)/area*ddt_slo*dgammaa ! added 20231226	
+					dzslo_fp_idx(k,m) = dzslo_fp_idx(k,m)+over_ss* water_v_cell(k)/area*dgammaa	
 				endif
 				
 				if(ss_slope(k).ge.1.d0)then 
@@ -3137,31 +3062,24 @@ do
 					write(*,'(a,f)') "dzslo=",dzslo_fp_idx(k,m)
 					stop "slope suspended sediment concentration is larger than 1"
 				endif
-				!slo_qsi(k,m)  = slo_ssi(k,m) * q_chan(k) !m3/s 
-!				slo_qsi(k,m)  = slo_ssi(k,m) * water_v_cell(k)/ddt_slo !m3/s 	
-				!dzslo_fp_idx(k,m) = (slo_Dsi(k,m) -slo_Esi(k,m) )*ddt_slo*dgammaa + dzslo_fp_idx(k,m)
 				slo_qsi(k,m)  = slo_ssi(k,m) * Qg(k) !m3/s modified 20231226
 				qss_slope(k) = qss_slope(k)+slo_qsi(k,m) 						
+
+!added 20240115				
+					!hs_idx(k)=hs_idx(k)+(slo_Dsi(k,m) -slo_Esi(k,m) )*ddt_slo*dgammaa								
+			endif !endif for riv==1 sediment supply 20250503
 				slo_sur_zb(k)= slo_sur_zb(k) + (slo_Dsi(k,m) -slo_Esi(k,m) )*ddt_slo*dgammaa				
 				Ero_slo_vol(k) =  Ero_slo_vol(k)+(slo_Esi(k,m)-slo_Dsi(k,m)) *area*ddt_slo*dgammaa !minus value: deposition; modified 20230711 for inundation
 				if(isnan(Ero_slo_vol(k)))then
 					write(*,*) k, m, slo_Esi(k,m) ,slo_Dsi(k,m) ,slo_ssi(k,m),slo_qsisum(k,m),area_chan(k), q_chan(k),  water_v_cell(k),Qg(k),B_chan(k), l_chan(k), I_chan(k),dzslo_fp_idx(k,m)
 					stop "erosion is NAN on the slope area"
 				endif
-!added 20240115				
-					!hs_idx(k)=hs_idx(k)+(slo_Dsi(k,m) -slo_Esi(k,m) )*ddt_slo*dgammaa								
 			enddo !end of do m = 1, Np
-				!	if(hs_idx(k).le.0.d0) 	hs_idx(k)= 0.d0		!added 20240115			
-!added 20240101 off 20240314			
-			!if(ss_slope(k).le.1E-10)then
-			!ss_slope(k) = 0.d0
-			!slo_ssi(k,:) = 0.d0
-			!slo_qsi(k,:) = 0.d0
-			!endif
-!		endif	!endif slope_ero_switch
-	!write(*,*) "check1205 15"			
+
+	!write(*,*) "check1205 15"			 
+!	  if(riv(i,j).ne.1.or. qrs(i,j)<0.d0) then !added 20250503
+	  if(riv(i,j).ne.1) then !modified 20250513
 		sum_fmslo =0.d0
-		sum_fmgully=0.d0
 		if(slo_sur_zb(k).gt.zb_slo_idx(k)) then	
 			do m = 1,Np		
 				soildepth_fp_idx=(slo_sur_zb_before(k) -zb_slo_idx(k))*fmslo(k,m)
@@ -3171,14 +3089,6 @@ do
 				if(isnan(fmslo(k,m)).or.fmslo(k,m)<0.d0)then
 					write(*,*) k,m, fmslo(k,m),fp,E,soildepth_fp_idx,(slo_sur_zb(k)-zb_slo_idx(k))*fmslo(k,m),soildepth_idx(k), V, ristar,usta
 					stop "fm of slope is incorrect" 
-				endif
-!modified 20231226
-				if(slope_ero_switch==1)then
-				if(gully_sedi_dep(k,m)<0.d0)then
-					write(*,*) gully_sedi_dep(k,m),k,m
-					stop 'over scouring in gully'
-				endif
-				sum_fmgully =sum_fmgully+ gully_sedi_dep(k,m)
 				endif
 			end do 	
 		else
@@ -3191,11 +3101,9 @@ do
 		if(slope_ero_switch==1)then	
 			d80=0.d0
 			nn = 1
-	!		if(sum_fmslo.gt.0.d0)then
-			if(sum_fmgully.gt.0.d0) then ! modified 20231226
+			if(sum_fmslo.gt.0.d0)then
 				do m = 1,np
-					fgully(k,m) = gully_sedi_dep(k,m)/sum_fmgully
-					d80= d80 + fgully(k,m)
+					d80 = d80+ fmslo(k,m)
 					if(d80<=0.8d0) then
 					nn=nn+1
 					if(nn>np) nn = np
@@ -3207,15 +3115,13 @@ do
 					elseif(ns_MS(k)>0.03d0)then
 						ns_MS(k) = 0.03d0
 					endif
-			else
-			do m = 1, Np
-				fgully(k,m) =0.d0
-			enddo	
+			else	
 				ns_MS(K)=0.02	
 			endif
 	!consider vegetation cover effect;modified 20230710 for inundation sediment flow computation
 			!ns_MS(k)=2.*ns_MS(k) !add the coeffient for the vegetation cover effect later 20230924
 		endif!20230924	
+		endif !20250503
 	end do ! end of do k = 1, slo_count	
 
 !pause '4'
@@ -3250,10 +3156,7 @@ do
 		exit ! finish for this timestep
 		endif
 !pause 'finished dt time step slope erosion computation'		
-enddo
-!endif
-!write (*,*) time, dt_slo_sed,t
-!    end subroutine slope_ero 
+enddo 
 	end subroutine slo_sedi_cal !modified 20230920 
 
 !Sediment flow exchange between slope and river;Added 20240305
@@ -3265,6 +3168,9 @@ enddo
 		real(8) hs_idx(slo_count)
 		integer k, i, j, riv_k, ll, m
 		real(8):: sedi
+		inflow_sedi(:) = 0.d0
+		overflow_sedi(:) =0.d0
+		lin_to_slo_idx_di(:,:)=0.d0
 !$omp parallel do private( i, j, riv_k, ll, m, sedi)
 		do k = 1, slo_count		
 		    i=slo_idx2i(k)
@@ -3273,9 +3179,6 @@ enddo
 			if(riv(i,j) == 0) cycle
 			riv_k=riv_ij2idx(i,j) 
 			ll= link_to_riv(riv_k)			
-			h_surf(i,j) = hs_idx(k)-da_idx(k)
-			if(h_surf(i,j).le.0.d0) h_surf(i,j) = 0.d0
-			water_v_cell(k) = h_surf(i,j) * area
 			if(ll == 0) cycle     !in case ll is not defined 
 			if (isnan(qrs(i,j))) then
 				write(*,*) k, m, riv(i,j), land(i,j), water_v_cell(k),domain(i,j),slo_qsisum(k,m),slo_ssi(k,m),qrs(slo_idx2i(k),slo_idx2j(k)),Qg(k),q_chan(k),slo_qsisum(k,m),slo_Dsi(k,m),slo_Esi(k,m), area_chan(k),area,B_chan(k),l_chan(k),h_chan(k),ns_MS(k),I_chan(k) 
@@ -3289,22 +3192,22 @@ enddo
 					lin_to_slo_sed_sum(ll)= lin_to_slo_sed_sum(ll) + overflow_sedi_di(ll,m)
 					lin_to_slo_sed_sum_idx(riv_k) = lin_to_slo_sed_sum_idx(riv_k) + overflow_sedi_di(ll,m)
 					overflow_sedi(riv_k) = overflow_sedi(riv_k) + overflow_sedi_di(ll,m) / dt
+					lin_to_slo_idx_di(riv_k,m)=lin_to_slo_idx_di(riv_k,m)-overflow_sedi_di(ll,m) / dt
 					overdepo_sedi_di(ll,m) = 0.d0 
 				endif
+				!sedi =slo_to_lin_idx_di(riv_k,m) !modified 20250503
+				slo_to_lin_sed(ll,m) = slo_to_lin_sed(ll,m) + slo_to_lin_idx_di(riv_k,m)  !the sediment supply to unit channel
+				slo_to_lin_sum_di(ll,m)=slo_to_lin_sum_di(ll,m)+slo_to_lin_idx_di(riv_k,m) 
+				slo_to_lin_sed_sum(ll) = slo_to_lin_sed_sum(ll) + slo_to_lin_idx_di(riv_k,m) 
+				slo_to_lin_sed_sum_idx(riv_k) = slo_to_lin_sed_sum_idx(riv_k) + slo_to_lin_idx_di(riv_k,m) 	
+				inflow_sedi(riv_k)= inflow_sedi(riv_k) + slo_to_lin_idx_di(riv_k,m) / dt
+				slo_to_lin_idx_di(riv_k,m)=0.d0	
 			enddo	
-			if(qrs(i,j) == 0.d0) cycle
-			 if(qrs(i,j).gt.0.d0)then! sediment supply
-			  do m = 1, Np !modified 2022/4/8	
-			    sedi= qrs(i,j)*area*slo_ssi(k,m)*dt
-				slo_to_lin_sed(ll,m) = slo_to_lin_sed(ll,m) + sedi !the sediment supply to unit channel
-				slo_to_lin_sum_di(ll,m)=slo_to_lin_sum_di(ll,m)+sedi
-				slo_to_lin_sed_sum(ll) = slo_to_lin_sed_sum(ll) + sedi
-				slo_to_lin_sed_sum_idx(riv_k) = slo_to_lin_sed_sum_idx(riv_k) + sedi	
-				inflow_sedi(riv_k)= inflow_sedi(riv_k) + sedi / dt
-			  end do
-			 elseif( qrs(i,j).lt.0.d0)then! sediment overflow
+
+			 if( qrs(i,j).lt.0.d0)then! sediment overflow (Only sediment loss from the unit channel due is considered; the inundation process in the slope area is ignored 20250513)
 			  do m  =1, Np  
-			  	sedi= qrs(i,j)*area*sed_lin(ll)%ssi(m)*dt
+			  	lin_to_slo_idx_di(riv_k,m) =lin_to_slo_idx_di(riv_k,m)+ qrs(i,j)*area*sed_lin(ll)%ssi(m) !negative value
+			  	sedi= lin_to_slo_idx_di(riv_k,m)*dt
 				overflow_sedi_di(ll,m) = overflow_sedi_di(ll,m)- sedi
 				lin_to_slo_sum_di(ll,m) = lin_to_slo_sum_di(ll,m)-sedi
 				lin_to_slo_sed_sum(ll)= lin_to_slo_sed_sum(ll)-sedi
@@ -3480,7 +3383,7 @@ enddo
 				if( d_mp == 0.d0 )exit
 				if( riv(i,j) == 1 )then
 !					write(*,*) 'kk,ao,vo',kk,ao,vo
-					vo_total(slo_riv_idx(kk)) = vo    !このkは斜面のkであってrivのkではない
+					vo_total(slo_riv_idx(kk)) = vo    !こ�?�kは斜面のkであってrivのkではな�?
 					debris_total = debris_total + vo
 					hki_area(slo_riv_idx(kk)) = hkiarea
 					hki_total = hki_total + hkiarea

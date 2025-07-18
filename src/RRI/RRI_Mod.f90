@@ -162,6 +162,10 @@ module globals
     real(8), allocatable, save :: dis_slo_1d_idx(:), len_slo_1d_idx(:)
     integer, allocatable, save :: dif_slo_idx(:), acc_slo_idx(:)
     real(8), save:: hr0, wc0 !added 20250314
+    !added 20250716
+    integer, save:: chan_capa_switch 
+    real(8), save:: min_wid, min_dep
+
 
     character*256 ofile_hs, ofile_hr, ofile_hg, ofile_qr, ofile_qu, ofile_qv, ofile_gu, ofile_gv, ofile_gampt_ff
 
