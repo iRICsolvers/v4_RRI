@@ -305,10 +305,12 @@ program RRI
  ! reading dam file modified by Qin 2021/4/28
     if (dam_switch ==1) then
           call dam_read
+          write(*,*) "for check01"
           do i  = 1, dam_num
           area_ratio(dam_iy(i), dam_ix(i)) = dam_reserv_area(i) / area
           if(reserv_elev(i)> 0.) zs(dam_iy(i), dam_ix(i)) = reserv_elev(i)
           if(dam_discharge_switch(i)==1) call dam_discharge_operation(i)
+           write(*,'(a,i)') "for check02, i =", i
           enddo
           write(*,'(a,i)') "End time of dam outflow discharge(hour) : ",max_dam_discharge_t
     endif 

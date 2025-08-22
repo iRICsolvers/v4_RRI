@@ -50,7 +50,7 @@ subroutine dam_read
 
             dam_iy(i) = ny - tmp_idx(2) + 1
             dam_ix(i) = tmp_idx(1)
-            
+            write(*,'(a,i)') "for check03, i =", i
             call cg_iric_read_bc_string(cgns_f,"dam",i,"name", dam_name(i), ier)
             call cg_iric_read_bc_real(cgns_f, "dam", i, "dam_volmax", dam_volmax(i), ier)
             call cg_iric_read_bc_real(cgns_f, "dam", i, "dam_floodq", dam_floodq(i), ier)
@@ -92,10 +92,11 @@ subroutine dam_discharge_operation(i)
         write(*,*) "Please set the hourly dam ourflow discharge data"
         stop
     endif
+    write(*,'(a,2i)') "for check04, i =", i, t_count
     allocate(xtmp(t_count),ytmp(t_count))
     call cg_iric_read_bc_functionalwithname(cgns_f,'dam', i, 'dam_outflow','dam_discharge_period', xtmp,ier)
     max_dam_discharge_t = xtmp(t_count)
-    allocate(  dam_discharge(max_dam_discharge_t,dam_num), dam_discharge_period(max_dam_discharge_t))
+    if(i==1) allocate(  dam_discharge(max_dam_discharge_t,dam_num), dam_discharge_period(max_dam_discharge_t))
 
     if(xtmp(1)<1)then
         write(*,*)"The given outflow start time of ", trim(dam_name(i))," should be >= 1 hour"
@@ -141,9 +142,10 @@ subroutine dam_discharge_operation(i)
      endif
 
     enddo
+ !enddo    
     DEALLOCATE(xtmp, STAT = ier)
     DEALLOCATE(ytmp, STAT = ier)
-! enddo
+
  !    write(*,'(a,i)') "End time of dam outflow discharge(hour) : ",max_dam_discharge_t
 end subroutine dam_discharge_operation   
 
