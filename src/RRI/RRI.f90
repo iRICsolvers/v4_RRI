@@ -594,16 +594,16 @@ end do
         allocate (inflow_sedi_ij(ny,nx),overflow_sedi_ij(ny,nx)) !for slope erosion
 ! allocation for debris (2021/11/17)
          allocate (c_dash(slo_count), hsc(slo_count), pw(slo_count), sf(slo_count))
-         allocate (vol(slo_count), vcc(slo_count), vcf(slo_count),LS_idx(slo_count),LS(ny, nx), Qg(slo_count),hki_g(slo_count), water_v_cell(slo_count))
+         allocate (vol(slo_count), vcc(slo_count), vcf(slo_count),LS_idx(slo_count),LS(ny, nx), Qg(slo_count),hki_g(slo_count), hki_g_2d(ny,nx), water_v_cell(slo_count))
          allocate (dzslo_mspnt_idx(slo_count), dzslo_mspnt(ny, nx), soildepth_idx_deb(slo_count))
          allocate (vo_total(riv_count), vo_total_river(link_count), hki_area(riv_count), vo_total_l(link_count))
          allocate (debri_sup_sum(link_count), debri_sup_sum_di(link_count, Np),debri_sup_sum_ij(ny,nx)) !added 20240424
-         allocate (cw(link_count), qw(link_count), vw(link_count), qwsum(link_count))
-         allocate (vw_idx(riv_count), vw2d(ny,nx), dmean_out(ny,nx),cw_idx(riv_count), cw2d(ny,nx))  !20240315  !20240724 added !20241125 cw_idx,cw2d added
+         allocate (cw(link_count), qw(link_count), vw(link_count), qwsum(link_count), qwsum_total(link_count))
+         allocate (vw_idx(riv_count), qwsum_total_idx(riv_count), vw2d(ny,nx), dmean_out(ny,nx),cw_idx(riv_count), cw2d(ny,nx), qwsum_2d(ny,nx))  !20240315  !20240724 added !20241125 cw_idx,cw2d added !20251002 qwsum_2d added
          allocate (n_link_depth(link_count))
          allocate (depth_idx_ini(riv_count),width_idx_ini(riv_count))
 ! allocation for sedput
-         allocate (fm_sedput(link_count,Np))
+         allocate (fm_sedput(link_count,Np),put_depth(link_count),put_depth_remain(link_count),l_put(link_count))
 !added for river width adjustment; 20240419
 !----RSR until here
 
@@ -723,7 +723,7 @@ end do
          eroslovol(:,:) = 0.d0
          slo_to_lin_sed(:,:) = 0.d0
          slo_to_lin_sed_sum(:)=0.d0   
-         slo_vol_remain(:,:) = 0.d0    
+         slo_vol_remain(:,:) = 0.d0  
          slo_to_lin_sum_di(:,:) = 0.d0  
          slo_s_dsum(:,:) =0.d0 !added by Qin 2021/11/8
          slo_s_sum(:) = 0.d0
@@ -775,6 +775,7 @@ end do
          vo_total_river(:) = 0.d0
          debris_total = 0.d0
          wood_total = 0.d0
+         kkk1 = 0
          hki_total = 0.d0
          vo_total_l(:) = 0.d0
          LS_idx(:) = 0.d0
@@ -785,7 +786,8 @@ end do
          debri_sup_sum_ij(:,:) = 0.d0
          Qg(:) = 0.d0
         water_v_cell(:) = 0.d0
-         hki_g(:) = 0
+         hki_g(:) = 0.
+         hki_g_2d(:,:) = 0.
          n_link_depth(:) = 0
 !---added for driftwood (2022/3/1)
          cw(:) = 0.d0
@@ -794,10 +796,18 @@ end do
          qwsum(:) = 0.d0
          hki_area(:) = 0.d0
          vw_idx(:) = 0.d0
+         qwsum_total(:) = 0.d0
+         qwsum_total_idx(:) = 0.d0
+         qwsum_2d(:,:) = 0.d0
          vw2d(:,:) = 0.d0
          dmean_out(:,:) = 0.d0
          cw_idx(:) = 0.d0
          cw2d(:,:) = 0.d0
+!---added for sedput (20251002)
+         put_depth(:) = 0.d0
+         put_depth_remain(:) = 0.d0
+         l_put(:) = 0
+         depth_idx_ini(:) = 0.d0
 
 	do k = 1, riv_count
       zb_riv0_idx(k) = zb_riv_idx(k)
@@ -956,6 +966,7 @@ endif
 
 !-------added for RSR model 20240724    !RSR initial setting
 call sub_riv_ij2idx( depth,  depth_idx )
+call sub_riv_ij2idx( depth,  depth_idx_ini )   !20260221
 if (sed_switch.ne.0) then
     call sub_sed_ij2idx( sed, sed_idx )
     call sub_riv_ij2idx( Emb, Emb_idx )
@@ -1019,17 +1030,76 @@ if (sed_switch.ne.0) then
         end if
         !----Sediment_put
         if(j_sedput .eq.1 )then
-            do l = 1, link_count
-                k = link_idx_k(l)
-                i = slo_idx2i(k)
-                j = slo_idx2j(k)
-                do m = 1, Np
-                    fm_sedput(l,m) = sed(i,j)%fms(m)
+        nn = ubound(iput, 1)
+        allocate(iput2(nn), jput2(nn))
+        iput2(:) = 0
+        jput2(:) = 0
+            do ii = 1, nn   ! Caution i and j are opposite in case of iRIC interface
+                if(iput(ii) == 0 .and. jput(ii) == 0) cycle
+                if(iput(ii) < 1 .or. iput(ii) > nx .or. &
+                   jput(ii) < 1 .or. jput(ii) > ny)then
+                    write(*,*) 'Invalid sediment supply location:', ii, iput(ii), jput(ii)
+                    stop 'Sediment supply location is outside the calculation grid'
+                end if
+                iput2(ii) = ny - jput(ii) + 1
+                jput2(ii) = iput(ii)
+                kk = riv_ij2idx(iput2(ii),jput2(ii))
+                if(kk <= 0)then
+                    write(*,*) 'Sediment supply location is not a river cell:', ii, iput(ii), jput(ii)
+                    stop 'Sediment supply must be specified at a river cell'
+                end if
+                write(*,*)iput2(ii),jput2(ii),kk
+            end do
+
+            do k = 1, riv_count
+                l = link_to_riv(k)
+                i = riv_idx2i(k) 
+                j = riv_idx2j(k)                
+                do ii = 1, nn
+                    if(iput2(ii) == 0 .or. jput2(ii) == 0) cycle
+                    if(i == iput2(ii).and.j == jput2(ii))then
+                        l_put(l) = 1
+                        ! put_v is bulk sediment volume including voids [m3].
+                        ! Store the remaining supply as an equivalent bed thickness [m].
+                        put_depth_remain(l) = put_depth_remain(l) + put_v(ii)/area_lin(l)
+                        do m = 1, Np
+                            fm_sedput(l,m) = sed(i,j)%fms(m)
+                        end do
+
+                        if(j_woodput==1)then   !added 20251031
+                            vw(l) = vw(l) + put_w(ii)/area_lin(l)                            
+                        end if
+        
+                        write(*,*)'sedput, i=, j=, k=, l=, put_v, put_depth, fm_put(1), put_wood', i, j, k, l, put_v(ii), put_depth_remain(l),fm_sedput(l,1), put_w(ii)
+                    end if
                 end do
-            end do    
+            end do
+            !added 20260318
+            do k = 1, riv_count
+                l = link_to_riv(k)
+                if(l_put(l)==1)then
+                    zb_roc_idx(k) = zb_roc_idx(k) - put_depth_remain(l)
+                end if
+            end do
         end if
     endif
 endif
+!-------sedout setting-----
+if (sd_out_switch == 1)then
+	i = 1
+	do 
+		if(itar2(i)==0.and.jtar2(i)==0)then
+			exit
+		else
+            itar(i) = ny - jtar2(i) + 1
+            jtar(i) = itar2(i)
+            k = riv_ij2idx(itar(i),jtar(i))
+            l = link_to_riv(k)
+            write(*,*) 'i_out_location, j_out_location, k, l', itar(i) , jtar(i), k, l
+			i = i + 1
+		end if
+	end do
+end if
 
 !-------RSR until here
 
@@ -1339,7 +1409,7 @@ elseif(sed_switch == 2) then
 
         if(time + ddt .gt. t * dt ) ddt = t * dt - time
 
-        call funcd2( sed_lin, hr_idx, hr_idx2,hr_idxa, hr_lin, qr_ave_idx, ust_idx, ust_lin, qsb_lin, qss_lin, qsw_idx, qsw_lin, t,water_v_lin, dzb_temp_lin,qss_b)
+        call funcd2( sed_lin, hr_idx, hr_idx2,hr_idxa, hr_lin, qr_ave_idx, ust_idx, ust_lin, qsb_lin, qss_lin, qsw_idx, qsw_lin, t,water_v_lin, dzb_temp_lin,qss_b,sumdzb_lin)
 
         !----link -> 1D 
         call sub_sed_linidx(sed_lin, sed_idx)
@@ -1425,10 +1495,10 @@ endif
 
     if(sed_switch == 2) then
        if(detail_console==1)then
-        write(*,'(a)') '    l       k    hr  qsb   qss    Emb     sumqb   sumqs     Ust      zb     sumdzb  link_0th  slo(deg)  ini_slo  width   depth   link_len  Slo_sed_sup(m3)   Inun_sed(m3)  Deb_sup(m3) Deb_remai(m3)'
+        write(*,'(a)') '    l       k   n_link_depth    put_depth_remain(l)   depth(k)  hr(k)   hr(l)  qsb   qss    Emb     sumqb   sumqs     Ust      zb     sumdzb  link_0th  slo(deg)  ini_slo  width   depth   link_len  Slo_sed_sup(m3)   Inun_sed(m3)  Deb_sup(m3) Deb_remai(m3)'
         do l = 1, link_count
             k = link_idx_k(l)
-            write(*,'(i5, i9, f6.3,3f7.4, 2e10.2, 3f8.3, i5, 2f8.3,f10.2,f10.3,f10.2,2f12.5, 2e15.2)') l, k,hr_lin(l), qsb_lin(l), qss_lin(l), Emb_lin(l), sumqsb_idx(k), sumqss_idx(k) , ust_lin(l), zb_riv_idx(k), sumdzb_lin(l), link_0th_order(l),zb_riv_slope_lin(l), zb_riv_slope0_lin(l), width_lin(l),depth_idx(k)+height_idx(k),Link_len(l), slo_to_lin_sed_sum(l), lin_to_slo_sed_sum(l), debri_sup_sum(l), vo_total_l(l)
+            write(*,'(i5, i9, i5, 2f10.4,5f7.4, 2e10.2, 3f8.3, i5, 2f8.3,f10.2,f10.3,f10.2,2f12.5, 2e15.2)') l, k,n_link_depth(l),put_depth_remain(l),depth_idx(k),hr_idx(k),hr_lin(l), qsb_lin(l), qss_lin(l), Emb_lin(l), sumqsb_idx(k), sumqss_idx(k) , ust_lin(l), zb_riv_idx(k), sumdzb_lin(l), link_0th_order(l),zb_riv_slope_lin(l), zb_riv_slope0_lin(l), width_lin(l),depth_idx(k)+height_idx(k),Link_len(l), slo_to_lin_sed_sum(l), lin_to_slo_sed_sum(l), debri_sup_sum(l), vo_total_l(l)
         end do
        end if
         write(*,'(a,f10.2)') 'Discharge_downstream= ', qr_ave_idx(downstream_k)
@@ -1681,7 +1751,7 @@ endif     !endif for (t*dt.ge.t_beddeform_start.and.sed_switch .ne. 0)
                                         !if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1) cycle !modified for gofukuya river 20231101;20240121	
                                        ! if(slo_grad(k).ge.0.25) cycle !20240126
                                         !if(slo_grad(k).ge.0.36397)cycle
-                                        if(hki_g(k)>0) cycle	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
+                                        if(hki_g(k)>0.) cycle	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
                                         endif                    
                                          water_v_cell(k) = hs_idx(k)*area !20250505
                                         !Modified 20250503   ! turnded off sediment inundation 20250513  
@@ -1990,7 +2060,7 @@ endif     !endif for (t*dt.ge.t_beddeform_start.and.sed_switch .ne. 0)
                       if(detail_console==1)then
                         if(j_drf == 1)then
                             write(*,*) "wood_total = ", wood_total
-                            write(*,'(a)') '    l    k    qr     h      area        vo_total_l(l)         cw(l)       vw(l)      qw(l)'
+                            write(*,'(a)') '    l    k    qr     hr      area        vo_total_l(l)         cw(l)       vw(l)      qw(l)'
                             do l = 1, link_count
                                 k = link_idx_k(l)
                                 write(*,'(2i5, 3f10.4, 5f14.5)') l, k, qr_ave_idx(k),hr_idxa(k), area_lin(l),vo_total_l(l),cw(l),vw(l),qw(l)
@@ -2103,7 +2173,8 @@ endif     !endif for (t*dt.ge.t_beddeform_start.and.sed_switch .ne. 0)
  !                       call sub_riv_idx2ij( dzslo_idx, dzslo )
                         call sub_slo_idx2ij( dzslo_idx, dzslo ) !modified by Qin; 2021/11/29
                         call sub_slo_idx2ij( Ero_slo_vol, eroslovol ) !modified by Qin;
-                        call sub_slo_idx2ij(ss_slope, ss_slope_ij) !added 20231101                        
+                        call sub_slo_idx2ij(ss_slope, ss_slope_ij) !added 20231101
+                        call sub_slo_idx2ij(hki_g, hki_g_2d) !added 20260321                        
                         !call sub_riv_linidx (slo_to_lin_sed_sum,slo_to_lin_sed_sum_idx)
                         call sub_riv_idx2ij(slo_to_lin_sed_sum_idx,slo_supply)
                         call sub_riv_idx2ij(lin_to_slo_sed_sum_idx,overflow_sed_sum)
@@ -2160,8 +2231,11 @@ endif     !endif for (t*dt.ge.t_beddeform_start.and.sed_switch .ne. 0)
                 call sub_riv_idx2ij( vw_idx, vw2d )
                 call sub_riv_linidx(cw, cw_idx)
                 call sub_riv_idx2ij( cw_idx, cw2d )
+                call sub_riv_linidx(qwsum_total, qwsum_total_idx)
+                call sub_riv_idx2ij(qwsum_total_idx, qwsum_2d)
             end if
         end if
+
         !------RSR until here
 
             tt = tt + 1
@@ -2244,7 +2318,17 @@ endif     !endif for (t*dt.ge.t_beddeform_start.and.sed_switch .ne. 0)
             if(outswitch_h_surf ==1) then
                 ofile_h_surf = trim(outfile_h_surf)//trim(t_char)//".out"
                 open(116, file = ofile_h_surf)            
-            endif   
+            endif
+
+            if (sd_out_switch==1) then
+            !call sed_output (sed,sed_idx ,t_char)!--check 5/20
+!               --> RRI_sed2.f90 line 745
+            !if(sed_switch==1)then!--check 5/20
+                !call sed_output2(sed,t_char, dzb_temp,sumdzb_idx,hr_idxa,qr_ave_idx,ust_idx,qsb_idx,qss_idx,sumqsb_idx,sumqss_idx)
+            !elseif(sed_switch == 2)then
+                call sed_output3(sed,t_char, dzb_temp,sumdzb_lin,hr_idxa,qr_ave_idx,ust_idx,qsb_idx,qss_idx,sumqsb_idx,sumqss_idx,area_lin)
+            !endif 
+	        endif   
 
             ! output (ascii)
             do i = 1, ny

@@ -38,6 +38,7 @@ program demAdjust2
 
     real(8), dimension(:, :), allocatable :: dem, adem, slo
     integer, dimension(:, :), allocatable :: dir, acc, adir, riv
+    integer, dimension(:, :), allocatable :: landuse, gsd_s, gsd_c
     real(8), dimension(:, :), allocatable :: width, depth, height
     integer, dimension(:, :), allocatable :: upstream
     real(8), dimension(:), allocatable :: total_length
@@ -60,6 +61,8 @@ program demAdjust2
 
     ! Start opne CGNS and Read file name
     call iric_cgns_open()
+    call cg_iric_clear_sol(cgns_f, ier)
+    if (ier /= 0) stop "Failed to clear previous calculation results"
     call cg_iric_read_string(cgns_f, "demfile", infile_dem, ier)
     call cg_iric_read_string(cgns_f, "accfile", infile_acc, ier)
     call cg_iric_read_string(cgns_f, "dirfile", infile_dir, ier)
@@ -444,9 +447,13 @@ program demAdjust2
     ! STEP 9 : Make River width, depth, leavy height
     ! river widhth, depth, leavy height, river length, river area ratio
     allocate (riv(ny, nx), width(ny, nx), depth(ny, nx), height(ny, nx))
+    allocate (landuse(ny, nx), gsd_s(ny, nx), gsd_c(ny, nx))
     width = 0.d0
     depth = 0.d0
     height = 0.d0
+    landuse = 1
+    gsd_s = 1
+    gsd_c = 1
 
     call cg_iric_read_integer(cgns_f, "riv_thresh", riv_thresh, ier)
     call cg_iric_read_real(cgns_f, "width_param_c", width_param_c, ier)
@@ -471,14 +478,18 @@ program demAdjust2
 
     write (*, *) "Done STEP 10"
 
-    !CGNSファイルに出力
+    ! Recreate the structured grid before writing cell attributes.
     call cg_iRIC_Write_Grid2d_Coords(cgns_f, nx + 1, ny + 1, gxx, gyy, ier)
+    if (ier /= 0) stop "Failed to recreate the calculation grid"
     call iric_write_cell_real("elevation_c", nx, ny, adem)
     call iric_write_cell_integer("dir_c", nx, ny, dir)
     call iric_write_cell_integer("acc_c", nx, ny, acc)
     call iric_write_cell_real("width_c", nx, ny, width)
     call iric_write_cell_real("depth_c", nx, ny, depth)
     call iric_write_cell_real("height_c", nx, ny, height)
+    call iric_write_cell_integer("landuse_c", nx, ny, landuse)
+    call iric_write_cell_integer("GSD_s", nx, ny, gsd_s)
+    call iric_write_cell_integer("GSD_c", nx, ny, gsd_c)
     call iric_cgns_close()
 
 end program demAdjust2

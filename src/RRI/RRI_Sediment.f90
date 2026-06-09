@@ -22,7 +22,7 @@
 ! 2015/12/29 added by yorozuya
 !         real(8) Es_idx(riv_count), Ds_idx(riv_count), Ew_idx(riv_count), Dw_idx(riv_count)
          
-         integer k, kk, kkk, m, n, kkk1,f,nn
+         integer k, kk, kkk, m, n, f,nn
          integer kk_div
          real(8) :: u_flax, Frn
          real(8) :: Emb_min
@@ -1108,7 +1108,7 @@ endif
 				!	sed_idx(k)%qbi(m) = 0.0
 !				elseif(hs_l > hr_idxa(k)*0.2d0)then  !check this criteria
 !					sed_idx(k)%qbi(m) = 0.d0
-				elseif(hr_idxa(k) < 0.1)then       !check this criteria
+				elseif(hr_idxa(k) < min_hr)then       !check this criteria
 					sed_idx(k)%qbi(m) = 0.d0	
 				else
 					C_K1 = 1./cos(thetr)/(tan(S_angle)-tan(thetr))
@@ -1174,7 +1174,7 @@ endif
 ! added by Harada
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-       subroutine funcd2( sed_lin, hr_idx, hr_idx2,hr_idxa, hr_lin, qr_ave_idx, ust_idx, ust_lin,  qsb_lin, qss_lin, qsw_idx, qsw_lin, t,water_v_lin, dzb_temp_lin,qss_b)
+       subroutine funcd2( sed_lin, hr_idx, hr_idx2,hr_idxa, hr_lin, qr_ave_idx, ust_idx, ust_lin,  qsb_lin, qss_lin, qsw_idx, qsw_lin, t,water_v_lin, dzb_temp_lin,qss_b,sumdzb_lin)
 		use globals
 		use sediment_mod
 		use dam_mod!, only:dam_switch,dam_num,dam_loc, damflg, dam_w_vol,dam_reserv_area ! added by Qin 
@@ -1190,12 +1190,12 @@ endif
 		real(8) qsb_lin(link_count), qss_lin(link_count), qsw_lin(link_count)
 		real(8) qss_b(link_count) !added by Qin 2021/5/27
 		real(8) qd_sum_idx(riv_count)
-		real(8) dzb_temp_lin(link_count)
+		real(8) dzb_temp_lin(link_count),sumdzb_lin(link_count)
 		real(8) water_v_lin(link_count)
 		real dzb_cap, ffd_total, slope11, h, thetr
 		integer t
 		
-		integer k, kk, kkk, m, n, kkk1, l, ll,lll,f, h_dam
+		integer k, kk, kkk, m, n, l, ll,lll,f, h_dam, k_put
 		integer kk_div
 		real(8) :: u_flax, Frn,thet
 		real(8) ::  Emb_min 
@@ -1203,7 +1203,7 @@ endif
 		!Driftwood
 		real(8), parameter :: C_Dw = 0.4d0
 		real(8), parameter :: C_Dr = 0.8d0
-		real(8) :: C_rt, D_depo, D_ero,chan_capa ,wid, expa_rate, divloss
+		real(8) :: C_rt, D_depo, D_ero,chan_capa ,wid, expa_rate, divloss, S_D
 		
 		qd_sum_idx(:) = 0.d0
 		Emb_min = Emc
@@ -1285,13 +1285,24 @@ endif
 		k = link_idx_k(l)
 		do
 			if(node_ups(k).ge.1.or.up_riv_idx(k,1).eq.0) then
-				if(hr_idx(k)> depth_idx_ini(k)*0.9.and.depth_idx(k)<depth_idx_ini(k)) n_link_depth(l) = 1
+				if(hr_idx(k)> depth_idx_ini(k)*0.9.and.depth_idx(k)<depth_idx_ini(k))then
+					n_link_depth(l) = 1
+					!write(*,*) k, l, hr_idx(k), depth_idx_ini(k), depth_idx(k)
+					!stop
+				end if
 				exit
 			end if
-			if(hr_idx(k)> depth_idx_ini(k)*0.9.and.depth_idx(k)<depth_idx_ini(k)) n_link_depth(l) = 1
+			if(hr_idx(k)> depth_idx_ini(k)*0.9.and.depth_idx(k)<depth_idx_ini(k))then
+				n_link_depth(l) = 1
+				!write(*,*) k, l, hr_idx(k), depth_idx_ini(k), depth_idx(k)
+				!stop
+			end if
 			k = up_riv_idx(k,1)
 		end do
-		if(depth_idx(k) < min_hr*2. ) n_link_depth(l) = 1
+!		if(depth_idx(k) < min_hr*2. )then
+!			n_link_depth(l) = 1
+!			write(*,*) k, l, depth_idx(k),min_hr
+!		end if
 	end do
 
 	do l = 1,link_count
@@ -1415,6 +1426,46 @@ if(debris_switch == 1)then !20230924
 endif
 !$omp end single 
 
+!-----added 20260220 sedput gradually
+!$omp single
+if(j_sedput == 1)then
+  do l = 1, link_count
+   k = link_idx_k(l)
+   put_depth(l) = 0.d0
+	if(area_lin(l) > 100. .and. Emb_lin(l)>0.01) then
+	 if( put_depth_remain(l) > Emb_lin(l)*0.01 ) then  !avoid huge deposition in small link
+	    if(sumdzb_lin(l) < 40.)then !check this condition
+	 		put_depth(l) = Emb_lin(l)*0.01
+			put_depth_remain(l) = put_depth_remain(l) - put_depth(l)
+		end if
+	 else
+		put_depth(l) = put_depth_remain(l)
+		put_depth_remain(l) = 0.d0
+	end if
+	else   !for very small link
+	 if( put_depth_remain(l) > Emb_lin(l)*0.0005 ) then
+	 	put_depth(l) = Emb_lin(l)*0.0005
+		put_depth_remain(l) = put_depth_remain(l) - put_depth(l)
+	 else
+		put_depth(l) = put_depth_remain(l)
+		put_depth_remain(l) = 0.d0
+	 end if
+	end if
+
+	if(put_depth_remain(l)<0.) put_depth_remain(l) =0.
+  end do
+  
+  k_put = 0
+  do l = 1, link_count
+	if(put_depth(l) > 0. .or. put_depth_remain(l) > 0.)then
+		k_put = k_put + 1
+	end if
+  end do
+  if(k_put == 0) j_sedput = 0
+
+end if
+!$omp end single
+
 !	if(slo_sedi_cal_switch==0)then    ! added 20240806
 !	    do k = 1, slo_count
 !			do m = 1, Np
@@ -1437,10 +1488,10 @@ endif
 !			if(link_0th_order(l) == 0) sed_lin(l)%ffd(m) = 0.d0 !!0th order channel: unlimit supply (no beddeform at upstream end);2021/6/14
 		!sed_lin(l)%dzbpr(m) = - ddt * sed_lin(l)%ffd(m) * dlambda !?P???[m]	
 		sed_lin(l)%dzbpr(m) = - ddt * sed_lin(l)%ffd(m) * dlambda + fmslo(k,m)*vo_total_river(l)/area_lin(l)*dlambda   !debris supply was added
-!-------Sediment put at initial   (For putting sedient, size distribution fmslo(k,m) is employed)
-		if(j_sedput == 1 .and. l == l_sedput)then
-			sed_lin(l)%dzbpr(m) = sed_lin(l)%dzbpr(m) + fm_sedput(l,m)*sedput_depth
-		end if	
+!-------Sediment put: put_depth is bulk bed thickness including voids [m].
+		if(j_sedput == 1 .and. l_put(l) == 1 )then
+			sed_lin(l)%dzbpr(m) = sed_lin(l)%dzbpr(m) + fm_sedput(l,m)*put_depth(l)
+		end if
 !---added 20211126		
 		sed_lin(l)%Esisum(m) = sed_lin(l)%Esisum(m) + sed_lin(l)%Esi(m)*ddt
 		sed_lin(l)%Dsisum(m) = sed_lin(l)%Dsisum(m) + sed_lin(l)%Dsi(m)*ddt			
@@ -1603,55 +1654,61 @@ endif
 			!endif
 		enddo
    endif			
-  j_sedput = 0 
+  !j_sedput = 0 
 
 if(j_drf == 1)then
-!$omp parallel do private(k,C_rt,D_depo,D_ero)  
+!!$omp parallel do private(k,C_rt,D_depo,D_ero,S_D, kkk1)  
 	do l = 1, link_count
 		k = link_idx_k(l)
-		if(hr_idxa(k) < 0.01)then
+		if(hr_idxa(k) < min_hr)then
 			cw(l) = 0.d0
 		elseif(domain_riv_idx(k).eq.2) then
 			!cw(l) = 0.d0 !no DW in downstream end
 		else
 		
 		!Driftwood erosion and deposition
-			if(dzb_temp_lin(l) > 0.d0) then   !Deposition
+			if(dzb_temp_lin(l) > 0.d0) then   !Sediment Deposition
 				if(hr_idxa(k)> 2.d0*C_Dw)then
 					C_rt=0.
                 else
                 	C_rt=-0.5d0*hr_idxa(k)/C_Dw+1.d0
 				end if
-				cw(l) = cw(l) + (-1.*qwsum(l) - C_rt*cw(l)*Csta*dzb_temp_lin(l)*area_lin(l)/ddt) * ddt/water_v_lin(l)
-				vw(l) = vw(l) + ddt*C_rt*cw(l)*Csta*dzb_temp_lin(l)/ddt
+				cw(l) = cw(l) + (-1.*qwsum(l) - C_wood_kd*C_rt*cw(l)*(1.-Csta)*dzb_temp_lin(l)*area_lin(l)/ddt) * ddt/water_v_lin(l)   !C_wood_kd added 20251023
+				vw(l) = vw(l) + ddt*C_wood_kd*C_rt*cw(l)*(1.-Csta)*dzb_temp_lin(l)/ddt                                                 !C_wood_kd added 20251023
 				if(cw(l).lt.0.0) then 
-					cw(l) = cw(l) - (-1.*qwsum(l) - C_rt*cw(l)*Csta*dzb_temp_lin(l)*area_lin(l)/ddt) * ddt/water_v_lin(l)  !一回戻して
+					cw(l) = cw(l) - (-1.*qwsum(l) - C_wood_kd*C_rt*cw(l)*(1.-Csta)*dzb_temp_lin(l)*area_lin(l)/ddt) * ddt/water_v_lin(l)  !一回戻して  !C_wood_kd added 20251023
 					D_depo = cw(l)*hr_idxa(k) + qwsum(l)*ddt/area_lin(l)
 					if(D_depo < 0.d0) D_depo = 0.d0
 					cw(l) = 0.d0
 					vw(l) = vw(l) + D_depo
 				end if
-			else 							  !Erosion
+			else 							  !Sediment Erosion
 				if(hr_idxa(k)>= 2.*C_Dw)then
 					C_rt=1.d0
 				else
 					C_rt=0.5d0*hr_idxa(k)/C_Dw
 				endif
-				cw(l) = cw(l) + (-1.*qwsum(l) - C_rt*vw(l)/C_Dr*Csta*dzb_temp_lin(l)*area_lin(l)/ddt) * ddt/water_v_lin(l)
-				vw(l) = vw(l) + ddt*C_rt*vw(l)/C_Dr*Csta*dzb_temp_lin(l)/ddt
+				S_D = vw(l)/C_Dr       !20260223 added S_D (=S/D) to avoid huge erosion 
+				if(S_D > 1.) S_D = 1.
+				if(cw(l) < alpha_ss1 )then    !20260223 added this if statement
+					cw(l) = cw(l) + (-1.*qwsum(l) - C_rt*S_D*(1.-Csta)*dzb_temp_lin(l)*area_lin(l)/ddt) * ddt/water_v_lin(l)
+					vw(l) = vw(l) + ddt*C_rt*S_D*(1.-Csta)*dzb_temp_lin(l)/ddt
+				else      ! cw(l) > alpha_ss1     no wood entrainment, transport only
+					cw(l) = cw(l) + (-1.*qwsum(l)) * ddt/water_v_lin(l)
+				end if
 				if(vw(l).lt.0.0) then
-					vw(l) = vw(l) - ddt*C_rt*vw(l)/C_Dr*Csta*dzb_temp_lin(l)/ddt
+					vw(l) = vw(l) - ddt*C_rt*S_D*(1.-Csta)*dzb_temp_lin(l)/ddt
 					D_ero = -vw(l)
 					cw(l) = cw(l) + (-1.*qwsum(l) - D_ero*area_lin(l)/ddt) * ddt/water_v_lin(l)
 					vw(l) = 0.d0
 					if(cw(l).lt.0.d0) cw(l) = 0.d0
 				end if
 			end if
-			qw(l) = cw(l) * qr_ave_idx(k)
 		end if
+		qw(l) = cw(l) * qr_ave_idx(k)
+		qwsum_total(l) = qwsum_total(l) + qw(l)*ddt
 	enddo
 end if
-
 
 !pause'before call washload'
 !          call washload(sed_idx, hr_idxa,  ust_idx, qsw_idx, qr_ave_idx, dzb_temp, width_idx, len_riv_idx)
@@ -1948,7 +2005,7 @@ divloss =1.d0
 	  enddo
 
 !pause'1'
-!$omp parallel do private(k,m,ss_c,ss_q)
+!$omp parallel do private(k,m)
     do l = 1, link_count
 		k = link_idx_k(l)
 		if(damflg(k)>0) cycle
@@ -1968,20 +2025,24 @@ divloss =1.d0
 				if (isnan(sed_lin(l)%ssi(m))) then !check 2022/4/7
 					write(*,*) l, k,m,sed_lin(l)%qsi(m),qr_ave_idx(k),water_v_lin(l),slo_vol_remain(l,m)
 					stop "ssi is Nan"
-				endif		
+				endif	
 				sed_lin(l)%qsi(m) = sed_lin(l)%ssi(m)*qr_ave_idx(k)	
 				slo_vol_remain(l,m) = 0.d0
 				ss_lin(l) = ss_lin(l) + sed_lin(l)%ssi(m)
 				qss_b(l) = qss_b(l)+sed_lin(l)%qsi(m) !added by Qin 2021/5/30
 	   		enddo
-		endif   
+		end if
+	end do  !20260223
 !pause'2'
-
-!pause'3'
-	    if(ss_lin(l).gt.alpha_ss2) then
+!$omp single
+    do l = 1, link_count    !20260223 added this loop to evaluate ss_lin(l) properly
+		k = link_idx_k(l)
+		if(damflg(k)>0) cycle
+	    if(ss_lin(l) > alpha_ss2) then
 	    	ss_c = 0.d0
 	    	ss_q = 0.d0
 			do m = 1, Np
+				!write(*,*)'l, m, ss_lin(l),slo_vol_remain(l,m) ',l, m, ss_lin(l),slo_vol_remain(l,m)
 				slo_vol_remain(l,m) = sed_lin(l)%ssi(m) / ss_lin(l) * (ss_lin(l)-alpha_ss2)*water_v_lin(l) ! To avoid the high concentration suspended sediment flow due to the large sediment supply from slope erosion 2022/3/30
 	!			slo_vol_remain(l,m) = sed_lin(l)%ssi(m) / ss_lin(l) * (ss_lin(l)-alpha_ss2)*qr_ave_idx(k)*ddt! To avoid the high concentration suspended sediment flow due to the large sediment supply from slope erosion 20230924
 				if (isnan(slo_vol_remain(l,m))) then !check 2021/6//3
@@ -1992,19 +2053,23 @@ divloss =1.d0
 				sed_lin(l)%ssi(m) = sed_lin(l)%ssi(m) / ss_lin(l) * alpha_ss2
 				sed_lin(l)%qsi(m) = sed_lin(l)%ssi(m)*qr_ave_idx(k) ! To avoid the high concentration suspended sediment flow due to the large sediment supply from slope erosion 2022/3/30
 				ss_c = ss_c + sed_lin(l)%ssi(m)
-				ss_q = ss_q+sed_lin(l)%qsi(m) 
+				ss_q = ss_q+sed_lin(l)%qsi(m)
+				!write(*,*)'l, m, slo_vol_remain(l,m) ',l, m, slo_vol_remain(l,m)
 		 	enddo
 		 	ss_lin(l) =  ss_c
 		 	qss_b(l) = ss_q
+			!write(*,*)'l, ss_lin(l) ',l, ss_lin(l) 
+			!stop
 	    endif
 	
-		!----Driftwood setting
+		!----Driftwood setting  
 		if(j_drf ==1)then
 			if(qr_ave_idx(k).le.1e-2) cw(l) = 0.d0
 			cw(l) = qw(l)/qr_ave_idx(k)
-			if(cw(l).gt.alpha_ss1) cw(l) = alpha_ss1
+!			if(cw(l).gt.alpha_ss1) cw(l) = alpha_ss1   !removed 20250225
 		end if
     enddo
+!$omp end single
 !pause'before deposition yoro-work'
 
 !------------------calculation of Erosion and Deposition of suspended sediment
@@ -2142,7 +2207,7 @@ divloss =1.d0
 		end if
 	end do
 
-!$omp parallel do private(k,m,n,lll)
+!!$omp parallel do private(k,m,n,lll,divloss,f)
 !--------------------trasportation of suspended sediment
   	do l = 1, link_count
 		k = link_idx_k(l)
@@ -2181,7 +2246,7 @@ divloss =1.d0
   	end do
 !pause'sum of ssload'
 
-!$omp parallel do private(k,m,alfa2)	  
+!!$omp parallel do private(k,m,alfa2)	  
 	do l = 1, link_count
 		k = link_idx_k(l) 	
 		ss_lin(l) = 0.d0 !20220512 
@@ -2226,7 +2291,6 @@ divloss =1.d0
 			
 		if (ss_lin(l).gt.alpha_ss2) then
 			do m =1, Np
-			!if(thet.gt.8.d0 .and. link_0th_order(l)==0)then!modified 20221206
 				slo_vol_remain(l,m) = slo_vol_remain(l,m)+ sed_lin(l)%ssi(m) / ss_lin(l) * (ss_lin(l)-alpha_ss2)*water_v_lin(l) ! no bed variation at upstream end unit channel (>8 degree) 20221206
 				if (isnan(slo_vol_remain(l,m))) then !check 2021/6//3
 					write(*,*) l, k,m,sed_lin(l)%qsi(m),sed_lin(l)%ssi(m),ss_lin(l),alpha_ss2,qr_ave_idx(k),water_v_lin(l), hr_lin(l)
@@ -2530,7 +2594,7 @@ do
 			if(debris_switch.ne.0)then		
 			!if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1)cycle !modified for gofukuya river 20231101;20240121	
 			!if(slo_grad(k).ge.0.25) cycle !20240126
-			if(hki_g(k)>0) cycle 	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
+			if(hki_g(k)>0.) cycle 	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
 			endif
 !	write(*,*) "check1205 01"				
             !if(riv(i,j) == 1) cycle !modified 20230711 for inundation				
@@ -2856,7 +2920,7 @@ do
 !modified 20240115			
 			if(debris_switch.ne.0)then		
 			!if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1) exit !modified for gofukuya river 20231101;20240121	
-			if(hki_g(k)>0) exit	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
+			if(hki_g(k)>0.) exit	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
 			endif		
 				do n = 1, 8
 				if(up_slo_idx(k,n) == 0) exit 
@@ -2894,7 +2958,7 @@ do
 			if(debris_switch.ne.0)then		
 			!if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1) exit !modified for gofukuya river 20231101;20240121	
 			!if(slo_grad(k).ge.0.25) exit !20240126
-			if(hki_g(k)>0) exit	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
+			if(hki_g(k)>0.) exit	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
 			endif	
 			x_up_inflow=0.d0
 			y_up_inflow =0.d0
@@ -2956,7 +3020,7 @@ do
 			if(debris_switch.ne.0)then		
 			!if(slo_grad(k).ge.0.25.and.zb(i,j)>100.d0 .and. riv(i,j).ne.1) cycle !modified for gofukuya river 20231101;20240121	
 			!if(slo_grad(k).ge.0.25) cycle !20240126
-			!if(hki_g(k)>0) cycle	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
+			!if(hki_g(k)>0.) cycle	! no suspended sediment transportation taking place in debris flow grid cell; modified for gofukuya river 20240109	
 			endif		
 		ss_slope(k) = 0.d0
 		qss_slope(k) = 0.d0
@@ -2965,7 +3029,7 @@ do
 			do m = 1, Np
 				soildepth_fp_before = (slo_sur_zb(k)-zb_slo_idx(k))*fmslo(k,m) 
 				soildepth_fp_idx = soildepth_fp_before
-			!	if(water_v_cell(k).le.0.d0.or.hki_g(k)>0)then !modified for gofukuya 20240109
+			!	if(water_v_cell(k).le.0.d0.or.hki_g(k)>0.)then !modified for gofukuya 20240109
 				if(riv(i,j)==1 .or. water_v_cell(k).le.0.d0)then
 						if(slo_Dsi(k,m)>1.)then
 						write(*,*) k, m, slo_Dsi(k,m),dsi(m), w0(m), slo_ssi(k,m), qrs(i,j), slo_qsisum(k,m)
@@ -3269,9 +3333,9 @@ enddo
 				h = ha - dap
 				hsp = D
 				pw(k) = pwc
-			elseif( ha > pwc )then
+			elseif( ha > pwc*D )then
 				h = 0.d0
-				hsp = ha - pwc*D/(lambda-pwc)
+				hsp = (ha - pwc*D)/(lambda-pwc)
 				pw(k) = pwc
 			elseif( ha >= 0.d0 )then
 				h = 0.d0
@@ -3367,7 +3431,7 @@ enddo
 			ao=(d_mp*sat + h ) * dis
 			vo=ao*b_mp
 			hkiarea = dis*b_mp
-			hki_g(k) = hki_g(k) + 1
+			hki_g(k) = hki_g(k) + 1.
 
 			kk = k
 			kkk = down_slo_1d_idx(k)
@@ -3378,7 +3442,7 @@ enddo
 				ii = slo_idx2i(kkk)
 				jj = slo_idx2j(kkk)
 				d_mp=soildepth_idx_deb(kk)
-				if(hki_g(kk)==0) d_mp = d_mp_ini   !caution !turned off at 20250122  !modified 20250219
+				if(hki_g(kk)<=0.0001) d_mp = d_mp_ini   !caution !turned off at 20250122  !modified 20250219
 				if( domain(i,j) == 0 ) exit
 				if( d_mp == 0.d0 )exit
 				if( riv(i,j) == 1 )then
@@ -3421,7 +3485,7 @@ enddo
 
 				if(tane <= tant)then !erosion
 					!write(*,*) 'Erosion'
-					if(hki_g(kk)==0)then     !20230319 to avoid double count
+					if(hki_g(kk)<=0.0001)then     !20230319 to avoid double count
 						dz_mp=d_mp !/cost
 					else
 						dz_mp=0.0001
@@ -3430,7 +3494,7 @@ enddo
 					if(d_mp*cost < ldelt)then
 						ldelt=d_mp*cost
 					end if
-					if(hki_g(kk)==0)then
+					if(hki_g(kk)<=0.0001)then
 						a=ao + dis*ldelt*sat +dis*h   !20230319 to avoid double count
 					else
 						a=ao
@@ -3513,12 +3577,12 @@ enddo
 				vol(kk)=vol(kk)+v
 				vcc(kk)=vcc(kk)+v*cc
 				vcf(kk)=vcf(kk)+v*(1.d0-cc)*cf
-				if(hki_g(kk)==0)then              !added 20230317
+				if(hki_g(kk)<=0.0001)then              !added 20230317
 					hkiarea = hkiarea + dis*b_mp
 				end if
 !				write(*,*)'k,kk,hki_g(kk),a,hkiarea,soil_depth,hs',k, kk, hki_g(kk), a, hkiarea,soildepth_idx(kk),hs_idx(kk)
 				
-				hki_g(kk) = hki_g(kk) + 1
+				hki_g(kk) = hki_g(kk) + 1.
 				if(a==0.d0)then
 					write(*,'(a,5i5,5f10.3)')'exit:a=0',i,j,ii,jj,0,a,cc
 					exit
@@ -3550,9 +3614,9 @@ enddo
 			h = ha - dap
 			hsp = D
 			pw_mp = pwc
-		elseif( ha > pwc )then
+		elseif( ha > pwc*D )then
 			h = 0.d0
-			hsp = ha - pwc*D/(lambda-pwc)
+			hsp = (ha - pwc*D)/(lambda-pwc)
 			pw_mp = pwc
 		elseif( ha >= 0.d0 )then
 			h = 0.d0

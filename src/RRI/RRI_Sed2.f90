@@ -2119,43 +2119,42 @@ endif
 	     type(sed_struct) sed(ny,nx)
 		 type(sed_struct) sed_idx(riv_count)
          character*6 t_char
-         integer i, ios, m, k,n,nn,nbl 
+         integer i, ios, m, k,n,nn,nbl, maxloc
+		 character*256 name(100)
 ! outfile
          character*256 outfile
 
-! target point
-         character*256 name(100)
-         integer target_i(100), target_j(100), maxloc
-         
-! read location file
-         open( 5, file = sdt_location, status = "old")
-             i = 1
-             do
-                 read(5,*,iostat=ios) name(i), target_i(i), target_j(i)
-                 if(ios.ne.0) exit
-                 i = i + 1
-             enddo
-             maxloc = i-1
-         close(5)
+! target point !modified 20260208
+		 maxloc = 0
+		 i = 1
+		 do 
+		 	if(itar(i)==0.and.jtar(i)==0)then
+				exit
+			else
+				maxloc = i
+				write(name(i), '(A,I0)') 'No.', maxloc
+				i = i + 1
+			end if
+		 end do
          
 ! output
          do i = 1, maxloc
              outfile = trim(sdout_file) // trim(name(i)) // trim(t_char) // ".txt"
-			 k = riv_ij2idx(target_i(i), target_j(i))
+			 k = riv_ij2idx(itar(i), jtar(i))
              open(30, file = outfile)
 			     write(30,*) "di        fm        ft    fsur      csi             f_qbi         f_qsi"
 
 				 do m = 1, Np
 
-			 write(30,'(1000es10.3)')sed(target_i(i),target_j(i))%dsed(m),&
-                            sed(target_i(i),target_j(i))%fm(m),&
-			    sed(target_i(i),target_j(i))%ft(m),sed_idx(k)%fsur(m),sed_idx(k)%ssi(m),sed_idx(k)%fqbi(m),sed_idx(k)%fqsi(m)
+			 write(30,'(1000es10.3)')sed(itar(i),jtar(i))%dsed(m),&
+                            sed(itar(i),jtar(i))%fm(m),&
+			    sed(itar(i),jtar(i))%ft(m),sed_idx(k)%fsur(m),sed_idx(k)%ssi(m),sed_idx(k)%fqbi(m),sed_idx(k)%fqsi(m)
 		        end do
 			 write(30,*) 
-			 write(30,'(a, es15.7)') 'dmean=', sed(target_i(i),target_j(i))%dmean
-			 write(30,'(a,es15.7)') 'D90= ', sed(target_i(i),target_j(i))%Bed_D90
-			 write(30,'(a,es15.7)') 'D60=', sed(target_i(i),target_j(i))%Bed_D60
-			 write(30,'(a,es10.3)') 'The_sampling_depth_of_bed_surface_material=', sed(target_i(i),target_j(i))%samp_dep
+			 write(30,'(a, es15.7)') 'dmean=', sed(itar(i),jtar(i))%dmean
+			 write(30,'(a,es15.7)') 'D90= ', sed(itar(i),jtar(i))%Bed_D90
+			 write(30,'(a,es15.7)') 'D60=', sed(itar(i),jtar(i))%Bed_D60
+			 write(30,'(a,es10.3)') 'The_sampling_depth_of_bed_surface_material=', sed(itar(i),jtar(i))%samp_dep
 		     close(30)
     	 enddo
 	  end subroutine sed_output
@@ -2203,7 +2202,8 @@ endif
 		enddo
 		close(301)
 	 end subroutine sed_output2	  
-	!modified 20240125 
+
+	!modified 20240125 20260608
 	subroutine sed_output3(sed,t_char, dzb_temp,sumdzb_lin,hr_idxa,qr_ave_idx,ust_idx,qsb_idx,qss_idx,sumqsb_idx,sumqss_idx)
 		use globals
 		use sediment_mod
@@ -2217,47 +2217,56 @@ endif
 		real(8) qsb_idx(riv_count),qss_idx(riv_count), sumqsb_idx(riv_count),sumqss_idx(riv_count)
 		real(8) sumdzb_lin(link_count)!,zb_riv_slope_lin(link_count)
 		character*6 t_char
-		integer i, ios, k,l,m 
-! outfile
-		character*256 outfile
+        integer i, ios, m, k,n,nn,nbl, l, maxloc
+		character*256 name(100)
+		logical :: ex
+		integer(kind=8) :: fsize
 
-! target point
-		character*20 name(100)
-		integer target_i(100), target_j(100), maxloc
+		inquire(file=outfile_sdout, exist=ex, size=fsize)
+
+		open(301, file=outfile_sdout, status='unknown', action='write', position='append', iostat=ios)
+		if (ios /= 0) stop 'Failed to open outfile_sdout'
+
+		if (.not. ex .or. fsize == 0_8) then
+    		if (j_drf == 0) then
+        		write(301,'(a)') 'Target_site     time    i      j      k     l    qr     qb      qs     di        fm       ssi(m=1,Np)(Suspended Sediment concentration)'
+    		else
+        		write(301,'(a)') 'Target_site    time     i      j     k       l       qr      qb      qs      cw       di       fm      ssi(m=1,Np)(Suspended Sediment concentration)'
+    		end if
+		end if
 		
-! read location file
-		open( 5, file = sdt_location, status = "old")
-			i = 1
-			do
-				read(5,*,iostat=ios) name(i), target_i(i), target_j(i)
-				if(ios.ne.0) exit
+! count number of target points !modified 20260208
+		 maxloc = 0
+		 i = 1
+		 do 
+		 	if(itar(i)==0.and.jtar(i)==0)then
+				exit
+			else
+				maxloc = i
+				write(name(i), '(A,I0)') 'No.', maxloc
 				i = i + 1
-			enddo
-			maxloc = i-1
-		close(5)
+			end if
+		 end do
 		
 ! output
-		outfile = "./out/sedTar/target_sed_"// trim(t_char) // ".txt"
-		open(301, file = outfile)
 		if(j_drf==0)then
-			write(301,'(a)') 'Target_site    i      j        qr             ssi(m=1,Np)(Suspended Sediment concentration)'
 			do i = 1, maxloc
-				k = riv_ij2idx(target_i(i), target_j(i))
+				k = riv_ij2idx(itar(i), jtar(i))
 				l = link_to_riv(k)
-				write(301,'(a,2i4,100f15.8)')name(i), target_j(i), ny+1-target_i(i),qr_ave_idx(k), (sed(target_i(i),target_j(i))%ssi(m),m=1,Np)
+				write(301,'(2a10,4i6,500f15.8)')name(i), t_char, itar(i), jtar(i), k, l, qr_ave_idx(k),qsb_idx(k),qss_idx(k),sed(itar(i),jtar(i))%dmean, (sed(itar(i),jtar(i))%fm(m),m=1,Np), (sed(itar(i),jtar(i))%ssi(m),m=1,Np)
 			enddo		
 		else
-			write(301,'(a)') 'Target_site    i      j        qr        cw       ssi(m=1,Np)(Suspended Sediment concentration)'
 			do i = 1, maxloc
-				k = riv_ij2idx(target_i(i), target_j(i))
+				k = riv_ij2idx(itar(i), jtar(i))
 				l = link_to_riv(k)
-				write(301,'(a,2i4,100f15.8)')name(i), target_j(i), ny+1-target_i(i), qr_ave_idx(k), cw(l), (sed(target_i(i),target_j(i))%ssi(m),m=1,Np)
+				write(301,'(2a10,4i6,100f15.8)')name(i),  t_char, itar(i), jtar(i), k, l, qr_ave_idx(k),qsb_idx(k),qss_idx(k),cw(l), sed(itar(i),jtar(i))%dmean, (sed(itar(i),jtar(i))%fm(m),m=1,Np), (sed(itar(i),jtar(i))%ssi(m),m=1,Np)
 	
 			!write(301,*)
 			!write(301,'(a,2i,2f12.3,f10.5,3f12.3,f10.5,f15.8,f10.2,f10.5,4f12.3,f20.2, 20f15.8)') name(i), l,k,qr_ave_idx(k),hr_idxa(k), tan(zb_riv_slope_lin(l)*3.14159/180.),width_lin(l),Link_len(l),zb_riv_idx(k),ust_idx(k), dzb_temp(k) &
 			!	, sumdzb_lin(l), sed(target_i(i),target_j(i))%dmean,qsb_idx(k),qss_idx(k),sumqsb_idx(k),sumqss_idx(k),area_lin(l), slo_to_lin_sed_sum(l),(slo_to_lin_sum_di(l,m), m = 1,Np)	
 			enddo	
-		endif			
+		endif
+
 		close(301)
 	 end subroutine sed_output3	 	 	 	  
 	   	 	 	  

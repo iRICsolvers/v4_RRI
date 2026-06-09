@@ -635,6 +635,12 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
         write (*, '("cohesion: ", f12.2)') cohe
         call cg_iric_read_real(cgns_f, "pwc", pwc, ier)
         write (*, '("pwc: ", f12.2)') pwc
+        if (pwc < 0.d0 .or. pwc >= lambda) then
+            write (*, *) 'Invalid landslide parameters.'
+            write (*, *) 'pwc must satisfy 0 <= pwc < lambda.'
+            write (*, *) 'pwc =', pwc, 'lambda =', lambda
+            stop 'Invalid pwc and lambda'
+        end if
         call cg_iric_read_real(cgns_f, "pf", pf, ier)
         write (*, '("pf: ", f12.2)') pf
         call cg_iric_read_real(cgns_f, "b_mp", b_mp, ier)
@@ -671,7 +677,7 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
         infil_s_d_label='infil_s_d_'//trim(cm)
         call cg_iric_read_real(cgns_f, gullyB_label, B_gully_r(i+1), ier)      
         call cg_iric_read_real(cgns_f, gullyD_label, D_gully(i+1), ier)     
-        call cg_iric_read_real(cgns_f, infil_s_d_label, infil_s_depth(i+1), ier)  
+        call cg_iric_read_real(cgns_f, infil_s_d_label, infil_s_depth(i+1), ier) 
         enddo
     endif
 
@@ -689,6 +695,8 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
     write (*, '("j_drf : ", i7)') j_drf
     call cg_iric_read_real(cgns_f, "Wood_density", Wood_density, ier)
     write (*, '("Wood_density : ", f12.5)') Wood_density
+    call cg_iric_read_real(cgns_f, "C_wood_kd", C_wood_kd, ier)
+    write (*, '("Wood_deposition_rate : ", f12.5)') C_wood_kd
 
  !------Advanced setting eps 20240724
         !call cg_iric_read_real(cgns_f, "eps", eps, ier)
@@ -736,6 +744,27 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
              DEALLOCATE(ytmp, STAT = ier)
 
         endif
+
+ !---modified for sedput 20251002  !caution i adn j are opposite in case of iRIC interface
+    ! put_v is the bulk sediment volume including voids [m3].
+    call cg_iric_read_integer(cgns_f, "j_sedput", j_sedput, ier)
+    call cg_iric_read_integer(cgns_f, "j_woodput", j_woodput, ier)
+    write (*, '("j_sedput : ", i7)') j_sedput
+    if(j_sedput>0) then
+        nm_cell =9 !tentative
+        allocate (iput(nm_cell+1), jput(nm_cell+1),put_v(nm_cell+1),put_w(nm_cell+1))
+        do i = 0, nm_cell
+            write(cm,'(i1)') i
+            iput_label = 'put_i_'//trim(cm)  
+            jput_label = 'put_j_'//trim(cm)  
+            put_v_label ='put_v_'//trim(cm)
+            put_w_label ='put_w_'//trim(cm)
+            call cg_iric_read_integer(cgns_f, iput_label, iput(i+1), ier)      
+            call cg_iric_read_integer(cgns_f, jput_label, jput(i+1), ier)     
+            call cg_iric_read_real(cgns_f, put_v_label, put_v(i+1), ier)
+            call cg_iric_read_real(cgns_f, put_w_label, put_w(i+1), ier)  
+        enddo
+    endif
 
 
  !------Advanced output setting 20240724
@@ -802,6 +831,25 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
         call cg_iric_read_string(cgns_f, "outfile_h_surf", outfile_h_surf, ier)
         write(*,'("outfile_h_surf: ", a)') trim(adjustl(outfile_h_surf))
     end if
+
+!added 20260208
+    outfile_sdout = ''
+    call cg_iric_read_integer(cgns_f, "sd_out_switch", sd_out_switch, ier)
+    if (sd_out_switch == 1)then
+        call cg_iric_read_string(cgns_f, "outfile_sdout", outfile_sdout, ier)
+        write(*,'("outfile_sdout : ", a)') trim(adjustl(outfile_sdout))
+        nm_cell =9 !tentative
+        allocate (itar(nm_cell+1), jtar(nm_cell+1),itar2(nm_cell+1), jtar2(nm_cell+1))
+        do i = 0, nm_cell
+            write(cm,'(i1)') i
+            i_tar_label = 'tar_i_'//trim(cm)  
+            j_tar_label = 'tar_j_'//trim(cm)  
+            call cg_iric_read_integer(cgns_f, i_tar_label, itar2(i+1), ier)      
+            call cg_iric_read_integer(cgns_f, j_tar_label, jtar2(i+1), ier) 
+            ! Caution i and j are opposite in case of iRIC interface
+        enddo
+    endif
+
 !---tentatively turn off the channel width expansion and over deposition cutting 20250122
     riv_wid_expan_switch = 0 
     !cut_overdepo_switch = 0

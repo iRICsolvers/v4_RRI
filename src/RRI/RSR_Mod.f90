@@ -84,6 +84,7 @@
          character*256 outfile_slope
          character*256 outfile_overflow_sed_vol
          character*256 outfile_h_surf !added 20250405
+         character*256 outfile_sdout  !added 20260208
       
 
          character*256 outfile_qsb1
@@ -156,6 +157,8 @@
 	     integer sd_out_switch
 	     character*256 sdt_location, sdout_file
        character*256 time_output!for yazagyodam
+       character(50) :: i_tar_label, j_tar_label !added 20260208
+       integer, allocatable,save :: itar(:), jtar(:), itar2(:), jtar2(:)   !added 20260208
 
 	     real(8), allocatable, save :: zb_rock(:,:), Emb(:,:), Et(:,:)
 	     real(8), allocatable, save :: zb_roc_idx(:), Emb_idx(:), Et_idx(:)!, zb_air_idx(:)
@@ -237,8 +240,8 @@
          real(8),allocatable,save:: vo_total(:), vo_total_river(:), vo_total_l(:)
          real(8),allocatable,save:: debri_sup_sum(:), debri_sup_sum_di(:,:), debri_sup_sum_ij(:,:) !added 20240424
          real(8) cohe, pwc, pc, pf, b_mp, d_mp_ini
-         integer, allocatable, save :: k_LS(:), hki_g(:)
-         real(8),allocatable,save:: LS_idx(:), LS(:,:), Qg(:), water_v_cell(:)
+         integer, allocatable, save :: k_LS(:)
+         real(8),allocatable,save:: LS_idx(:), LS(:,:), Qg(:), water_v_cell(:), hki_g(:), hki_g_2d(:,:)
          real(8) debris_total, L_rain_ini, wood_total, hki_total
          real(8) T_bebris_off !added for setting the time to switch off debris flow and lanslide computation
          integer debris_end_switch   !20240724
@@ -250,14 +253,20 @@
          character*256 past_ls_file, past_debris_file
          real(8), allocatable,save:: past_ls(:,:), past_Debri_dzb(:,:)
 !--------------------added for driftwood
-         real(8) Wood_density, qwood_total
+         real(8) Wood_density, qwood_total, C_wood_kd
          integer j_drf
-         real(8),allocatable,save:: cw(:), qw(:), vw(:), qwsum(:), hki_area(:)
-         real(8),allocatable,save:: vw_idx(:), vw2d(:,:),cw_idx(:), cw2d(:,:)
+         real(8),allocatable,save:: cw(:), qw(:), vw(:), qwsum(:), hki_area(:), qwsum_total(:)
+         real(8),allocatable,save:: vw_idx(:), qwsum_total_idx(:), vw2d(:,:),cw_idx(:), cw2d(:,:), qwsum_2d(:,:)
+         integer kkk1
          !--------------------added for sediment put
-         integer j_sedput, l_sedput
+         integer j_sedput, l_sedput, j_woodput
          real(8) sedput_depth
          real(8),allocatable,save:: fm_sedput(:,:)
+         integer, allocatable,save :: iput(:), jput(:), l_put(:), iput2(:), jput2(:)   !------20251002
+         ! put_v is bulk sediment volume including voids [m3]; put_w is wood volume [m3].
+         ! put_depth and put_depth_remain are equivalent bed thicknesses [m].
+         real(8),allocatable,save:: put_v(:), put_depth(:), put_depth_remain(:), put_w(:)  !------20260220
+         character(50) :: iput_label,jput_label, put_v_label, put_w_label
 
 !---------------added for division of unit channel
         character*256 infile_divi

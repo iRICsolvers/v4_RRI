@@ -379,9 +379,12 @@ contains
             if(slo_sedi_cal_switch>0) call iric_write_result_real ('Total sediment supply volume from slope to unit channel[m3]', slo_supply)
             if(slo_sedi_cal_switch>0) call iric_write_result_real ('Total sediment overflow volume from unit channel[m3]', overflow_sed_sum) 
             if(debris_switch==1) call iric_write_result_real('Land slide occurence', LS)
-            if(debris_switch==1) call iric_write_result_real('Elevation change (debris flow) [m]', dzslo_mspnt)
+            if(debris_switch==1) call iric_write_result_real('Debris flow path', hki_g_2d)  ! hki_g_2d must be real type
+            if(debris_switch==1) call iric_write_result_real('Elevation change (debris flow) [m]', dzslo_mspnt)   !abs remove this later 20260322
             if(debris_switch==1) call iric_write_result_real('Total sediment supply from debris flow [m3]', debri_sup_sum_ij)            
             if(j_drf==1) call iric_write_result_real('Wood_deposition [m3_m2]', vw2d)
+            if(j_drf==1) call iric_write_result_real('Wood_total', qwsum_2d)
+            if(j_drf==1) call iric_write_result_real('Wood_concentration', cw2d)
             !if(sed_switch==2)
            ! call iric_write_result_real('Suspended sediment concentration[m3/m3]', ssc_ij)
             if(sed_switch==2) call iric_write_result_integer('Unit channel ID', link_ij) !added 20250328

@@ -159,6 +159,10 @@ contains
 	end do
 
 	call cg_iric_write_grid_real_cell(cgns_f, name, tmpv, ierr)
+    if (ierr /= 0) then
+      write(*,*) "Failed to write real grid attribute: ", trim(name)
+      stop "Grid attribute write failed"
+    end if
   end subroutine
   
   subroutine iric_write_cell_integer(name, nx, ny, v)
@@ -183,6 +187,10 @@ contains
 	end do
 
 	call cg_iric_write_grid_integer_cell(cgns_f, name, tmpv, ierr)
+    if (ierr /= 0) then
+      write(*,*) "Failed to write integer grid attribute: ", trim(name)
+      stop "Grid attribute write failed"
+    end if
   end subroutine
 
   !subroutine iric_read_grid()
