@@ -24,9 +24,10 @@ program check_cgns
     
     ! get run type
     call cg_iric_read_integer(idf, "run_type", run_type, ier)
+    if (ier /= 0) stop "Failed to read run_type"
     
-    open(1,file ="runtype.txt")
-    write(1,*) run_type
+    open(1, file="runtype.txt", status="replace", action="write")
+    write(1, "(i0)") run_type
     close(1)
     
     call cg_iric_close(idf, ier)    
