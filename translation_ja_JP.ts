@@ -49,8 +49,8 @@
             <translation>計算実行</translation>
         </message>
         <message>
-            <source>Data File Settings (Legacy)</source>
-            <translation>データファイル設定（旧）</translation>
+            <source>Geographic Data file</source>
+            <translation>データファイル設定</translation>
         </message>
         <message>
             <source>Dem File</source>
@@ -65,8 +65,8 @@
             <translation>Dir（流向）</translation>
         </message>
         <message>
-            <source>River Shape Parameters (Legacy)</source>
-            <translation>河道形状パラメータ（旧）</translation>
+            <source>River Shape Parameters</source>
+            <translation>河道形状パラメーター</translation>
         </message>
         <message>
             <source>Width : Cw, Sw</source>
