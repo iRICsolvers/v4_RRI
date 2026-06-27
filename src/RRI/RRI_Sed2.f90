@@ -1476,7 +1476,6 @@ subroutine debris_setting
 		implicit none
 
 		real(8), parameter :: PI = acos(-1.0d0)
-		real(8), parameter :: Phi = 35.0d0   !(deg) naibu masatu kaku deg
     real(8), parameter :: rho = 1.d0   !=1.0d0(kg/m3)  density of water
 		real(8) tanp, hsc0
     integer k

@@ -3291,7 +3291,6 @@ enddo
 
 		real(8), parameter :: PI = acos(-1.0d0)
 		real(8), parameter :: rho = 1.d0   !=1.0d0(kg/m3)  density of water
-		real(8), parameter :: Phi = 35.0d0   !(deg) naibu masatu kaku deg
 		real(8) hs_idx(slo_count)
 		real(8) :: Csta,sint,cost,tant,tanp
 		real(8) :: h, dap, ha, hsp, D
@@ -3382,7 +3381,6 @@ enddo
         implicit none
 		
 		real(8), parameter :: PI = acos(-1.0d0)
-		real(8), parameter :: Phi = 35.0d0   !(deg) naibu masatu kaku deg
 		real(8), parameter :: deg2rad = PI/180.0d0
 		real(8), parameter :: rad2deg = 180.0d0/PI
 		real(8), parameter :: rhow = 1.d0   !=1.0d0(kg/m3)  density of water

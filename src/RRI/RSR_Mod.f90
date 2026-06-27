@@ -239,7 +239,7 @@
          real(8),allocatable,save:: dzslo_mspnt_idx(:), dzslo_mspnt(:,:), soildepth_idx_deb(:)  !added 20240219
          real(8),allocatable,save:: vo_total(:), vo_total_river(:), vo_total_l(:)
          real(8),allocatable,save:: debri_sup_sum(:), debri_sup_sum_di(:,:), debri_sup_sum_ij(:,:) !added 20240424
-         real(8) cohe, pwc, pc, pf, b_mp, d_mp_ini
+         real(8) cohe, phi, pwc, pc, pf, b_mp, d_mp_ini
          integer, allocatable, save :: k_LS(:)
          real(8),allocatable,save:: LS_idx(:), LS(:,:), Qg(:), water_v_cell(:), hki_g(:), hki_g_2d(:,:)
          real(8) debris_total, L_rain_ini, wood_total, hki_total

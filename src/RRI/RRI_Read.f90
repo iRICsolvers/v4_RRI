@@ -633,6 +633,14 @@ call cg_iric_read_integer(cgns_f, "eight_dir", eight_dir, ier)
     if (debris_switch >= 1)then
         call cg_iric_read_real(cgns_f, "cohe", cohe, ier)
         write (*, '("cohesion: ", f12.2)') cohe
+        call cg_iric_read_real(cgns_f, "phi", phi, ier)
+        write (*, '("internal friction angle: ", f12.2)') phi
+        if (phi <= 0.d0 .or. phi >= 90.d0) then
+            write (*, *) 'Invalid landslide parameters.'
+            write (*, *) 'phi must satisfy 0 < phi < 90 degrees.'
+            write (*, *) 'phi =', phi
+            stop 'Invalid phi'
+        endif
         call cg_iric_read_real(cgns_f, "pwc", pwc, ier)
         write (*, '("pwc: ", f12.2)') pwc
         if (pwc < 0.d0 .or. pwc >= lambda) then
