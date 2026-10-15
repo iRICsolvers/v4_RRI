@@ -58,7 +58,7 @@
                      endif
                  endif
              enddo
-            call qr_calc(hr_idx, qr_idx) !modified 20240407
+            ! call qr_calc(hr_idx, qr_idx) ! Preserve dam/barrage discharge set above.
          endif
          
          if( div_switch > 0 ) call RRI_Div(qr_idx, hr_idx,qr_div_idx)
