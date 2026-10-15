@@ -185,17 +185,17 @@ integer i
 dam_qout(i) = 0.d0
 if (dam_discharge_switch(i) == 1) then
  
-   t = int((time+ddt)/3600)+1
+   t = max(1, min(max_dam_discharge_t, ceiling((time+ddt)/3600.d0)))
    !----
    if((time+ddt)>dam_discharge_period(t))then
     write(*,*) "error: time of dam outflow < present comupation time"
     write(*,'("Time of outflow (s): ",f15.5)') dam_discharge_period(t)
     write(*,'("Present time (s): ",f15.5)') time+ddt
    stop
-   elseif ((time+ddt) .lt. dam_discharge_period(t-1))then
+   elseif ((time+ddt) .lt. (t-1)*3600.d0)then
     write(*,*) "error: present comupation time <  previous time section of dam outflow data"
     write(*,'("Time of outflow (s): ",f15.5)') dam_discharge_period(t)
-    write(*,'("Time of previous outflow  time section (s): ",f15.5)')dam_discharge_period(t-1)
+    write(*,'("Time of previous outflow  time section (s): ",f15.5)')(t-1)*3600.d0
     write(*,'("Present time (s): ",f15.5)') time+ddt
    endif
       if(t.ge.max_dam_discharge_t) t = max_dam_discharge_t
